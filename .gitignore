@@ -1,0 +1,48 @@
+# Node / Astro
+node_modules/
+web/**/node_modules/
+web/**/dist/
+web/**/.astro/
+web/**/.output/
+web/**/.vercel/
+web/**/.netlify/
+web/**/.cache/
+web/**/.vite/
+web/**/.turbo/
+web/**/.next/
+web/**/.svelte-kit/
+web/**/coverage/
+web/**/*.log
+web/**/npm-debug.log*
+web/**/yarn-debug.log*
+web/**/yarn-error.log*
+web/**/pnpm-debug.log*
+
+# Build artifacts
+dist/
+bin/
+
+# Terraform
+**/.terraform/
+*.tfstate
+*.tfstate.backup
+.terraform.lock.hcl
+
+# IDE (root only — per-site .vscode/ ships with the scaffold)
+/.idea/
+/.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Local secrets
+.env
+.env.local
+.env.*.local
+web/**/.env
+web/**/.env.local
+web/**/.env.*.local
+web/**/.env.production
+*.pem
+*.key

@@ -1,0 +1,112 @@
+name: Bootstrap (one-shot)
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  install-labels:
+    if: github.run_number == 1
+    permissions:
+      issues: write
+      contents: read
+    uses: convergent-systems-co/repo-standards/.github/workflows/label-install.yml@v1
+    with:
+      labels-ref: v1
+      delete-others: false
+
+  bootstrap:
+    needs: install-labels
+    if: github.run_number == 1
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+      actions: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Enable secret scanning + push protection
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          gh api -X PATCH "repos/$REPO" \
+            --input - <<< '{"security_and_analysis":{"secret_scanning":{"status":"enabled"},"secret_scanning_push_protection":{"status":"enabled"}}}' \
+            || echo "WARN: secret scanning toggle requires GHAS for private repos or admin perms — skipping"
+
+      - name: File seed issues
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          existing=$(gh issue list --repo "$REPO" --search "Welcome in:title" --json number --jq '.[0].number // empty')
+          if [ -n "$existing" ]; then
+            echo "Welcome issue already exists (#$existing). Skipping seed."
+            exit 0
+          fi
+
+          mapfile -t seed_files < <(ls .github/seed-issues/*.md 2>/dev/null)
+          if [ ${#seed_files[@]} -eq 0 ]; then
+            echo "No seed-issues to file."
+            exit 0
+          fi
+
+          for f in "${seed_files[@]}"; do
+            front=$(awk '/^---$/{n++; next} n==1' "$f")
+            body=$(awk '/^---$/{n++; next} n==2' "$f")
+            title=$(echo "$front"  | grep -E '^title:'  | sed -E 's/^title: *"?(.*)"?$/\1/')
+            labels=$(echo "$front" | grep -E '^labels:' | sed -E 's/^labels: *\[(.+)\]$/\1/' | tr -d '"' | tr -d ' ')
+
+            gh issue create --repo "$REPO" \
+              --title "$title" \
+              --body  "$body" \
+              --label "$labels"
+          done
+
+          welcome=$(cat <<'WELCOME'
+          # Welcome to this repo
+
+          Bootstrapped from [`convergent-systems-co/astro-tf-app-template`](https://github.com/convergent-systems-co/astro-tf-app-template).
+
+          10 seed issues have been filed. Resolve in order — issue #1 asks you to confirm or switch the default AGPL-3.0 license:
+
+          - [ ] Choose your license (default: AGPL-3.0)
+          - [ ] Set site name, URL, and repo identity
+          - [ ] Wire CI: typecheck + build
+          - [ ] Initialize Terraform remote state backend
+          - [ ] Define minimum-viable infra (Pages project + DNS)
+          - [ ] Wire Cloudflare Pages deployment
+          - [ ] Add web vitals monitoring
+          - [ ] Review Dependabot config; enable security updates
+          - [ ] Fill CODEOWNERS for /, /infra, /.github
+          - [ ] Replace SECURITY.md stub with real policy + key
+          - [ ] Cut v0.1.0 release and first deploy
+
+          Triage and label cleanup run automatically via reusable workflows from [`repo-standards@v1`](https://github.com/convergent-systems-co/repo-standards/tree/v1).
+          WELCOME
+          )
+          gh issue create --repo "$REPO" --title "Welcome to ${REPO##*/}" --body "$welcome" --label "kind/docs,area/core,priority/low"
+
+      - name: Self-cleanup commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if [ -d ".github/seed-issues" ] || [ -f ".github/workflows/bootstrap.yml" ]; then
+            git rm -rf .github/seed-issues 2>/dev/null || true
+            git rm    .github/workflows/bootstrap.yml 2>/dev/null || true
+            if git status --short | grep -q .; then
+              git commit -m "chore: remove bootstrap scaffolding"
+              git pull --rebase
+              git push
+            else
+              echo "No scaffolding files to remove."
+            fi
+          else
+            echo "Scaffolding already cleaned up."
+          fi
