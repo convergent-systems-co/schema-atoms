@@ -26,7 +26,7 @@ schemas/
     ├── brand.schema.json        (TBD)
     ├── theme.schema.json        (TBD)
     └── common.defs.json         (shared $defs: SemVer, name slug, timestamp, signed_by)
-web/site/                        Astro static site → schema-atoms.com (serves the schemas)
+web/                             Astro static site → schema-atoms.com (serves the schemas)
 infra/terraform/                 Cloudflare Pages + DNS via core-infra v0.1.0 pages-project module
 ATOMS.yml                        catalog manifest (conforms to atoms-spec/v1)
 ```

@@ -17,12 +17,12 @@ jobs:
         with:
           node-version: "22"
           cache: "npm"
-          cache-dependency-path: web/site/package-lock.json
+          cache-dependency-path: web/package-lock.json
       - name: install
-        working-directory: web/site
+        working-directory: web
         run: npm ci
       - name: typecheck (astro check)
-        working-directory: web/site
+        working-directory: web
         run: npm run check
 
   build:
@@ -33,16 +33,16 @@ jobs:
         with:
           node-version: "22"
           cache: "npm"
-          cache-dependency-path: web/site/package-lock.json
+          cache-dependency-path: web/package-lock.json
       - name: install
-        working-directory: web/site
+        working-directory: web
         run: npm ci
       - name: build
-        working-directory: web/site
+        working-directory: web
         run: npm run build
       - name: upload dist
         uses: actions/upload-artifact@v4
         with:
           name: site-dist
-          path: web/site/dist/
+          path: web/dist/
           retention-days: 7

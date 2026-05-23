@@ -4,7 +4,7 @@ The primary Astro site for this project.
 
 ## Commands
 
-All commands are run from `web/site/`:
+All commands are run from `web/`:
 
 | Command           | Action                                       |
 | :---------------- | :------------------------------------------- |

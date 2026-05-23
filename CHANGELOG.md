@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Initial template scaffold: Astro 6 (TypeScript, static) at `web/site/`,
+- Initial template scaffold: Astro 6 (TypeScript, static) at `web/`,
   Cloudflare Pages deploy workflow, Terraform Cloudflare provider stubs in
   `infra/terraform/envs/{dev,stg,prod}/`, the same standards machinery as
   `convergent-systems-co/go-tf-app-template` (bootstrap, label sync, triage,

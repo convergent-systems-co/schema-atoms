@@ -1,5 +1,4 @@
 # Defaults
-SITE      ?= site
 ENV       ?= dev
 NPM       ?= npm
 
@@ -8,20 +7,20 @@ NPM       ?= npm
 help: ## Show this help
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "  %-20s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
-install: ## npm ci in the active site
-	cd web/$(SITE) && $(NPM) ci
+install: ## npm ci in web/
+	cd web && $(NPM) ci
 
 dev: ## Run the site's dev server
-	cd web/$(SITE) && $(NPM) run dev
+	cd web && $(NPM) run dev
 
-build: ## Build the active site into web/<site>/dist
-	cd web/$(SITE) && $(NPM) run build
+build: ## Build the site into web/dist
+	cd web && $(NPM) run build
 
-check: ## Astro check (type + diagnostics) on the active site
-	cd web/$(SITE) && $(NPM) run check
+check: ## Astro check (type + diagnostics)
+	cd web && $(NPM) run check
 
 preview: ## Preview the production build locally
-	cd web/$(SITE) && $(NPM) run preview
+	cd web && $(NPM) run preview
 
 tf-init: ## terraform init for the selected env
 	cd infra/terraform/envs/$(ENV) && terraform init
@@ -38,4 +37,4 @@ tf-fmt: ## terraform fmt over infra/
 fmt: tf-fmt ## Format everything (currently TF only)
 
 clean: ## Remove site build output
-	rm -rf web/$(SITE)/dist web/$(SITE)/.astro
+	rm -rf web/dist web/.astro
