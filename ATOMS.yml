@@ -1,0 +1,40 @@
+# ATOMS.yml — catalog manifest for schema-atoms
+#
+# See https://github.com/convergent-systems-co/atoms-spec for the canonical spec this conforms to.
+#
+# schema-atoms is the layer that holds entity schemas for the catalog system —
+# one JSON Schema per top-level type (agentic, prompt, skill, profile, brand,
+# theme, …). Distinct from atoms-spec, which governs the shape of the catalog
+# MANIFEST. See the v0.1 taxonomy spec in convergent-systems-co/atoms:
+# docs/superpowers/specs/2026-05-23-atoms-type-taxonomy-design.md
+
+name: schema-atoms
+version: 0.1.0
+spec: atoms-spec/v1
+domain: schema-atoms.com
+ecosystem:
+  federation: xdao.co
+  redirect: schema.xdao.co
+
+purpose: |
+  Canonical JSON Schemas for instance files in *-atoms catalogs. One schema per
+  top-level type, served via content-addressable $id URLs under
+  https://schema-atoms.com/v1/<type>.schema.json. Consumed by every atoms
+  catalog repo to validate its content at CI time.
+
+# schema-atoms is itself a catalog: each schema file is an atom of type `schema`.
+atomTypes: []   # TBD — the catalog's own atomTypes enumeration once authored
+
+compositionType: schemas
+compositionDir: schemas
+
+ruleTypes: []   # TBD
+
+runtimeConsumers:
+  - aish
+  - olympus
+
+license: Apache-2.0
+maintainers:
+  - name: Convergent Systems
+    contact: maintainers@xdao.co

@@ -1,72 +1,45 @@
-# astro-tf-app-template
+# schema-atoms
 
-GitHub template repository for Astro + Terraform projects in the
-[convergent-systems-co](https://github.com/convergent-systems-co) org.
+Canonical JSON Schemas for the convergent-systems-co atoms ecosystem. One schema per top-level type — `agentic`, `prompt`, `skill`, `profile`, `brand`, `theme`, … — served at content-addressable `$id` URLs that downstream catalogs reference.
 
-> Use this template, don't fork it. Click **Use this template** above.
+| | |
+|---|---|
+| **Type** | `schema` (this catalog's atoms are JSON Schema files) |
+| **Site** | [`schema-atoms.com`](https://schema-atoms.com) (apex, Cloudflare-proxied) |
+| **Schema URL pattern** | `https://schema-atoms.com/v1/<type>.schema.json` |
+| **JSON Schema draft** | 2020-12 (mandated for all schemas; see taxonomy spec §3) |
+| **Ecosystem** | Federated under `xdao.co` |
 
-## What you get
+## Status
 
-- Astro starter at `web/site/` (TypeScript, static output, Astro 6.x)
-- Multi-site convention: `web/<site-name>/` (see `web/README.md`)
-- Terraform infra layout (`modules/`, `envs/dev/stg/prod`) wired for the Cloudflare provider
-- GitHub Actions: CI (typecheck/build), TF plan, secret scan (gitleaks), release-to-Cloudflare-Pages
-- Structured issue templates (bug / feature / RFC / chore)
-- 10 seed issues filed automatically on first push
-- 28-label org standard installed automatically
-- Agentic issue triage via `repo-standards@v1` (Copilot primary, REST fallback)
-- Weekly label cleanup
-- ADR (MADR) starter, CHANGELOG (Keep-a-Changelog), Code of Conduct
-- DevContainer (Node 22 + Terraform + tflint + gh)
-- AGPL-3.0 license by default; seed issue 00 lets the consumer change it
+Bootstrap state. Repo + site scaffold are in place, no schemas authored yet. Schemas land in `schemas/v1/` per the [v0.1 type taxonomy spec](https://github.com/convergent-systems-co/atoms/blob/main/docs/superpowers/specs/2026-05-23-atoms-type-taxonomy-design.md).
 
 ## Layout
 
 ```
-web/                    Front-end sites
-  site/                 Astro 6 (TypeScript, static, minimal starter)
-  README.md             multi-site convention
-infra/                  Infrastructure-as-code
-  terraform/
-    modules/
-    envs/{dev,stg,prod}/  Cloudflare provider stubs
-docs/                   Project docs
-  adr/                  MADR-format architecture decisions
-scripts/                Project tooling
-.github/                Workflows, issue templates, dependabot, seed issues
+schemas/
+└── v1/                          ← schemas authored here; each $id pins /v1/<type>.schema.json
+    ├── agentic.schema.json      (TBD — discriminates actor/reviewer via subtype const)
+    ├── prompt.schema.json       (TBD)
+    ├── skill.schema.json        (TBD)
+    ├── profile.schema.json      (TBD)
+    ├── brand.schema.json        (TBD)
+    ├── theme.schema.json        (TBD)
+    └── common.defs.json         (shared $defs: SemVer, name slug, timestamp, signed_by)
+web/site/                        Astro static site → schema-atoms.com (serves the schemas)
+infra/terraform/                 Cloudflare Pages + DNS via core-infra v0.1.0 pages-project module
+ATOMS.yml                        catalog manifest (conforms to atoms-spec/v1)
 ```
 
-## How to use
+## Relationship to atoms-spec
 
-1. Click **Use this template** on this repo
-2. Push your first commit to `main`
-3. The bootstrap workflow runs once:
-   - Enables secret scanning + push protection (GHAS / public repos only)
-   - Installs the 28-label standard
-   - Files the 10 seed issues
-   - Files a "Welcome" meta-issue
-   - Removes itself
-4. Work through the seed issues in order, starting with the license choice
+| Repo | Governs | Example |
+|---|---|---|
+| [`atoms-spec`](https://github.com/convergent-systems-co/atoms-spec) | Shape of `ATOMS.yml` (the catalog manifest) | every catalog declares `spec: atoms-spec/v1` |
+| `schema-atoms` (this repo) | Shape of **instance files within a catalog** | `persona-atoms/agentic/coder.md` frontmatter validates against `https://schema-atoms.com/v1/agentic.schema.json` |
 
-## Local development
-
-```sh
-# install
-make install SITE=site         # or: cd web/site && npm ci
-
-# dev server (localhost:4321)
-make dev SITE=site             # or: cd web/site && npm run dev
-
-# typecheck
-make check SITE=site
-
-# build
-make build SITE=site
-
-# infra plan
-make tf-plan ENV=dev
-```
+Two layers of the same validation concern, separated by what they validate. See open question #4 in the taxonomy spec.
 
 ## License
 
-AGPL-3.0. See `LICENSE` and `COPYRIGHT`. Per-project bootstrap may override; see seed issue 00.
+Apache-2.0. See [LICENSE](LICENSE).
