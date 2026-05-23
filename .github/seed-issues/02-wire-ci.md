@@ -12,6 +12,6 @@ every PR, and that the Node version matches `package.json`'s `engines` field.
 
 - [ ] `ci.yml` runs on PR + push-to-main
 - [ ] `check` job runs `npm run check` (Astro check / TypeScript)
-- [ ] `build` job runs `npm run build` and uploads `web/site/dist/` as artifact
-- [ ] Node version in CI matches `web/site/package.json` `engines.node`
+- [ ] `build` job runs `npm run build` and uploads `web/dist/` as artifact
+- [ ] Node version in CI matches `web/package.json` `engines.node`
 - [ ] Required status check enabled on the `main` branch protection rule

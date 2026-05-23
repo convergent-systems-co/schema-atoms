@@ -3,8 +3,8 @@
 set -euo pipefail
 
 echo "Installing site dependencies…"
-(cd web/site && npm ci)
+(cd web && npm ci)
 
 echo
-echo "To start the dev server: make dev SITE=site"
+echo "To start the dev server: make dev"
 echo "To plan infra:           make tf-plan ENV=dev"
