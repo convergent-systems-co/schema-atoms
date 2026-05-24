@@ -1,0 +1,41 @@
+# signer-roles — valid signer roles per atom-schema-spec quorum_rules.
+# Atom: schema-atoms/controlled-vocabulary/signer-roles@1.0.0
+# License: CC-BY-4.0 (Convergent Systems Co.)
+# Source: ATOMS.yml signing.quorum_rules
+
+values:
+  - name: root
+    description: >
+      Top-level trust anchor for the catalog federation. A root signer can
+      authorize any quorum rule and is responsible for bootstrapping the signing
+      key hierarchy. Root signers are typically the infrastructure operator or
+      steward of the canonical catalog.
+
+  - name: editor
+    description: >
+      Subject-matter contributor who authors or significantly revises atom
+      content. Editors satisfy the editorial-review requirement in quorum rules
+      (e.g. "1 of role:catalog-maintainer + 1 of role:editor" for design-spec
+      atoms). An editor's signature attests that the content is technically
+      correct and complete.
+
+  - name: catalog-maintainer
+    description: >
+      Operator responsible for the ongoing health and consistency of the
+      schema-atoms catalog. Catalog-maintainer signatures are required by the
+      default quorum rule and by most class-specific rules. The catalog-maintainer
+      attests that the atom conforms to the atom-schema-spec and catalog policy.
+
+  - name: ratifier
+    description: >
+      Governance approver for atoms in controlled namespaces (e.g.
+      "governance/*"). A ratifier's signature attests that the atom meets the
+      governance criteria of the federation and that its promotion has been
+      reviewed at the appropriate authority level.
+
+  - name: mirror-operator
+    description: >
+      Operator of a federated mirror of the catalog. Mirror-operator signatures
+      are used in federation protocols to attest that a mirrored atom has been
+      received intact and verified against the canonical content hash. This role
+      does not grant the ability to author or promote atoms.

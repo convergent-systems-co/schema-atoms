@@ -1,0 +1,14 @@
+id          = "schema-atoms/ebnf-grammar/toml-1-0"
+version     = "1.0.0"
+content_hash = ""
+lifecycle   = "draft"
+created_at  = "2026-05-23T00:00:00Z"
+
+[ebnf_grammar]
+name        = "toml-1-0"
+description = "TOML v1.0.0 EBNF grammar — the grammar for the TOML configuration file format."
+asset       = "grammar.ebnf"
+
+[protocol]
+provenance  = "https://toml.io/en/v1.0.0 — TOML 1.0.0 specification by Tom Preston-Werner et al."
+license     = "MIT"
