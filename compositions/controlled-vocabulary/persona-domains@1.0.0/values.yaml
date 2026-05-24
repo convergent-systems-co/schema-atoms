@@ -1,0 +1,44 @@
+# persona-domains — recognized domain specializations for AI persona atoms.
+# Atom: schema-atoms/controlled-vocabulary/persona-domains@1.0.0
+# License: CC-BY-4.0 (Convergent Systems Co.)
+
+values:
+  - name: engineering
+    description: >
+      Software engineering and development. Personas in this domain focus on
+      code quality, system design, testing, CI/CD, and developer tooling.
+      Applies to roles such as coder, tech lead, and code reviewer.
+
+  - name: security
+    description: >
+      Information security and secure development. Personas in this domain
+      focus on threat modeling, vulnerability analysis, secure coding practices,
+      cryptography, and compliance. Applies to roles such as security reviewer
+      and red-team analyst.
+
+  - name: architecture
+    description: >
+      Systems and solution architecture. Personas in this domain focus on
+      high-level design decisions, architectural patterns, ADR authorship,
+      inter-system integration, and long-term structural concerns. Applies to
+      roles such as architect and tech lead.
+
+  - name: data
+    description: >
+      Data engineering, analytics, and data governance. Personas in this domain
+      focus on data models, pipelines, schema design, query optimization, and
+      data quality. Applies to roles such as data engineer and analytics engineer.
+
+  - name: documentation
+    description: >
+      Technical writing and documentation. Personas in this domain focus on
+      clarity, completeness, and maintainability of written artifacts including
+      READMEs, runbooks, ADRs, API references, and onboarding guides. Applies to
+      roles such as technical writer and docs reviewer.
+
+  - name: finops
+    description: >
+      Cloud financial operations and cost optimization. Personas in this domain
+      focus on infrastructure cost visibility, right-sizing, budget governance,
+      and cost-efficiency trade-off analysis. Applies to roles such as finops
+      analyst and cloud cost reviewer.
