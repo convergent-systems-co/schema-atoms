@@ -18,44 +18,41 @@ const totalAtoms = classes.reduce((sum, c) => sum + c.count, 0);
     <meta name="description" content="Canonical schema atoms for the convergent-systems.co atoms ecosystem." />
     <title>schema-atoms</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="stylesheet" href="/brand.css" />
     <style>
-      :root {
-        --bg: #0b0d10;
-        --fg: #e8e8e6;
-        --muted: #7a8088;
-        --accent: #ffb86c;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
-      }
-      * { box-sizing: border-box; }
-      html, body { margin: 0; padding: 0; background: var(--bg); color: var(--fg); }
-      body { min-height: 100vh; padding: 2rem; line-height: 1.5; }
-      main { max-width: 42rem; margin: 0 auto; }
-      h1 { font-size: clamp(1.75rem, 5vw, 2.5rem); margin: 0 0 0.25rem; font-weight: 600; letter-spacing: -0.03em; }
-      .meta { color: var(--muted); font-size: 0.875rem; margin: 0 0 2rem; }
-      .meta a { color: var(--accent); text-decoration: none; }
-      .meta a:hover { text-decoration: underline; }
-      h2 { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin: 0 0 0.75rem; }
+      body { min-height: 100vh; padding: 2.5rem 2rem; }
+      main { max-width: 44rem; margin: 0 auto; }
+
+      .wordmark { font-size: clamp(1.6rem, 4vw, 2.2rem); font-weight: 800; letter-spacing: -0.03em; margin: 0 0 0.2rem; color: var(--fg); }
+      .wordmark span { color: var(--gold); }
+      .meta { color: var(--muted); font-size: 0.875rem; margin: 0 0 2.5rem; }
+      .meta a { color: var(--cyan); }
+      .meta a:hover { color: var(--cyan-soft); }
+
+      .section-label { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.32em; text-transform: uppercase; color: var(--subtle); margin: 0 0 0.75rem; }
+
       ul { list-style: none; padding: 0; margin: 0 0 2.5rem; }
-      li { border-bottom: 1px solid #1f242a; }
-      li a { display: flex; align-items: center; justify-content: space-between; padding: 0.65rem 0; color: var(--fg); text-decoration: none; }
-      li a:hover { color: var(--accent); }
-      .count { color: var(--muted); font-size: 0.875rem; font-variant-numeric: tabular-nums; }
-      .empty-list { display: flex; flex-wrap: wrap; gap: 0.4rem; padding: 0; margin: 0; list-style: none; }
-      .empty-list li { font-size: 0.8rem; color: var(--muted); background: #11141a; border: 1px solid #1f242a; border-radius: 3px; padding: 0.2em 0.5em; }
-      footer { color: var(--muted); margin-top: 3rem; font-size: 0.875rem; border-top: 1px solid #1f242a; padding-top: 1.5rem; }
-      footer a { color: var(--accent); text-decoration: none; }
-      footer a:hover { text-decoration: underline; }
+      li { border-bottom: 1px solid var(--border); }
+      li a { display: flex; align-items: center; justify-content: space-between; padding: 0.7rem 0; color: var(--fg); text-decoration: none; font-size: 0.95rem; }
+      li a:hover { color: var(--cyan); }
+      .count { color: var(--subtle); font-size: 0.8rem; font-variant-numeric: tabular-nums; font-family: var(--font-mono); }
+
+      .coming-soon { display: flex; flex-wrap: wrap; gap: 0.35rem; padding: 0; margin: 0 0 2.5rem; list-style: none; }
+      .coming-soon li { font-size: 0.75rem; color: var(--subtle); background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 3px; padding: 0.2em 0.55em; font-family: var(--font-mono); }
+
+      footer { color: var(--subtle); margin-top: 3rem; font-size: 0.8rem; border-top: 1px solid var(--border); padding-top: 1.5rem; }
+      footer a { color: var(--cyan); }
     </style>
   </head>
   <body>
     <main>
-      <h1>schema-atoms</h1>
+      <h1 class="wordmark">schema<span>-atoms</span></h1>
       <p class="meta">
-        {totalAtoms} atom{totalAtoms !== 1 ? 's' : ''} across {classes.length} class{classes.length !== 1 ? 'es' : ''} &mdash;
+        {totalAtoms} atom{totalAtoms !== 1 ? 's' : ''} &middot; {classes.length} class{classes.length !== 1 ? 'es' : ''} &middot;
         <a href="https://github.com/convergent-systems-co/schema-atoms">github</a>
       </p>
 
-      <h2>Classes</h2>
+      <p class="section-label">Classes</p>
       <ul>
         {classes.map(({ name, count }) => (
           <li>
@@ -69,16 +66,15 @@ const totalAtoms = classes.reduce((sum, c) => sum + c.count, 0);
 
       {emptyClasses.length > 0 && (
         <>
-          <h2>Coming soon</h2>
-          <ul class="empty-list">
+          <p class="section-label">Coming soon</p>
+          <ul class="coming-soon">
             {emptyClasses.map((cls) => <li>{cls}</li>)}
           </ul>
         </>
       )}
 
       <footer>
-        Part of the <a href="https://github.com/convergent-systems-co/atoms">atoms ecosystem</a>.
-        Apache-2.0.
+        Part of the <a href="https://github.com/convergent-systems-co/atoms">atoms ecosystem</a> &mdash; Apache-2.0 &middot; CC-BY-4.0
       </footer>
     </main>
   </body>

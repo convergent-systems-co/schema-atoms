@@ -11,7 +11,6 @@ export function getStaticPaths() {
 }
 
 const { class: atomClass, slug } = Astro.params;
-// Collect all versions of this slug within this class
 const allFiles = getAtomsForClass(atomClass);
 const versions = allFiles
   .map(parseAtomFilename)
@@ -24,28 +23,26 @@ const versions = allFiles
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="description" content={`Version history for ${slug} in ${atomClass}`} />
+    <meta name="description" content={`Version history for ${slug} in ${atomClass} — schema-atoms`} />
     <title>{slug} — {atomClass} — schema-atoms</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="stylesheet" href="/brand.css" />
     <style>
-      :root {
-        --bg: #0b0d10;
-        --fg: #e8e8e6;
-        --muted: #7a8088;
-        --accent: #ffb86c;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
-      }
-      * { box-sizing: border-box; }
-      html, body { margin: 0; padding: 0; background: var(--bg); color: var(--fg); }
-      body { min-height: 100vh; padding: 2rem; line-height: 1.5; }
-      main { max-width: 42rem; margin: 0 auto; }
-      h1 { font-size: clamp(1.75rem, 5vw, 2.5rem); margin: 0 0 0.5rem; font-weight: 600; letter-spacing: -0.03em; }
-      .breadcrumb { color: var(--muted); font-size: 0.875rem; margin-bottom: 1.5rem; }
-      .breadcrumb a { color: var(--accent); text-decoration: none; }
-      .breadcrumb a:hover { text-decoration: underline; }
+      body { min-height: 100vh; padding: 2.5rem 2rem; }
+      main { max-width: 44rem; margin: 0 auto; }
+
+      .breadcrumb { color: var(--subtle); font-size: 0.8rem; margin-bottom: 1.75rem; }
+      .breadcrumb a { color: var(--cyan); }
+      .breadcrumb a:hover { color: var(--cyan-soft); }
+
+      h1 { font-size: clamp(1.5rem, 4vw, 2rem); font-weight: 800; letter-spacing: -0.03em; margin: 0 0 0.4rem; }
+      .class-label { color: var(--subtle); font-size: 0.8rem; font-family: var(--font-mono); margin: 0 0 2rem; }
+
       ul { list-style: none; padding: 0; margin: 0; }
-      li { border-bottom: 1px solid #1f242a; }
-      li a { display: block; padding: 0.75rem 0; color: var(--accent); text-decoration: none; font-weight: 500; }
-      li a:hover { text-decoration: underline; }
+      li { border-bottom: 1px solid var(--border); }
+      li:first-child { border-top: 1px solid var(--border); }
+      li a { display: block; padding: 0.75rem 0; color: var(--cyan); text-decoration: none; font-family: var(--font-mono); font-size: 0.9rem; font-weight: 500; }
+      li a:hover { color: var(--cyan-soft); }
     </style>
   </head>
   <body>
@@ -56,7 +53,7 @@ const versions = allFiles
         {slug}
       </p>
       <h1>{slug}</h1>
-      <p>Class: {atomClass}</p>
+      <p class="class-label">{atomClass}</p>
       {versions.length > 0 && (
         <ul>
           {versions.map((v) => (
