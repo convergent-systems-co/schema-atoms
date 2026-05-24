@@ -1,5 +1,9 @@
-# Per-env variables for dev.
+# Per-env variables for stg.
+# Do NOT commit real values. Populate via environment variables before apply:
 #
-# account_id    = "REPLACE-ME-cloudflare-account-id"
-# project_name  = "REPLACE-ME-pages-project-name"
-# production_branch = "main"
+#   export TF_VAR_cloudflare_account_id="<account-id>"
+#   export TF_VAR_zone_id="<zone-id>"
+#   export TF_VAR_account_token="<pages-account-token-from-1password>"
+#   export TF_VAR_dns_token="<dns-token-from-1password>"
+#
+# See docs/runbook/deploy.md for how to obtain each value.
