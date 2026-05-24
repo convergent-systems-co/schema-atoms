@@ -31,9 +31,12 @@ export function buildCatalog(): AtomEntry[] {
     // Skip non-directories (edge case on unusual FS layouts).
     if (!statSync(classDir).isDirectory()) continue;
 
-    const tomlFiles = readdirSync(classDir).filter((f) => f.endsWith('.toml'));
-    for (const file of tomlFiles) {
-      entries.push({ class: cls, slug: file.replace(/\.toml$/, ''), file });
+    const atomDirs = readdirSync(classDir).filter((f) => {
+      const fullPath = join(classDir, f);
+      return statSync(fullPath).isDirectory() && existsSync(join(fullPath, 'atom.toml'));
+    });
+    for (const dir of atomDirs) {
+      entries.push({ class: cls, slug: dir, file: join(dir, 'atom.toml') });
     }
   }
 
