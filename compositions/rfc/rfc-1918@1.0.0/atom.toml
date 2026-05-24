@@ -1,0 +1,19 @@
+# atom.toml — RFC 1918: Address Allocation for Private Internets
+id          = "schema-atoms/rfc/rfc-1918"
+version     = "1.0.0"
+content_hash = ""
+lifecycle   = "draft"
+created_at  = "2026-05-24T00:00:00Z"
+
+[rfc]
+rfc_number     = 1918
+title          = "Address Allocation for Private Internets"
+authors        = ["Y. Rekhter", "B. Moskowitz", "D. Karrenberg", "G. J. de Groot", "E. Lear"]
+published_date = "1996-02"
+status         = "BCP"
+obsoletes      = ["RFC 1597", "RFC 1627"]
+asset          = "rfc1918.txt"
+
+[protocol]
+provenance = "https://www.rfc-editor.org/rfc/rfc1918 — RFC 1918, February 1996, Rekhter et al."
+license    = "IETF Trust"
