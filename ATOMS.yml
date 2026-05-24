@@ -1,40 +1,75 @@
 # ATOMS.yml — catalog manifest for schema-atoms
 #
-# See https://github.com/convergent-systems-co/atoms-spec for the canonical spec this conforms to.
-#
-# schema-atoms is the layer that holds entity schemas for the catalog system —
-# one JSON Schema per top-level type (agentic, prompt, skill, profile, brand,
-# theme, …). Distinct from atoms-spec, which governs the shape of the catalog
-# MANIFEST. See the v0.1 taxonomy spec in convergent-systems-co/atoms:
-# docs/superpowers/specs/2026-05-23-atoms-type-taxonomy-design.md
+# Conforms to: https://github.com/convergent-systems-co/atoms/blob/main/specs/atom-schema-spec-v1.0.0-draft.md
+# Parts II and VII
 
+spec_version: atoms-spec/v1.1.0
 name: schema-atoms
-version: 0.1.0
-spec: atoms-spec/v1
-domain: schema-atoms.com
-ecosystem:
-  federation: xdao.co
-  redirect: schema.xdao.co
+version: 1.0.0-draft
+canonical_domain: schema-atoms.com
+federation: convergent-systems.co
 
-purpose: |
-  Canonical JSON Schemas for instance files in *-atoms catalogs. One schema per
-  top-level type, served via content-addressable $id URLs under
-  https://schema-atoms.com/v1/<type>.schema.json. Consumed by every atoms
-  catalog repo to validate its content at CI time.
+atom_types:
+  # Family: design-spec
+  - design-spec
+  # Family: api-spec
+  - openapi-spec
+  - asyncapi-spec
+  - graphql-schema
+  - grpc-spec
+  - json-rpc-spec
+  # Family: data-schema
+  - json-schema
+  - protobuf-schema
+  - avro-schema
+  - xml-schema
+  - toml-schema
+  # Family: protocol-spec
+  - rfc
+  - w3c-spec
+  - iso-spec
+  - fips
+  - internal-protocol
+  # Family: language-spec
+  - bnf-grammar
+  - ebnf-grammar
+  - language-reference
+  - query-language-spec
+  - regex-spec
+  # Family: taxonomy-spec
+  - ontology
+  - controlled-vocabulary
+  - code-list
 
-# schema-atoms is itself a catalog: each schema file is an atom of type `schema`.
-atomTypes: []   # TBD — the catalog's own atomTypes enumeration once authored
+composition_type: spec-compositions
+composition_dir: compositions/
 
-compositionType: schemas
-compositionDir: schemas
+signing:
+  required_algorithms: ["ml-dsa-65"]
+  accepted_algorithms: ["ml-dsa-65", "ml-dsa-44", "ml-dsa-87"]
+  quorum_rules:
+    default: "1 of role:catalog-maintainer"
+    design-spec: "1 of role:catalog-maintainer + 1 of role:editor"
+    "governance/*": "1 of role:catalog-maintainer + 1 of role:ratifier"
+    rfc: "1 of role:catalog-maintainer"
+    w3c-spec: "1 of role:catalog-maintainer"
+    iso-spec: "1 of role:catalog-maintainer"
+    fips: "1 of role:catalog-maintainer"
 
-ruleTypes: []   # TBD
+lifecycle:
+  current: draft
 
-runtimeConsumers:
-  - aish
+licensing:
+  code: Apache-2.0
+  data: CC-BY-4.0
+  # Note: imported protocol-specs retain their upstream license.
+  # CC-BY-4.0 applies to Convergent Systems-authored atom content only.
+  # Each imported atom's protocol.provenance block records the upstream license.
+
+steward: convergent-systems-co
+infrastructure_operator: convergent-systems-co
+
+runtime_consumers:
+  - ai-constitution
   - olympus
-
-license: Apache-2.0
-maintainers:
-  - name: Convergent Systems
-    contact: maintainers@xdao.co
+  - atoms-tools
