@@ -31,24 +31,16 @@ In the Cloudflare dashboard: **My Profile → API Tokens → Create Token**
 Keep both token values in 1Password under **Convergent Systems - Developer** vault before
 setting them as GitHub secrets (they cannot be retrieved from Cloudflare after creation).
 
-### 2. Set GitHub secrets and variables
+### 2. GitHub secrets and variables
 
-In GitHub repo → **Settings → Secrets and variables → Actions**:
+`CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` are org-level secrets scoped to all
+repos — no per-repo setup needed.
 
-| Kind | Name | Value |
-|---|---|---|
-| Secret | `CLOUDFLARE_API_TOKEN` | The account token from step 1 |
-| Secret | `CLOUDFLARE_ACCOUNT_ID` | Your Cloudflare account ID (found in the dashboard URL: `dash.cloudflare.com/<account-id>`) |
-| Variable | `CLOUDFLARE_PAGES_PROJECT` | `schema-atoms` (the Pages project name for prod) |
-
-Using `gh` CLI:
+`CLOUDFLARE_PAGES_PROJECT` is a repo variable already set to `schema-atoms`. To inspect or
+update it:
 
 ```bash
-# Secrets
-gh secret set CLOUDFLARE_API_TOKEN --repo convergent-systems-co/schema-atoms
-gh secret set CLOUDFLARE_ACCOUNT_ID --repo convergent-systems-co/schema-atoms
-
-# Variable (not a secret — visible in logs)
+gh variable list --repo convergent-systems-co/schema-atoms
 gh variable set CLOUDFLARE_PAGES_PROJECT --body "schema-atoms" --repo convergent-systems-co/schema-atoms
 ```
 
