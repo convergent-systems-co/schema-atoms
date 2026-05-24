@@ -30,11 +30,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: validate atoms manifest
-        run: |
-          # TODO: replace echo with real invocation once atoms-tools binary ships.
-          # Wire: atoms validate ATOMS.yml
-          # Tracking: convergent-systems-co/schema-atoms#121
-          echo 'atoms validate: pending atoms-tools binary release'
+        run: python3 scripts/validate_atoms.py --root .
 
   build:
     runs-on: ubuntu-latest
