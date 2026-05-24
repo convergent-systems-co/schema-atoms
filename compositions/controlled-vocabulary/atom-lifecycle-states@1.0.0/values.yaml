@@ -1,0 +1,27 @@
+# atom-lifecycle-states — valid lifecycle states for atoms in the schema-atoms catalog.
+# Atom: schema-atoms/controlled-vocabulary/atom-lifecycle-states@1.0.0
+# License: CC-BY-4.0 (Convergent Systems Co.)
+
+values:
+  - name: draft
+    description: >
+      The atom is under active development or review and has not yet been ratified
+      for production use. Consumers may reference it but should expect breaking
+      changes before it reaches the published state.
+
+  - name: published
+    description: >
+      The atom has passed quorum signing and is approved for production use.
+      Its content is stable; any breaking change requires a new versioned atom.
+
+  - name: adopted
+    description: >
+      The atom is published and has been referenced by at least one downstream
+      catalog or consumer (e.g. ai-constitution, olympus). Adoption signals
+      real-world usage and raises the social cost of breaking changes.
+
+  - name: historic
+    description: >
+      The atom has been superseded by a newer version or retired from active use.
+      Historic atoms remain in the catalog for archival and audit purposes but
+      SHOULD NOT be referenced in new compositions.

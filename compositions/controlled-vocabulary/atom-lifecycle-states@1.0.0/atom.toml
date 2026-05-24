@@ -1,0 +1,10 @@
+id          = "schema-atoms/controlled-vocabulary/atom-lifecycle-states"
+version     = "1.0.0"
+content_hash = ""
+lifecycle   = "draft"
+created_at  = "2026-05-23T00:00:00Z"
+
+[controlled_vocabulary]
+name        = "atom-lifecycle-states"
+description = "Valid lifecycle states for atoms in the schema-atoms catalog."
+asset       = "values.yaml"
