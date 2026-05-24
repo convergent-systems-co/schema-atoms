@@ -1,0 +1,63 @@
+---
+import { ATOM_CLASSES, getAtomsForClass, parseAtomFilename } from '../../../../lib/catalog';
+
+export function getStaticPaths() {
+  return ATOM_CLASSES.flatMap((c) =>
+    getAtomsForClass(c).map((filename) => {
+      const { slug, version } = parseAtomFilename(filename);
+      return { params: { class: c, slug, version } };
+    })
+  );
+}
+
+const { class: atomClass, slug, version } = Astro.params;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={`${slug} version ${version} — ${atomClass}`} />
+    <title>{slug}@{version} — {atomClass} — schema-atoms</title>
+    <style>
+      :root {
+        --bg: #0b0d10;
+        --fg: #e8e8e6;
+        --muted: #7a8088;
+        --accent: #ffb86c;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+      }
+      * { box-sizing: border-box; }
+      html, body { margin: 0; padding: 0; background: var(--bg); color: var(--fg); }
+      body { min-height: 100vh; padding: 2rem; line-height: 1.5; }
+      main { max-width: 42rem; margin: 0 auto; }
+      h1 { font-size: clamp(1.75rem, 5vw, 2.5rem); margin: 0 0 0.5rem; font-weight: 600; letter-spacing: -0.03em; }
+      .version-badge { display: inline-block; background: #1a1f26; border: 1px solid #2a2f36; color: var(--accent); padding: 0.2em 0.6em; border-radius: 3px; font-size: 0.875rem; font-family: monospace; margin-bottom: 1.5rem; }
+      .breadcrumb { color: var(--muted); font-size: 0.875rem; margin-bottom: 1.5rem; }
+      .breadcrumb a { color: var(--accent); text-decoration: none; }
+      .breadcrumb a:hover { text-decoration: underline; }
+      .toml-link { display: inline-flex; align-items: center; gap: 0.5rem; color: var(--accent); text-decoration: none; font-weight: 500; }
+      .toml-link:hover { text-decoration: underline; }
+      code { background: #1a1f26; padding: 0.1em 0.4em; border-radius: 3px; font-size: 0.9em; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <p class="breadcrumb">
+        <a href="/">schema-atoms</a> /
+        <a href={`/${atomClass}/`}>{atomClass}</a> /
+        <a href={`/${atomClass}/${slug}/`}>{slug}</a> /
+        {version}
+      </p>
+      <h1>{slug}</h1>
+      <span class="version-badge">{version}</span>
+      <p>Class: {atomClass}</p>
+      <p>
+        <a class="toml-link" href={`/${atomClass}/${slug}/${version}/atom.toml`}>
+          Download <code>atom.toml</code>
+        </a>
+      </p>
+    </main>
+  </body>
+</html>
