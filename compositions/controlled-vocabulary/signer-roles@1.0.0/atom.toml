@@ -1,0 +1,10 @@
+id          = "schema-atoms/controlled-vocabulary/signer-roles"
+version     = "1.0.0"
+content_hash = ""
+lifecycle   = "draft"
+created_at  = "2026-05-23T00:00:00Z"
+
+[controlled_vocabulary]
+name        = "signer-roles"
+description = "Valid signer roles per atom-schema-spec quorum_rules."
+asset       = "values.yaml"
