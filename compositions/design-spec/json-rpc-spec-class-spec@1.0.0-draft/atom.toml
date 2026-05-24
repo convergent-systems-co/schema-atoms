@@ -1,0 +1,14 @@
+# atom.toml — class specification atom for json-rpc-spec
+id          = "schema-atoms/design-spec/json-rpc-spec-class-spec"
+version     = "1.0.0-draft"
+content_hash = ""
+lifecycle   = "draft"
+created_at  = "2026-05-23T00:00:00Z"
+
+[spec]
+class       = "design-spec"
+title       = "JSON-RPC Spec Class Specification"
+summary     = "Normative definition of the json-rpc-spec atom class in schema-atoms."
+authors     = ["convergent-systems-co"]
+conforms_to = "schema-atoms/design-spec/atom-spec@1.1.0"
+asset       = "spec.md"
