@@ -1,4 +1,4 @@
-# Adjust per repo.
-*           @convergent-systems-co/maintainers
-/infra/     @convergent-systems-co/infra
-/.github/   @convergent-systems-co/maintainers
+# Adjust to real team slugs once org teams are created.
+*           @itsfwcp
+/infra/     @itsfwcp
+/.github/   @itsfwcp
