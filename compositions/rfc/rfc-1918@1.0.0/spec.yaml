@@ -1,0 +1,61 @@
+# spec.yaml — structured extract of RFC 1918 for AI/application consumption
+# atom: schema-atoms/rfc/rfc-1918@1.0.0
+
+rfc_number: 1918
+title: "Address Allocation for Private Internets"
+status: BCP
+published_date: "1996-02"
+authors:
+  - "Y. Rekhter"
+  - "B. Moskowitz"
+  - "D. Karrenberg"
+  - "G. J. de Groot"
+  - "E. Lear"
+
+address_blocks:
+  - cidr: "10.0.0.0/8"
+    range_start: "10.0.0.0"
+    range_end: "10.255.255.255"
+    name: "24-bit block"
+    size_hosts: 16777216
+  - cidr: "172.16.0.0/12"
+    range_start: "172.16.0.0"
+    range_end: "172.31.255.255"
+    name: "20-bit block"
+    size_hosts: 1048576
+  - cidr: "192.168.0.0/16"
+    range_start: "192.168.0.0"
+    range_end: "192.168.255.255"
+    name: "16-bit block"
+    size_hosts: 65536
+
+normative_requirements:
+  - "Internet routers MUST NOT forward packets with private source or destination addresses"
+  - "Route information about private networks MUST NOT be propagated on inter-enterprise links"
+  - "Private addresses MUST NOT appear in the DNS in a way resolvable by outside parties"
+  - "Routers not using private address space MUST be configured to reject routing information about private networks from external sources"
+
+key_definitions:
+  private internet: >
+    An enterprise autonomously operating a network using TCP/IP that does not require
+    globally unique IP addresses for all hosts, typically because those hosts do not
+    need connectivity to the public Internet.
+  enterprise: >
+    An entity autonomously operating a network using TCP/IP and determining the
+    addressing plan and address assignments within that network.
+
+routing_policy:
+  internet_routers_must_filter: true
+  filtered_prefixes:
+    - "10.0.0.0/8"
+    - "172.16.0.0/12"
+    - "192.168.0.0/16"
+  nat_required_for_internet_access: true
+
+references:
+  - rfc: 1597
+    relationship: obsoletes
+  - rfc: 1627
+    relationship: obsoletes
+  - rfc: 1466
+    relationship: see_also
