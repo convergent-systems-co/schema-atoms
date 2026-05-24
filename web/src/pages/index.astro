@@ -20,62 +20,148 @@ const totalAtoms = classes.reduce((sum, c) => sum + c.count, 0);
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="stylesheet" href="/brand.css" />
     <style>
-      body { min-height: 100vh; padding: 2.5rem 2rem; }
-      main { max-width: 44rem; margin: 0 auto; }
+      body { min-height: 100vh; }
 
-      .wordmark { font-size: clamp(1.6rem, 4vw, 2.2rem); font-weight: 800; letter-spacing: -0.03em; margin: 0 0 0.2rem; color: var(--fg); }
-      .wordmark span { color: var(--gold); }
-      .meta { color: var(--muted); font-size: 0.875rem; margin: 0 0 2.5rem; }
-      .meta a { color: var(--cyan); }
-      .meta a:hover { color: var(--cyan-soft); }
+      .shell { display: grid; grid-template-columns: 1fr 220px; min-height: 100vh; max-width: 1320px; margin: 0 auto; }
+      .content { min-width: 0; padding: 32px; }
+      .sidenav { position: sticky; top: 0; height: 100vh; padding: 32px 24px; border-left: 1px solid var(--border); display: flex; flex-direction: column; gap: 32px; }
 
-      .section-label { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.32em; text-transform: uppercase; color: var(--subtle); margin: 0 0 0.75rem; }
+      /* Brand mark in sidenav */
+      .brand { display: inline-flex; align-items: center; gap: 12px; text-decoration: none; color: var(--fg); }
+      .mark { display: grid; grid-template-columns: repeat(2, 1fr); gap: 3px; width: 32px; height: 32px; padding: 5px; background: var(--bg-surface); border-radius: 8px; flex-shrink: 0; }
+      .dot { width: 100%; height: 100%; border-radius: 50%; }
+      .dot-1 { background: #5CD6FF; }
+      .dot-2 { background: #F4C75E; }
+      .dot-3 { background: #FF8A3D; }
+      .dot-4 { background: #EEF1F7; }
+      .brand-text { font-weight: 800; font-size: 15px; letter-spacing: -0.02em; line-height: 1.1; }
 
-      ul { list-style: none; padding: 0; margin: 0 0 2.5rem; }
-      li { border-bottom: 1px solid var(--border); }
-      li a { display: flex; align-items: center; justify-content: space-between; padding: 0.7rem 0; color: var(--fg); text-decoration: none; font-size: 0.95rem; }
-      li a:hover { color: var(--cyan); }
-      .count { color: var(--subtle); font-size: 0.8rem; font-variant-numeric: tabular-nums; font-family: var(--font-mono); }
+      .nav ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 2px; }
+      .nav-link { display: block; padding: 7px 10px; border-radius: 6px; color: var(--muted); text-decoration: none; font-size: 13px; font-weight: 500; }
+      .nav-link:hover { background: var(--bg-surface); color: var(--fg); }
+
+      .aside-meta { margin-top: auto; padding-top: 16px; border-top: 1px solid var(--border); }
+      .meta-link { display: inline-flex; align-items: center; gap: 6px; text-decoration: none; color: var(--subtle); font-family: var(--font-mono); font-size: 11px; }
+      .meta-link:hover { color: var(--cyan); }
+
+      /* Hero */
+      .hero { padding: 48px 0 40px; max-width: 680px; }
+      .hero-mark { width: 72px; height: 72px; margin-bottom: 28px; }
+      .hero h1 { font-size: clamp(2.2rem, 5vw, 3.2rem); font-weight: 800; letter-spacing: -0.04em; margin: 0 0 12px; line-height: 1; }
+      .hero h1 span { color: var(--gold); }
+      .lede { font-size: 1.05rem; color: var(--muted); margin: 0 0 20px; max-width: 520px; line-height: 1.6; }
+      .status { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-family: var(--font-mono); color: var(--subtle); background: var(--bg-surface); padding: 7px 14px; border-radius: 999px; }
+      .status-dot { width: 7px; height: 7px; background: var(--cyan); border-radius: 50%; animation: pulse 2.4s ease-in-out infinite; }
+      @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+      /* Stats row */
+      .stats { display: grid; grid-template-columns: repeat(3, auto); gap: 24px; padding: 32px 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); margin-bottom: 40px; }
+      .stat-value { font-size: 2rem; font-weight: 700; color: var(--cyan); line-height: 1; margin-bottom: 4px; }
+      .stat-label { font-size: 11px; font-family: var(--font-mono); color: var(--subtle); text-transform: lowercase; letter-spacing: 0.04em; }
+
+      /* Class list */
+      .section-label { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.32em; text-transform: uppercase; color: var(--subtle); margin: 0 0 12px; }
+      ul.class-list { list-style: none; padding: 0; margin: 0 0 2.5rem; }
+      ul.class-list li { border-bottom: 1px solid var(--border); }
+      ul.class-list li a { display: flex; align-items: center; justify-content: space-between; padding: 0.65rem 0; color: var(--fg); text-decoration: none; font-size: 0.9rem; }
+      ul.class-list li a:hover { color: var(--cyan); }
+      .count { color: var(--subtle); font-size: 0.78rem; font-variant-numeric: tabular-nums; font-family: var(--font-mono); }
 
       .coming-soon { display: flex; flex-wrap: wrap; gap: 0.35rem; padding: 0; margin: 0 0 2.5rem; list-style: none; }
-      .coming-soon li { font-size: 0.75rem; color: var(--subtle); background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 3px; padding: 0.2em 0.55em; font-family: var(--font-mono); }
+      .coming-soon li { font-size: 0.72rem; color: var(--subtle); background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 3px; padding: 0.2em 0.55em; font-family: var(--font-mono); }
 
-      footer { color: var(--subtle); margin-top: 3rem; font-size: 0.8rem; border-top: 1px solid var(--border); padding-top: 1.5rem; }
-      footer a { color: var(--cyan); }
+      footer { margin-top: 64px; padding: 24px 0; color: var(--subtle); font-size: 12px; border-top: 1px solid var(--border); }
+      footer a { color: var(--muted); }
+
+      @media (max-width: 880px) {
+        .shell { grid-template-columns: 1fr; }
+        .sidenav { position: static; height: auto; border-left: none; border-bottom: 1px solid var(--border); flex-direction: row; align-items: center; padding: 16px 24px; gap: 20px; }
+        .nav ul { flex-direction: row; flex-wrap: wrap; }
+        .aside-meta { margin-top: 0; padding-top: 0; border-top: none; display: none; }
+        .content { padding: 24px; }
+      }
     </style>
   </head>
   <body>
-    <main>
-      <h1 class="wordmark">schema<span>-atoms</span></h1>
-      <p class="meta">
-        {totalAtoms} atom{totalAtoms !== 1 ? 's' : ''} &middot; {classes.length} class{classes.length !== 1 ? 'es' : ''} &middot;
-        <a href="https://github.com/convergent-systems-co/schema-atoms">github</a>
-      </p>
+    <div class="shell">
+      <main class="content">
+        <section class="hero">
+          <img src="/mark.svg" alt="schema-atoms mark" class="hero-mark" />
+          <h1>schema<span>-atoms</span></h1>
+          <p class="lede">
+            Canonical, versioned schema atoms for the convergent-systems.co ecosystem.
+            Machine-readable by AI agents. Human-readable by design.
+          </p>
+          <span class="status">
+            <span class="status-dot"></span>
+            {totalAtoms} atoms · {classes.length} classes · draft
+          </span>
+        </section>
 
-      <p class="section-label">Classes</p>
-      <ul>
-        {classes.map(({ name, count }) => (
-          <li>
-            <a href={`/${name}/`}>
-              <span>{name}</span>
-              <span class="count">{count}</span>
-            </a>
-          </li>
-        ))}
-      </ul>
+        <div class="stats">
+          <div>
+            <div class="stat-value">{totalAtoms}</div>
+            <div class="stat-label">atoms</div>
+          </div>
+          <div>
+            <div class="stat-value">{classes.length}</div>
+            <div class="stat-label">classes</div>
+          </div>
+          <div>
+            <div class="stat-value">{ATOM_CLASSES.length}</div>
+            <div class="stat-label">registered types</div>
+          </div>
+        </div>
 
-      {emptyClasses.length > 0 && (
-        <>
-          <p class="section-label">Coming soon</p>
-          <ul class="coming-soon">
-            {emptyClasses.map((cls) => <li>{cls}</li>)}
+        <p class="section-label">Classes</p>
+        <ul class="class-list">
+          {classes.map(({ name, count }) => (
+            <li>
+              <a href={`/${name}/`}>
+                <span>{name}</span>
+                <span class="count">{count}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+
+        {emptyClasses.length > 0 && (
+          <>
+            <p class="section-label">Coming soon</p>
+            <ul class="coming-soon">
+              {emptyClasses.map((cls) => <li>{cls}</li>)}
+            </ul>
+          </>
+        )}
+
+        <footer>
+          Part of the <a href="https://github.com/convergent-systems-co/atoms">atoms ecosystem</a> &mdash; Apache-2.0 &middot; CC-BY-4.0
+        </footer>
+      </main>
+
+      <nav class="sidenav">
+        <a class="brand" href="/">
+          <div class="mark" aria-hidden="true">
+            <span class="dot dot-1"></span>
+            <span class="dot dot-2"></span>
+            <span class="dot dot-3"></span>
+            <span class="dot dot-4"></span>
+          </div>
+          <span class="brand-text">schema-atoms</span>
+        </a>
+
+        <div class="nav">
+          <ul>
+            {classes.map(({ name }) => (
+              <li><a class="nav-link" href={`/${name}/`}>{name}</a></li>
+            ))}
           </ul>
-        </>
-      )}
+        </div>
 
-      <footer>
-        Part of the <a href="https://github.com/convergent-systems-co/atoms">atoms ecosystem</a> &mdash; Apache-2.0 &middot; CC-BY-4.0
-      </footer>
-    </main>
+        <div class="aside-meta">
+          <a class="meta-link" href="https://github.com/convergent-systems-co/schema-atoms">github ↗</a>
+        </div>
+      </nav>
+    </div>
   </body>
 </html>
