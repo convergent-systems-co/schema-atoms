@@ -1,0 +1,15 @@
+id          = "schema-atoms/design-spec/atom-spec"
+version     = "1.1.0"
+content_hash = ""
+lifecycle   = "draft"
+created_at  = "2026-05-23T00:00:00Z"
+supersedes  = "schema-atoms/spec/atom-spec@1.1.0"
+migration_notes = "Class renamed from 'spec' to 'design-spec' per the Atom Schema Spec v1.0.0. Content is identical. Old path schema-atoms/spec/atom-spec@1.1.0 is now historic. Consumers should update references to schema-atoms/design-spec/atom-spec."
+
+[spec]
+class       = "design-spec"
+title       = "Atom Spec"
+summary     = "The Atom Spec defines the universal atom envelope and publishing workflow for all schema-atoms catalogs."
+authors     = ["convergent-systems-co"]
+conforms_to = "schema-atoms/design-spec/atom-spec@1.1.0"
+asset       = "atom-spec@1.1.0.md"

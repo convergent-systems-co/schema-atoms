@@ -1,0 +1,6 @@
+id           = "schema-atoms/spec/atom-spec"
+version      = "1.1.0"
+content_hash = ""
+lifecycle    = "historic"
+created_at   = "2026-05-23T00:00:00Z"
+superseded_by = "schema-atoms/design-spec/atom-spec@1.1.0"
