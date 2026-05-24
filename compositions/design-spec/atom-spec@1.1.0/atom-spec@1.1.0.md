@@ -231,7 +231,68 @@ Each catalog declares its atom types and configuration in `ATOMS.yml` at the rep
 
 ---
 
-## 11. Normative Requirements Summary
+## 11. AI and Application Consumption
+
+Atoms are designed as the primary unit of knowledge for both AI agents and applications, not just human readers. The catalog exposes several access patterns.
+
+### 11.1 Referencing Atoms
+
+An atom is referenced by its full identifier: `<catalog>/<class>/<slug>@<version>`. This string is stable, globally unique, and usable as a cache key, context citation, or lookup token.
+
+```
+schema-atoms/rfc/rfc-1918@1.0.0
+schema-atoms/design-spec/atom-spec@1.1.0
+schema-atoms/controlled-vocabulary/atom-lifecycle-states@1.0.0
+```
+
+When an AI agent includes an atom in its context, it SHOULD cite the full identifier so that the reference can be resolved, updated, or audited later.
+
+### 11.2 Catalog Discovery Endpoints
+
+The catalog publishes machine-readable index files at build time under `/exports/`:
+
+| Endpoint | Contents |
+|---|---|
+| `/exports/catalog.json` | Flat array of all atoms — `{class, slug, file}` per entry |
+| `/exports/by-class.json` | Atoms grouped by class name |
+| `/exports/by-lifecycle.json` | Atoms grouped by lifecycle state |
+| `/mirror.toml` | Federation mirror declaration for this catalog |
+
+An application discovering available atoms SHOULD fetch `/exports/catalog.json` rather than scraping the catalog directory.
+
+### 11.3 The `atom.toml` as Machine-Readable Payload
+
+The `atom.toml` file is the primary structured data surface for applications. Every field in the envelope and payload section is parseable from TOML. Applications and AI agents that need atom metadata (id, version, lifecycle, class-specific fields) SHOULD parse `atom.toml` directly.
+
+The atom's content is in the `asset` file declared in the payload section. The asset type varies by class — `.md` for specification prose, `.yaml` or `.json` for structured data, `.ebnf` for grammars, `.txt` for plain-text documents.
+
+### 11.4 Structured Extracts (`spec.yaml`)
+
+For classes whose asset is not already machine-readable (e.g., plain-text RFC documents), atoms MAY include a `spec.yaml` alongside the primary asset. A `spec.yaml` is a structured YAML extract of the atom's normative content, intended for direct consumption by AI agents and applications without requiring text parsing.
+
+```
+compositions/rfc/rfc-1918@1.0.0/
+├── atom.toml       ← envelope + [rfc] metadata
+├── rfc1918.txt     ← normative text (human + AI readable)
+└── spec.yaml       ← structured extract (machine/AI optimized)
+```
+
+The `spec.yaml` schema is class-specific. Class specification atoms SHOULD document their `spec.yaml` structure when a text asset is the primary format.
+
+### 11.5 Loading an Atom into AI Context
+
+The recommended pattern for loading a single atom into an AI agent's context window:
+
+1. Resolve the atom ID to a directory: `compositions/<class>/<slug>@<version>/`
+2. Parse `atom.toml` for structured metadata (id, version, lifecycle, payload fields)
+3. Load the asset file for the atom's normative content
+4. If a `spec.yaml` exists, prefer it over the text asset for structured queries
+
+For bulk loading, use `/exports/by-class.json` to enumerate atoms by class, then load selectively.
+
+---
+
+## 12. Normative Requirements Summary
 
 - An atom MUST have a unique `id` of the form `<catalog>/<class>/<slug>`.
 - An atom MUST declare a SemVer `version`.

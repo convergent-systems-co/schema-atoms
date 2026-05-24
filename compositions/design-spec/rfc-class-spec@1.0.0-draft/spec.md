@@ -147,9 +147,73 @@ Atom directory layout:
 
 ```
 compositions/rfc/rfc-1918@1.0.0/
-├── atom.toml
-└── rfc1918.txt
+├── atom.toml       ← envelope + [rfc] metadata + [protocol]
+├── rfc1918.txt     ← normative RFC text
+└── spec.yaml       ← structured extract for AI/application use
 ```
+
+---
+
+## AI and Application Consumption
+
+### Structured Fields in `[rfc]`
+
+The `[rfc]` payload section is the primary machine-readable interface for applications and AI agents. Key fields for programmatic use:
+
+| Field | AI / Application Use |
+|---|---|
+| `rfc_number` | Canonical lookup key; resolves cross-references in `obsoletes` / `obsoleted_by` |
+| `title` | Display label; use in citations and context summaries |
+| `status` | Filter by normative weight — `BCP` and `STANDARDS TRACK` carry stronger obligations than `INFORMATIONAL` |
+| `published_date` | Temporal ordering; detecting whether a newer version exists |
+| `obsoletes` / `obsoleted_by` | Dependency graph traversal; detecting superseded references |
+| `asset` | Filename of the normative text for full-content loading |
+
+### The `spec.yaml` Structured Extract
+
+RFC text assets (`.txt`) are human-readable prose. For AI agents and applications that need structured normative data without parsing free text, an `rfc` atom SHOULD include a `spec.yaml` alongside the text asset.
+
+The `spec.yaml` captures the normative data points in a form directly consumable by code or AI context:
+
+```yaml
+rfc_number: 1918
+title: "Address Allocation for Private Internets"
+status: BCP
+normative_requirements:
+  - "Private address blocks MUST NOT be forwarded by Internet backbone routers"
+  - "Route information about private networks MUST NOT be propagated on inter-enterprise links"
+key_definitions:
+  private internet: "An enterprise network using TCP/IP that does not require globally unique addresses"
+address_blocks:
+  - cidr: "10.0.0.0/8"
+    range: "10.0.0.0 - 10.255.255.255"
+    name: "24-bit block"
+  - cidr: "172.16.0.0/12"
+    range: "172.16.0.0 - 172.31.255.255"
+    name: "20-bit block"
+  - cidr: "192.168.0.0/16"
+    range: "192.168.0.0 - 192.168.255.255"
+    name: "16-bit block"
+references:
+  - rfc: 1597
+    relationship: obsoletes
+  - rfc: 1627
+    relationship: obsoletes
+```
+
+The `spec.yaml` schema is not rigidly fixed — include the fields that are most useful for the RFC's subject matter. `normative_requirements` and any structured data tables (address blocks, algorithm parameters, status codes) are the highest-value fields.
+
+### Loading an RFC Atom
+
+The recommended consumption pattern for AI agents and applications:
+
+1. Parse `atom.toml` for identity and metadata (`rfc_number`, `title`, `status`, `authors`, `published_date`)
+2. If `spec.yaml` exists, load it for structured normative content — address blocks, requirements lists, definitions
+3. Load the `.txt` asset only when complete normative prose is required
+
+An AI agent asked "what are the private IP address ranges?" resolves `schema-atoms/rfc/rfc-1918@1.0.0`, reads `spec.yaml.address_blocks`, and returns the three CIDR blocks directly — no text parsing required.
+
+Atom citation format: `schema-atoms/rfc/rfc-<number>@<version>`
 
 ---
 
