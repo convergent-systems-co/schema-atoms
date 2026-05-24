@@ -1,16 +1,27 @@
 ---
-import { ATOM_CLASSES, getAtomsForClass, parseAtomFilename } from '../../../../lib/catalog';
+import { marked } from 'marked';
+import { ATOM_CLASSES, getAtomsForClass, parseAtomFilename, loadAtomData } from '../../../../lib/catalog';
 
 export function getStaticPaths() {
   return ATOM_CLASSES.flatMap((c) =>
-    getAtomsForClass(c).map((filename) => {
-      const { slug, version } = parseAtomFilename(filename);
+    getAtomsForClass(c).map((dir) => {
+      const { slug, version } = parseAtomFilename(dir);
       return { params: { class: c, slug, version } };
     })
   );
 }
 
 const { class: atomClass, slug, version } = Astro.params;
+const atom = loadAtomData(atomClass, `${slug}@${version}`);
+
+const spec = atom?.spec as Record<string, unknown> | undefined;
+const title = (spec?.['title'] as string) || slug;
+const summary = spec?.['summary'] as string | undefined;
+const authors = spec?.['authors'] as string[] | undefined;
+const conformsTo = spec?.['conforms_to'] as string | undefined;
+const lifecycle = atom?.lifecycle ?? '';
+
+const contentHtml = atom?.assetContent ? marked.parse(atom.assetContent) : null;
 ---
 
 <!doctype html>
@@ -18,28 +29,55 @@ const { class: atomClass, slug, version } = Astro.params;
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="description" content={`${slug} version ${version} — ${atomClass}`} />
-    <title>{slug}@{version} — {atomClass} — schema-atoms</title>
+    <meta name="description" content={summary ?? `${slug} — ${atomClass}`} />
+    <title>{title} — {atomClass} — schema-atoms</title>
     <style>
       :root {
         --bg: #0b0d10;
         --fg: #e8e8e6;
         --muted: #7a8088;
         --accent: #ffb86c;
+        --border: #1f242a;
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
       }
       * { box-sizing: border-box; }
       html, body { margin: 0; padding: 0; background: var(--bg); color: var(--fg); }
-      body { min-height: 100vh; padding: 2rem; line-height: 1.5; }
-      main { max-width: 42rem; margin: 0 auto; }
-      h1 { font-size: clamp(1.75rem, 5vw, 2.5rem); margin: 0 0 0.5rem; font-weight: 600; letter-spacing: -0.03em; }
-      .version-badge { display: inline-block; background: #1a1f26; border: 1px solid #2a2f36; color: var(--accent); padding: 0.2em 0.6em; border-radius: 3px; font-size: 0.875rem; font-family: monospace; margin-bottom: 1.5rem; }
+      body { min-height: 100vh; padding: 2rem; line-height: 1.6; }
+      main { max-width: 48rem; margin: 0 auto; }
       .breadcrumb { color: var(--muted); font-size: 0.875rem; margin-bottom: 1.5rem; }
       .breadcrumb a { color: var(--accent); text-decoration: none; }
       .breadcrumb a:hover { text-decoration: underline; }
-      .toml-link { display: inline-flex; align-items: center; gap: 0.5rem; color: var(--accent); text-decoration: none; font-weight: 500; }
-      .toml-link:hover { text-decoration: underline; }
-      code { background: #1a1f26; padding: 0.1em 0.4em; border-radius: 3px; font-size: 0.9em; }
+      h1 { font-size: clamp(1.75rem, 5vw, 2.5rem); margin: 0 0 0.5rem; font-weight: 600; letter-spacing: -0.03em; }
+      .summary { color: var(--muted); font-size: 1.05rem; margin: 0 0 1.5rem; }
+      .meta { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 2rem; }
+      .badge { display: inline-block; background: #11141a; border: 1px solid var(--border); border-radius: 3px; padding: 0.2em 0.6em; font-size: 0.8rem; font-family: monospace; }
+      .badge.lifecycle-draft { border-color: #ffb86c44; color: var(--accent); }
+      .badge.lifecycle-stable { border-color: #50fa7b44; color: #50fa7b; }
+      .badge.lifecycle-historic { border-color: #7a808844; color: var(--muted); }
+      .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 2rem; font-size: 0.875rem; }
+      .meta-table td { padding: 0.4rem 0; vertical-align: top; }
+      .meta-table td:first-child { color: var(--muted); width: 8rem; padding-right: 1rem; }
+      .meta-table td code { background: #1a1f26; padding: 0.1em 0.4em; border-radius: 3px; font-size: 0.85em; }
+      hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+      .prose { color: var(--fg); }
+      .prose h1, .prose h2, .prose h3, .prose h4 { font-weight: 600; letter-spacing: -0.02em; margin: 2rem 0 0.75rem; }
+      .prose h1 { font-size: 1.75rem; }
+      .prose h2 { font-size: 1.3rem; border-bottom: 1px solid var(--border); padding-bottom: 0.4rem; }
+      .prose h3 { font-size: 1.1rem; }
+      .prose p { margin: 0 0 1rem; }
+      .prose ul, .prose ol { padding-left: 1.5rem; margin: 0 0 1rem; }
+      .prose li { margin-bottom: 0.25rem; }
+      .prose code { background: #1a1f26; padding: 0.15em 0.4em; border-radius: 3px; font-size: 0.875em; }
+      .prose pre { background: #11141a; border: 1px solid var(--border); border-radius: 4px; padding: 1rem; overflow-x: auto; margin: 0 0 1rem; }
+      .prose pre code { background: none; padding: 0; }
+      .prose table { width: 100%; border-collapse: collapse; margin: 0 0 1rem; font-size: 0.875rem; }
+      .prose th { background: #11141a; padding: 0.5rem 0.75rem; text-align: left; border: 1px solid var(--border); color: var(--muted); font-weight: 600; }
+      .prose td { padding: 0.5rem 0.75rem; border: 1px solid var(--border); }
+      .prose a { color: var(--accent); text-decoration: none; }
+      .prose a:hover { text-decoration: underline; }
+      .prose blockquote { border-left: 3px solid var(--accent); margin: 0 0 1rem; padding: 0.5rem 1rem; background: #11141a; color: var(--muted); }
+      .toml-link { color: var(--muted); text-decoration: none; font-size: 0.875rem; }
+      .toml-link:hover { color: var(--accent); }
     </style>
   </head>
   <body>
@@ -50,14 +88,36 @@ const { class: atomClass, slug, version } = Astro.params;
         <a href={`/${atomClass}/${slug}/`}>{slug}</a> /
         {version}
       </p>
-      <h1>{slug}</h1>
-      <span class="version-badge">{version}</span>
-      <p>Class: {atomClass}</p>
-      <p>
-        <a class="toml-link" href={`/${atomClass}/${slug}/${version}/atom.toml`}>
-          Download <code>atom.toml</code>
-        </a>
-      </p>
+
+      <h1>{title}</h1>
+      {summary && <p class="summary">{summary}</p>}
+
+      <div class="meta">
+        <span class={`badge lifecycle-${lifecycle}`}>{lifecycle}</span>
+        <span class="badge">{version}</span>
+        <span class="badge">{atomClass}</span>
+      </div>
+
+      <table class="meta-table">
+        <tbody>
+          {atom?.id && <tr><td>id</td><td><code>{atom.id}</code></td></tr>}
+          {authors && authors.length > 0 && <tr><td>authors</td><td>{authors.join(', ')}</td></tr>}
+          {conformsTo && <tr><td>conforms to</td><td><code>{conformsTo}</code></td></tr>}
+          {atom?.created_at && <tr><td>created</td><td>{atom.created_at.slice(0, 10)}</td></tr>}
+          {atom?.supersedes && <tr><td>supersedes</td><td><code>{atom.supersedes}</code></td></tr>}
+          {atom?.migration_notes && <tr><td>migration</td><td>{atom.migration_notes}</td></tr>}
+        </tbody>
+      </table>
+
+      {contentHtml && (
+        <>
+          <hr />
+          <div class="prose" set:html={contentHtml} />
+        </>
+      )}
+
+      <hr />
+      <a class="toml-link" href={`/${atomClass}/${slug}/${version}/atom.toml`}>↓ atom.toml</a>
     </main>
   </body>
 </html>
