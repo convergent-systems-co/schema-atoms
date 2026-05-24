@@ -35,35 +35,40 @@ def load_schema_asset(atom_dir: Path, asset_name: str):
     return None, f"YAML asset {asset_name} skipped (pyyaml not required; use .json for full validation)"
 
 
-def validate_json_schema_atom(path: Path, data: dict, violations: list):
+def validate_json_schema_atom(rel_path: Path, abs_path: Path, data: dict, violations: list):
+    """Validate a single json-schema atom.
+
+    rel_path — path relative to repo root (used in violation messages)
+    abs_path — absolute path to atom.toml (used for filesystem access)
+    """
     spec = data.get("spec", {})
     schema_version = spec.get("schema_version", "")
     root_schema_id = spec.get("root_schema_id", "")
     asset_name = spec.get("asset", "")
 
     if not schema_version:
-        violations.append(f"{path}: [spec].schema_version is required")
+        violations.append(f"{rel_path}: [spec].schema_version is required")
     if not root_schema_id:
-        violations.append(f"{path}: [spec].root_schema_id is required")
+        violations.append(f"{rel_path}: [spec].root_schema_id is required")
     if not asset_name:
-        violations.append(f"{path}: [spec].asset is required")
+        violations.append(f"{rel_path}: [spec].asset is required")
 
     if not (schema_version and root_schema_id and asset_name):
         return  # can't validate further without required fields
 
-    atom_dir = path.parent
+    atom_dir = abs_path.parent
     schema_data, err = load_schema_asset(atom_dir, asset_name)
     if err:
         if "skipped" in err:
             return  # yaml skip is informational, not a violation
-        violations.append(f"{path}: {err}")
+        violations.append(f"{rel_path}: {err}")
         return
 
     # #67 — $id must match root_schema_id
     schema_id = schema_data.get("$id", "")
     if schema_id != root_schema_id:
         violations.append(
-            f"{path}: $id '{schema_id}' in schema asset does not match "
+            f"{rel_path}: $id '{schema_id}' in schema asset does not match "
             f"spec.root_schema_id '{root_schema_id}'"
         )
 
@@ -72,12 +77,12 @@ def validate_json_schema_atom(path: Path, data: dict, violations: list):
     actual_schema_uri = schema_data.get("$schema", "")
     if expected_schema_uri is None:
         violations.append(
-            f"{path}: unknown schema_version '{schema_version}'; "
+            f"{rel_path}: unknown schema_version '{schema_version}'; "
             f"valid values: {', '.join(SCHEMA_VERSION_MAP.keys())}"
         )
     elif actual_schema_uri != expected_schema_uri:
         violations.append(
-            f"{path}: $schema '{actual_schema_uri}' does not match "
+            f"{rel_path}: $schema '{actual_schema_uri}' does not match "
             f"expected '{expected_schema_uri}' for schema_version '{schema_version}'"
         )
 
@@ -95,7 +100,12 @@ def main():
             data = tomllib.load(f)
         spec = data.get("spec", {})
         if spec.get("class") == "json-schema":
-            validate_json_schema_atom(atom_path.relative_to(root), data, violations)
+            validate_json_schema_atom(
+                atom_path.relative_to(root),
+                atom_path,
+                data,
+                violations,
+            )
     print(f"Validated {count} json-schema atoms")
     if violations:
         for v in violations:
