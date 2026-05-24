@@ -1,4 +1,4 @@
-import { readdirSync, existsSync } from 'fs';
+import { readdirSync, existsSync, statSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
@@ -38,19 +38,23 @@ export const ATOM_CLASSES = [
 export type AtomClass = (typeof ATOM_CLASSES)[number];
 
 /**
- * Returns all .toml filenames (without extension) for the given atom class.
- * Returns an empty array when the class directory is empty or has no .toml files.
+ * Returns atom directory names (<slug>@<version>) for the given atom class.
+ * Atoms are stored as compositions/<class>/<slug>@<version>/atom.toml.
+ * Returns an empty array when the class directory has no atom subdirectories.
  */
 export function getAtomsForClass(atomClass: string): string[] {
   const dir = join(COMPOSITIONS_DIR, atomClass);
   if (!existsSync(dir)) return [];
-  return (readdirSync(dir) as string[]).filter((f: string) => f.endsWith('.toml'));
+  return (readdirSync(dir) as string[]).filter((entry: string) => {
+    const entryPath = join(dir, entry);
+    return statSync(entryPath).isDirectory() && existsSync(join(entryPath, 'atom.toml'));
+  });
 }
 
 /**
- * Parses a slug and version from a .toml filename.
- * Convention: <slug>@<version>.toml  (e.g. openapi-3.1@1.0.0.toml)
- * Falls back to filename-as-slug with version "latest" when no "@" separator.
+ * Parses a slug and version from an atom directory name (<slug>@<version>)
+ * or legacy flat filename (<slug>@<version>.toml).
+ * Falls back to entry-as-slug with version "latest" when no "@" separator.
  */
 export function parseAtomFilename(filename: string): { slug: string; version: string } {
   const base = filename.replace(/\.toml$/, '');
