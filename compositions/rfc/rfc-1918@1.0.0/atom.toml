@@ -12,7 +12,8 @@ authors        = ["Y. Rekhter", "B. Moskowitz", "D. Karrenberg", "G. J. de Groot
 published_date = "1996-02"
 status         = "BCP"
 obsoletes      = ["RFC 1597", "RFC 1627"]
-asset          = "rfc1918.txt"
+asset          = "rfc1918.md"
+asset_source   = "rfc1918.txt"
 
 [protocol]
 provenance = "https://www.rfc-editor.org/rfc/rfc1918 — RFC 1918, February 1996, Rekhter et al."
