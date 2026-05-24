@@ -14,14 +14,27 @@ export function getStaticPaths() {
 const { class: atomClass, slug, version } = Astro.params;
 const atom = loadAtomData(atomClass, `${slug}@${version}`);
 
-const spec = atom?.spec as Record<string, unknown> | undefined;
-const title = (spec?.['title'] as string) || slug;
-const summary = spec?.['summary'] as string | undefined;
-const authors = spec?.['authors'] as string[] | undefined;
-const conformsTo = spec?.['conforms_to'] as string | undefined;
+const payload = atom?.payload as Record<string, unknown> | undefined;
+const title = (payload?.['title'] as string) || (payload?.['name'] as string) || slug;
+const summary = (payload?.['summary'] as string) || (payload?.['description'] as string);
+const authors = payload?.['authors'] as string[] | undefined;
+const conformsTo = payload?.['conforms_to'] as string | undefined;
 const lifecycle = atom?.lifecycle ?? '';
+const assetExt = atom?.assetName?.split('.').pop() ?? '';
 
-const contentHtml = atom?.assetContent ? marked.parse(atom.assetContent) : null;
+// Markdown assets → render as prose. Everything else → code block.
+const isMarkdown = assetExt === 'md';
+const contentHtml = isMarkdown && atom?.assetContent
+  ? marked.parse(atom.assetContent)
+  : null;
+const codeContent = !isMarkdown && atom?.assetContent ? atom.assetContent : null;
+
+// Language hint for syntax highlighting label
+const langLabel: Record<string, string> = {
+  yaml: 'yaml', yml: 'yaml', json: 'json', toml: 'toml',
+  ebnf: 'ebnf', bnf: 'bnf', proto: 'protobuf', xsd: 'xml',
+};
+const codeLang = langLabel[assetExt] ?? assetExt;
 ---
 
 <!doctype html>
@@ -43,23 +56,44 @@ const contentHtml = atom?.assetContent ? marked.parse(atom.assetContent) : null;
       * { box-sizing: border-box; }
       html, body { margin: 0; padding: 0; background: var(--bg); color: var(--fg); }
       body { min-height: 100vh; padding: 2rem; line-height: 1.6; }
-      main { max-width: 48rem; margin: 0 auto; }
+      main { max-width: 52rem; margin: 0 auto; }
       .breadcrumb { color: var(--muted); font-size: 0.875rem; margin-bottom: 1.5rem; }
       .breadcrumb a { color: var(--accent); text-decoration: none; }
       .breadcrumb a:hover { text-decoration: underline; }
       h1 { font-size: clamp(1.75rem, 5vw, 2.5rem); margin: 0 0 0.5rem; font-weight: 600; letter-spacing: -0.03em; }
-      .summary { color: var(--muted); font-size: 1.05rem; margin: 0 0 1.5rem; }
+      .summary { color: var(--muted); font-size: 1.05rem; margin: 0 0 1.5rem; line-height: 1.5; }
       .meta { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 2rem; }
       .badge { display: inline-block; background: #11141a; border: 1px solid var(--border); border-radius: 3px; padding: 0.2em 0.6em; font-size: 0.8rem; font-family: monospace; }
       .badge.lifecycle-draft { border-color: #ffb86c44; color: var(--accent); }
       .badge.lifecycle-stable { border-color: #50fa7b44; color: #50fa7b; }
       .badge.lifecycle-historic { border-color: #7a808844; color: var(--muted); }
       .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 2rem; font-size: 0.875rem; }
-      .meta-table td { padding: 0.4rem 0; vertical-align: top; }
+      .meta-table td { padding: 0.4rem 0; vertical-align: top; border-bottom: 1px solid var(--border); }
       .meta-table td:first-child { color: var(--muted); width: 8rem; padding-right: 1rem; }
-      .meta-table td code { background: #1a1f26; padding: 0.1em 0.4em; border-radius: 3px; font-size: 0.85em; }
+      .meta-table tr:last-child td { border-bottom: none; }
+      code { background: #1a1f26; padding: 0.15em 0.4em; border-radius: 3px; font-size: 0.875em; }
       hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
-      .prose { color: var(--fg); }
+
+      /* Section headers */
+      .section-label { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin: 0 0 1rem; }
+
+      /* Code asset block */
+      .asset-block { position: relative; }
+      .asset-header { display: flex; align-items: center; justify-content: space-between; background: #0d1117; border: 1px solid var(--border); border-bottom: none; border-radius: 4px 4px 0 0; padding: 0.4rem 0.75rem; }
+      .asset-filename { font-size: 0.8rem; color: var(--muted); font-family: monospace; }
+      .asset-lang { font-size: 0.75rem; color: var(--muted); opacity: 0.6; }
+      pre.asset { background: #0d1117; border: 1px solid var(--border); border-radius: 0 0 4px 4px; padding: 1.25rem; overflow-x: auto; margin: 0 0 2rem; font-size: 0.85rem; line-height: 1.5; white-space: pre; }
+      pre.asset code { background: none; padding: 0; font-size: inherit; }
+
+      /* TOML viewer */
+      .toml-viewer { margin-top: 1rem; }
+      details summary { cursor: pointer; color: var(--muted); font-size: 0.875rem; padding: 0.5rem 0; user-select: none; }
+      details summary:hover { color: var(--accent); }
+      details[open] summary { margin-bottom: 0.5rem; }
+      pre.toml { background: #0d1117; border: 1px solid var(--border); border-radius: 4px; padding: 1.25rem; overflow-x: auto; margin: 0; font-size: 0.85rem; line-height: 1.5; white-space: pre; }
+      pre.toml code { background: none; padding: 0; }
+
+      /* Prose */
       .prose h1, .prose h2, .prose h3, .prose h4 { font-weight: 600; letter-spacing: -0.02em; margin: 2rem 0 0.75rem; }
       .prose h1 { font-size: 1.75rem; }
       .prose h2 { font-size: 1.3rem; border-bottom: 1px solid var(--border); padding-bottom: 0.4rem; }
@@ -68,7 +102,7 @@ const contentHtml = atom?.assetContent ? marked.parse(atom.assetContent) : null;
       .prose ul, .prose ol { padding-left: 1.5rem; margin: 0 0 1rem; }
       .prose li { margin-bottom: 0.25rem; }
       .prose code { background: #1a1f26; padding: 0.15em 0.4em; border-radius: 3px; font-size: 0.875em; }
-      .prose pre { background: #11141a; border: 1px solid var(--border); border-radius: 4px; padding: 1rem; overflow-x: auto; margin: 0 0 1rem; }
+      .prose pre { background: #0d1117; border: 1px solid var(--border); border-radius: 4px; padding: 1rem; overflow-x: auto; margin: 0 0 1rem; }
       .prose pre code { background: none; padding: 0; }
       .prose table { width: 100%; border-collapse: collapse; margin: 0 0 1rem; font-size: 0.875rem; }
       .prose th { background: #11141a; padding: 0.5rem 0.75rem; text-align: left; border: 1px solid var(--border); color: var(--muted); font-weight: 600; }
@@ -76,8 +110,6 @@ const contentHtml = atom?.assetContent ? marked.parse(atom.assetContent) : null;
       .prose a { color: var(--accent); text-decoration: none; }
       .prose a:hover { text-decoration: underline; }
       .prose blockquote { border-left: 3px solid var(--accent); margin: 0 0 1rem; padding: 0.5rem 1rem; background: #11141a; color: var(--muted); }
-      .toml-link { color: var(--muted); text-decoration: none; font-size: 0.875rem; }
-      .toml-link:hover { color: var(--accent); }
     </style>
   </head>
   <body>
@@ -109,6 +141,7 @@ const contentHtml = atom?.assetContent ? marked.parse(atom.assetContent) : null;
         </tbody>
       </table>
 
+      {/* Markdown asset → prose */}
       {contentHtml && (
         <>
           <hr />
@@ -116,8 +149,29 @@ const contentHtml = atom?.assetContent ? marked.parse(atom.assetContent) : null;
         </>
       )}
 
+      {/* Non-markdown asset → code block */}
+      {codeContent && (
+        <>
+          <hr />
+          <p class="section-label">Asset</p>
+          <div class="asset-block">
+            <div class="asset-header">
+              <span class="asset-filename">{atom?.assetName}</span>
+              <span class="asset-lang">{codeLang}</span>
+            </div>
+            <pre class="asset"><code>{codeContent}</code></pre>
+          </div>
+        </>
+      )}
+
+      {/* TOML viewer — always shown, collapsed by default */}
       <hr />
-      <a class="toml-link" href={`/${atomClass}/${slug}/${version}/atom.toml`}>↓ atom.toml</a>
+      <div class="toml-viewer">
+        <details>
+          <summary>atom.toml</summary>
+          <pre class="toml"><code>{atom?.tomlRaw}</code></pre>
+        </details>
+      </div>
     </main>
   </body>
 </html>

@@ -68,6 +68,9 @@ export function parseAtomFilename(filename: string): { slug: string; version: st
   };
 }
 
+// Envelope-level keys that are NOT payload sections.
+const ENVELOPE_KEYS = new Set(['id', 'version', 'content_hash', 'lifecycle', 'created_at', 'supersedes', 'migration_notes', 'protocol']);
+
 export interface AtomData {
   id: string;
   version: string;
@@ -75,10 +78,25 @@ export interface AtomData {
   created_at: string;
   supersedes?: string;
   migration_notes?: string;
-  spec?: Record<string, unknown>;
+  /** The payload section (e.g. [spec], [controlled_vocabulary], [ebnf_grammar]) */
+  payload?: Record<string, unknown>;
+  payloadKey?: string;
   assetContent?: string;
   assetName?: string;
+  /** Raw text of atom.toml for the inline viewer */
+  tomlRaw: string;
   raw: Record<string, unknown>;
+}
+
+/**
+ * Derives the expected TOML section key from a class name.
+ * design-spec → spec (special case)
+ * controlled-vocabulary → controlled_vocabulary
+ * ebnf-grammar → ebnf_grammar
+ */
+function classToSectionKey(atomClass: string): string {
+  if (atomClass === 'design-spec') return 'spec';
+  return atomClass.replace(/-/g, '_');
 }
 
 /**
@@ -90,12 +108,28 @@ export function loadAtomData(atomClass: string, atomDir: string): AtomData | nul
   const tomlPath = join(dir, 'atom.toml');
   if (!existsSync(tomlPath)) return null;
 
-  // Parse TOML using a minimal hand-rolled parser sufficient for atom.toml structure.
-  // Avoids a runtime TOML dep; atom.toml files are simple and well-structured.
-  const raw = parseAtomToml(readFileSync(tomlPath, 'utf-8'));
+  const tomlRaw = readFileSync(tomlPath, 'utf-8');
+  const raw = parseAtomToml(tomlRaw);
 
-  const spec = raw['spec'] as Record<string, unknown> | undefined;
-  const assetName = spec?.['asset'] as string | undefined;
+  // Find payload section: try the derived key first, then any non-envelope section.
+  const derivedKey = classToSectionKey(atomClass);
+  let payloadKey: string | undefined;
+  let payload: Record<string, unknown> | undefined;
+
+  if (raw[derivedKey] && typeof raw[derivedKey] === 'object' && !Array.isArray(raw[derivedKey])) {
+    payloadKey = derivedKey;
+    payload = raw[derivedKey] as Record<string, unknown>;
+  } else {
+    for (const k of Object.keys(raw)) {
+      if (!ENVELOPE_KEYS.has(k) && typeof raw[k] === 'object' && !Array.isArray(raw[k])) {
+        payloadKey = k;
+        payload = raw[k] as Record<string, unknown>;
+        break;
+      }
+    }
+  }
+
+  const assetName = payload?.['asset'] as string | undefined;
   let assetContent: string | undefined;
 
   if (assetName) {
@@ -112,9 +146,11 @@ export function loadAtomData(atomClass: string, atomDir: string): AtomData | nul
     created_at: raw['created_at'] as string ?? '',
     supersedes: raw['supersedes'] as string | undefined,
     migration_notes: raw['migration_notes'] as string | undefined,
-    spec,
+    payload,
+    payloadKey,
     assetContent,
     assetName,
+    tomlRaw,
     raw,
   };
 }
