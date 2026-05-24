@@ -22,17 +22,13 @@ const conformsTo = payload?.['conforms_to'] as string | undefined;
 const lifecycle = atom?.lifecycle ?? '';
 const assetExt = atom?.assetName?.split('.').pop() ?? '';
 
-// Markdown assets → render as prose. Everything else → code block.
 const isMarkdown = assetExt === 'md';
-const contentHtml = isMarkdown && atom?.assetContent
-  ? marked.parse(atom.assetContent)
-  : null;
+const contentHtml = isMarkdown && atom?.assetContent ? marked.parse(atom.assetContent) : null;
 const codeContent = !isMarkdown && atom?.assetContent ? atom.assetContent : null;
 
-// Language hint for syntax highlighting label
 const langLabel: Record<string, string> = {
   yaml: 'yaml', yml: 'yaml', json: 'json', toml: 'toml',
-  ebnf: 'ebnf', bnf: 'bnf', proto: 'protobuf', xsd: 'xml',
+  ebnf: 'ebnf', bnf: 'bnf', proto: 'protobuf', xsd: 'xml', txt: 'text',
 };
 const codeLang = langLabel[assetExt] ?? assetExt;
 ---
@@ -42,74 +38,59 @@ const codeLang = langLabel[assetExt] ?? assetExt;
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="description" content={summary ?? `${slug} — ${atomClass}`} />
+    <meta name="description" content={summary ?? `${slug} — ${atomClass} — schema-atoms`} />
     <title>{title} — {atomClass} — schema-atoms</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="stylesheet" href="/brand.css" />
     <style>
-      :root {
-        --bg: #0b0d10;
-        --fg: #e8e8e6;
-        --muted: #7a8088;
-        --accent: #ffb86c;
-        --border: #1f242a;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
-      }
-      * { box-sizing: border-box; }
-      html, body { margin: 0; padding: 0; background: var(--bg); color: var(--fg); }
-      body { min-height: 100vh; padding: 2rem; line-height: 1.6; }
+      body { min-height: 100vh; padding: 2.5rem 2rem; }
       main { max-width: 52rem; margin: 0 auto; }
-      .breadcrumb { color: var(--muted); font-size: 0.875rem; margin-bottom: 1.5rem; }
-      .breadcrumb a { color: var(--accent); text-decoration: none; }
-      .breadcrumb a:hover { text-decoration: underline; }
-      h1 { font-size: clamp(1.75rem, 5vw, 2.5rem); margin: 0 0 0.5rem; font-weight: 600; letter-spacing: -0.03em; }
-      .summary { color: var(--muted); font-size: 1.05rem; margin: 0 0 1.5rem; line-height: 1.5; }
-      .meta { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 2rem; }
-      .badge { display: inline-block; background: #11141a; border: 1px solid var(--border); border-radius: 3px; padding: 0.2em 0.6em; font-size: 0.8rem; font-family: monospace; }
-      .badge.lifecycle-draft { border-color: #ffb86c44; color: var(--accent); }
-      .badge.lifecycle-stable { border-color: #50fa7b44; color: #50fa7b; }
-      .badge.lifecycle-historic { border-color: #7a808844; color: var(--muted); }
-      .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 2rem; font-size: 0.875rem; }
+
+      .breadcrumb { color: var(--subtle); font-size: 0.8rem; margin-bottom: 1.75rem; }
+      .breadcrumb a { color: var(--cyan); }
+      .breadcrumb a:hover { color: var(--cyan-soft); }
+
+      h1 { font-size: clamp(1.6rem, 4vw, 2.2rem); font-weight: 800; letter-spacing: -0.03em; margin: 0 0 0.5rem; }
+      .summary { color: var(--muted); font-size: 1.05rem; margin: 0 0 1.5rem; line-height: 1.55; }
+
+      .badges { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 2rem; }
+      .badge { display: inline-block; background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 3px; padding: 0.2em 0.6em; font-size: 0.75rem; font-family: var(--font-mono); color: var(--muted); }
+      .badge.draft  { border-color: rgba(244,199,94,0.3);  color: var(--gold); }
+      .badge.published { border-color: rgba(92,214,255,0.3); color: var(--cyan); }
+      .badge.adopted   { border-color: rgba(92,214,255,0.4); color: var(--cyan-soft); }
+      .badge.historic  { border-color: var(--border); color: var(--subtle); }
+
+      .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 2rem; font-size: 0.85rem; }
       .meta-table td { padding: 0.4rem 0; vertical-align: top; border-bottom: 1px solid var(--border); }
-      .meta-table td:first-child { color: var(--muted); width: 8rem; padding-right: 1rem; }
       .meta-table tr:last-child td { border-bottom: none; }
-      code { background: #1a1f26; padding: 0.15em 0.4em; border-radius: 3px; font-size: 0.875em; }
+      .meta-table td:first-child { color: var(--subtle); width: 7rem; padding-right: 1rem; font-family: var(--font-mono); font-size: 0.8rem; }
+
       hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
 
-      /* Section headers */
-      .section-label { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin: 0 0 1rem; }
+      .asset-block { margin-bottom: 2rem; }
+      .asset-header { display: flex; align-items: center; justify-content: space-between; background: var(--bg-surface); border: 1px solid var(--border); border-bottom: none; border-radius: 6px 6px 0 0; padding: 0.4rem 0.85rem; }
+      .asset-filename { font-size: 0.8rem; color: var(--muted); font-family: var(--font-mono); }
+      .asset-lang { font-size: 0.7rem; color: var(--subtle); letter-spacing: 0.05em; text-transform: uppercase; }
+      pre.asset { background: var(--bg-surface); border: 1px solid var(--border); border-radius: 0 0 6px 6px; padding: 1.25rem; overflow-x: auto; margin: 0; }
 
-      /* Code asset block */
-      .asset-block { position: relative; }
-      .asset-header { display: flex; align-items: center; justify-content: space-between; background: #0d1117; border: 1px solid var(--border); border-bottom: none; border-radius: 4px 4px 0 0; padding: 0.4rem 0.75rem; }
-      .asset-filename { font-size: 0.8rem; color: var(--muted); font-family: monospace; }
-      .asset-lang { font-size: 0.75rem; color: var(--muted); opacity: 0.6; }
-      pre.asset { background: #0d1117; border: 1px solid var(--border); border-radius: 0 0 4px 4px; padding: 1.25rem; overflow-x: auto; margin: 0 0 2rem; font-size: 0.85rem; line-height: 1.5; white-space: pre; }
-      pre.asset code { background: none; padding: 0; font-size: inherit; }
-
-      /* TOML viewer */
-      .toml-viewer { margin-top: 1rem; }
-      details summary { cursor: pointer; color: var(--muted); font-size: 0.875rem; padding: 0.5rem 0; user-select: none; }
-      details summary:hover { color: var(--accent); }
-      details[open] summary { margin-bottom: 0.5rem; }
-      pre.toml { background: #0d1117; border: 1px solid var(--border); border-radius: 4px; padding: 1.25rem; overflow-x: auto; margin: 0; font-size: 0.85rem; line-height: 1.5; white-space: pre; }
-      pre.toml code { background: none; padding: 0; }
-
-      /* Prose */
-      .prose h1, .prose h2, .prose h3, .prose h4 { font-weight: 600; letter-spacing: -0.02em; margin: 2rem 0 0.75rem; }
-      .prose h1 { font-size: 1.75rem; }
-      .prose h2 { font-size: 1.3rem; border-bottom: 1px solid var(--border); padding-bottom: 0.4rem; }
-      .prose h3 { font-size: 1.1rem; }
+      .prose { color: var(--fg); }
+      .prose h1, .prose h2, .prose h3, .prose h4 { font-weight: 700; letter-spacing: -0.02em; margin: 2rem 0 0.75rem; color: var(--fg); }
+      .prose h1 { font-size: 1.6rem; }
+      .prose h2 { font-size: 1.25rem; border-bottom: 1px solid var(--border); padding-bottom: 0.4rem; }
+      .prose h3 { font-size: 1.05rem; }
       .prose p { margin: 0 0 1rem; }
       .prose ul, .prose ol { padding-left: 1.5rem; margin: 0 0 1rem; }
-      .prose li { margin-bottom: 0.25rem; }
-      .prose code { background: #1a1f26; padding: 0.15em 0.4em; border-radius: 3px; font-size: 0.875em; }
-      .prose pre { background: #0d1117; border: 1px solid var(--border); border-radius: 4px; padding: 1rem; overflow-x: auto; margin: 0 0 1rem; }
-      .prose pre code { background: none; padding: 0; }
+      .prose li { margin-bottom: 0.3rem; }
+      .prose a { color: var(--cyan); }
+      .prose a:hover { color: var(--cyan-soft); }
+      .prose blockquote { border-left: 3px solid var(--gold); margin: 0 0 1rem; padding: 0.5rem 1rem; background: var(--bg-surface); color: var(--muted); }
       .prose table { width: 100%; border-collapse: collapse; margin: 0 0 1rem; font-size: 0.875rem; }
-      .prose th { background: #11141a; padding: 0.5rem 0.75rem; text-align: left; border: 1px solid var(--border); color: var(--muted); font-weight: 600; }
+      .prose th { background: var(--bg-elevated); padding: 0.5rem 0.75rem; text-align: left; border: 1px solid var(--border); color: var(--subtle); font-weight: 600; font-size: 0.75rem; letter-spacing: 0.04em; text-transform: uppercase; }
       .prose td { padding: 0.5rem 0.75rem; border: 1px solid var(--border); }
-      .prose a { color: var(--accent); text-decoration: none; }
-      .prose a:hover { text-decoration: underline; }
-      .prose blockquote { border-left: 3px solid var(--accent); margin: 0 0 1rem; padding: 0.5rem 1rem; background: #11141a; color: var(--muted); }
+
+      .toml-viewer details summary { cursor: pointer; color: var(--subtle); font-size: 0.8rem; font-family: var(--font-mono); padding: 0.4rem 0; user-select: none; }
+      .toml-viewer details summary:hover { color: var(--cyan); }
+      .toml-viewer details[open] summary { margin-bottom: 0.5rem; }
     </style>
   </head>
   <body>
@@ -124,8 +105,8 @@ const codeLang = langLabel[assetExt] ?? assetExt;
       <h1>{title}</h1>
       {summary && <p class="summary">{summary}</p>}
 
-      <div class="meta">
-        <span class={`badge lifecycle-${lifecycle}`}>{lifecycle}</span>
+      <div class="badges">
+        <span class={`badge ${lifecycle}`}>{lifecycle}</span>
         <span class="badge">{version}</span>
         <span class="badge">{atomClass}</span>
       </div>
@@ -134,14 +115,13 @@ const codeLang = langLabel[assetExt] ?? assetExt;
         <tbody>
           {atom?.id && <tr><td>id</td><td><code>{atom.id}</code></td></tr>}
           {authors && authors.length > 0 && <tr><td>authors</td><td>{authors.join(', ')}</td></tr>}
-          {conformsTo && <tr><td>conforms to</td><td><code>{conformsTo}</code></td></tr>}
+          {conformsTo && <tr><td>conforms_to</td><td><code>{conformsTo}</code></td></tr>}
           {atom?.created_at && <tr><td>created</td><td>{atom.created_at.slice(0, 10)}</td></tr>}
           {atom?.supersedes && <tr><td>supersedes</td><td><code>{atom.supersedes}</code></td></tr>}
           {atom?.migration_notes && <tr><td>migration</td><td>{atom.migration_notes}</td></tr>}
         </tbody>
       </table>
 
-      {/* Markdown asset → prose */}
       {contentHtml && (
         <>
           <hr />
@@ -149,11 +129,9 @@ const codeLang = langLabel[assetExt] ?? assetExt;
         </>
       )}
 
-      {/* Non-markdown asset → code block */}
       {codeContent && (
         <>
           <hr />
-          <p class="section-label">Asset</p>
           <div class="asset-block">
             <div class="asset-header">
               <span class="asset-filename">{atom?.assetName}</span>
@@ -164,12 +142,11 @@ const codeLang = langLabel[assetExt] ?? assetExt;
         </>
       )}
 
-      {/* TOML viewer — always shown, collapsed by default */}
       <hr />
       <div class="toml-viewer">
         <details>
           <summary>atom.toml</summary>
-          <pre class="toml"><code>{atom?.tomlRaw}</code></pre>
+          <pre><code>{atom?.tomlRaw}</code></pre>
         </details>
       </div>
     </main>
