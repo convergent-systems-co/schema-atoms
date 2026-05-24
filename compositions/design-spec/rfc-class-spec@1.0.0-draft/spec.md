@@ -65,7 +65,8 @@ Every `rfc` atom MUST include an `[rfc]` section. The following table describes 
 | `status` | string | MUST | IETF document status. One of: `STANDARDS TRACK`, `INFORMATIONAL`, `EXPERIMENTAL`, `BCP`, `HISTORIC`. |
 | `obsoletes` | array of strings | MAY | RFC identifiers obsoleted by this document (e.g., `["RFC 1597", "RFC 1627"]`). Omit if empty. |
 | `obsoleted_by` | array of strings | MAY | RFC identifiers that supersede this document (e.g., `["RFC 4632"]`). Omit if empty. |
-| `asset` | string | MUST | Filename of the RFC text asset bundled in this atom directory. |
+| `asset` | string | MUST | Filename of the primary asset for this atom. SHOULD be a `.md` file for site rendering. |
+| `asset_source` | string | MAY | Filename of the canonical plain-text source (`.txt`) when `asset` is a markdown conversion. Preserves the archival original. |
 
 ### Status Values
 
@@ -96,8 +97,8 @@ The `provenance` URL MUST point to `https://www.rfc-editor.org/rfc/rfc<number>`.
 
 | Format | Extension | When to use |
 |---|---|---|
-| Plain-text RFC | `.txt` | Canonical IETF format; preferred for faithful representation of the original document |
-| Markdown | `.md` | Acceptable for markdown-converted or summarized versions annotated for schema-atoms use |
+| Markdown | `.md` | **Preferred** for `asset`. Renders as prose on schema-atoms.com. Use a structured conversion of the RFC with headings, tables, and inline code. |
+| Plain-text RFC | `.txt` | Use as `asset_source` alongside a `.md` asset to preserve the canonical IETF format. Also acceptable as `asset` when no markdown conversion exists yet. |
 
 The `asset` field in `[rfc]` MUST name exactly one file present in the atom directory.
 
