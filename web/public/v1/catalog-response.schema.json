@@ -1,0 +1,122 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schema-atoms.com/v1/catalog-response.schema.json",
+  "title": "CatalogResponse",
+  "description": "Response shape for GET /v1/catalog — the public AI model catalog served by api.convergent-systems.co.",
+  "type": "object",
+  "required": ["object", "data"],
+  "properties": {
+    "object": {
+      "const": "list"
+    },
+    "data": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/CatalogEntry" }
+    }
+  },
+  "additionalProperties": false,
+
+  "$defs": {
+    "CatalogEntry": {
+      "title": "CatalogEntry",
+      "description": "A single model as returned by GET /v1/catalog.",
+      "type": "object",
+      "required": ["id", "object", "provider", "task", "capabilities"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Provider-canonical model ID used in chat completion requests, e.g. '@cf/meta/llama-3.1-8b-instruct'."
+        },
+        "object": {
+          "const": "model"
+        },
+        "provider": {
+          "type": "string",
+          "description": "Routing provider key.",
+          "enum": ["cloudflare", "anthropic", "openai", "azure"]
+        },
+        "task": {
+          "type": "string",
+          "description": "Primary task type for this model.",
+          "enum": [
+            "text-generation",
+            "code-generation",
+            "reasoning",
+            "embedding",
+            "image-generation",
+            "speech-to-text",
+            "text-to-speech",
+            "multimodal"
+          ]
+        },
+        "capabilities": {
+          "type": "array",
+          "description": "Discrete capabilities exposed by this model.",
+          "items": {
+            "type": "string",
+            "enum": [
+              "streaming",
+              "tool-use",
+              "function-calling",
+              "vision",
+              "json-mode",
+              "prompt-caching",
+              "reasoning",
+              "lora",
+              "batch-processing"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "context_window": {
+          "type": ["integer", "null"],
+          "description": "Maximum context length in tokens. Null when not publicly specified."
+        },
+        "pricing": {
+          "oneOf": [
+            { "$ref": "#/$defs/NeuronPricing" },
+            { "$ref": "#/$defs/TokenPricing" }
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+
+    "NeuronPricing": {
+      "title": "NeuronPricing",
+      "description": "Cloudflare Workers AI billing unit (neurons per 1k tokens).",
+      "type": "object",
+      "required": ["unit", "per_thousand"],
+      "properties": {
+        "unit": { "const": "neurons" },
+        "per_thousand": {
+          "type": "number",
+          "description": "Neuron cost per 1,000 tokens.",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false
+    },
+
+    "TokenPricing": {
+      "title": "TokenPricing",
+      "description": "Standard per-token billing (input and output rates in USD per million tokens).",
+      "type": "object",
+      "required": ["unit", "input_per_million", "output_per_million"],
+      "properties": {
+        "unit": { "const": "tokens" },
+        "input_per_million": {
+          "type": "number",
+          "description": "USD cost per million input tokens.",
+          "minimum": 0
+        },
+        "output_per_million": {
+          "type": "number",
+          "description": "USD cost per million output tokens.",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

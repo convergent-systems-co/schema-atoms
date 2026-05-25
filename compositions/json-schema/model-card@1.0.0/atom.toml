@@ -1,0 +1,12 @@
+id           = "schema-atoms/json-schema/model-card"
+version      = "1.0.0"
+lifecycle    = "draft"
+created_at   = "2026-05-25T00:00:00Z"
+
+[json_schema]
+class        = "json-schema"
+title        = "ModelCard"
+description  = "Canonical JSON Schema for AI model-card atoms. Defines the structure of model-atoms.com compositions: vendor, provider, capabilities, context window, pricing tier, lifecycle."
+schema_url   = "https://schema-atoms.com/v1/model-card.schema.json"
+source       = "model-atoms.com"
+draft        = "2020-12"

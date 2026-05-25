@@ -1,0 +1,12 @@
+id           = "schema-atoms/json-schema/catalog-response"
+version      = "1.0.0"
+lifecycle    = "draft"
+created_at   = "2026-05-25T00:00:00Z"
+
+[json_schema]
+class        = "json-schema"
+title        = "CatalogResponse"
+description  = "JSON Schema for the GET /v1/catalog response from api.convergent-systems.co. Defines CatalogEntry with NeuronPricing (Cloudflare) and TokenPricing (Anthropic/OpenAI/Azure) variants."
+schema_url   = "https://schema-atoms.com/v1/catalog-response.schema.json"
+endpoint     = "https://api.convergent-systems.co/v1/catalog"
+draft        = "2020-12"
