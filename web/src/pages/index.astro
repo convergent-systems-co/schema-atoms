@@ -17,7 +17,7 @@ const totalAtoms = classes.reduce((sum, c) => sum + c.count, 0);
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content="Canonical schema atoms for the convergent-systems.co atoms ecosystem." />
     <title>schema-atoms</title>
-    <link rel="icon" type="image/svg+xml" href="https://brand-atoms.com/dist/brands/atom-family/1.0.0/assets/favicon.svg" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="preconnect" href="https://brand-atoms.com" />
     <link rel="stylesheet" href="https://brand-atoms.com/dist/brands/atom-family/1.0.0/css/tokens.css" />
     <link rel="stylesheet" href="https://brand-atoms.com/dist/brands/atom-family/1.0.0/ui/atoms-catalog.css" />
@@ -96,7 +96,6 @@ const totalAtoms = classes.reduce((sum, c) => sum + c.count, 0);
               <radialGradient id="s-cyan" cx="38%" cy="32%" r="60%"><stop offset="0%" stop-color="#aaeeff"/><stop offset="40%" stop-color="#3aaedd"/><stop offset="100%" stop-color="#0a4a6a"/></radialGradient>
               <linearGradient id="tube-h" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#f0f0f0"/><stop offset="40%" stop-color="#d0d4da"/><stop offset="100%" stop-color="#8890a0"/></linearGradient>
             </defs>
-            <rect width="400" height="400" fill="#000000" rx="48"/>
             <line x1="80" y1="310" x2="200" y2="220" stroke="url(#tube-h)" stroke-width="22" stroke-linecap="round"/>
             <line x1="200" y1="220" x2="320" y2="310" stroke="url(#tube-h)" stroke-width="22" stroke-linecap="round"/>
             <line x1="200" y1="220" x2="135" y2="95" stroke="url(#tube-h)" stroke-width="22" stroke-linecap="round"/>
@@ -159,14 +158,27 @@ const totalAtoms = classes.reduce((sum, c) => sum + c.count, 0);
       </main>
 
       <nav class="sidenav">
-        <a class="brand" href="/">
-          <div class="mark" aria-hidden="true">
-            <span class="dot dot-1"></span>
-            <span class="dot dot-2"></span>
-            <span class="dot dot-3"></span>
-            <span class="dot dot-4"></span>
-          </div>
-          <span class="brand-text">schema-atoms</span>
+        <a class="brand" href="/" aria-label="schema-atoms home">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 480" width="140" height="112" aria-hidden="true">
+            <defs>
+              <radialGradient id="nb-blue" cx="38%" cy="32%" r="60%"><stop offset="0%" stop-color="#9ad8ff"/><stop offset="40%" stop-color="#3b9fd4"/><stop offset="100%" stop-color="#0a4a7a"/></radialGradient>
+              <radialGradient id="nb-white" cx="38%" cy="32%" r="60%"><stop offset="0%" stop-color="#ffffff"/><stop offset="50%" stop-color="#c8d0dc"/><stop offset="100%" stop-color="#7a8090"/></radialGradient>
+              <radialGradient id="nb-orange" cx="38%" cy="32%" r="60%"><stop offset="0%" stop-color="#ffcc88"/><stop offset="40%" stop-color="#e87020"/><stop offset="100%" stop-color="#7a2800"/></radialGradient>
+              <radialGradient id="nb-cyan" cx="38%" cy="32%" r="60%"><stop offset="0%" stop-color="#aaeeff"/><stop offset="40%" stop-color="#3aaedd"/><stop offset="100%" stop-color="#0a4a6a"/></radialGradient>
+              <linearGradient id="nb-tube" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#f0f0f0"/><stop offset="40%" stop-color="#d0d4da"/><stop offset="100%" stop-color="#8890a0"/></linearGradient>
+            </defs>
+            <g transform="translate(100, 20) scale(0.8)">
+              <line x1="80" y1="310" x2="200" y2="220" stroke="url(#nb-tube)" stroke-width="22" stroke-linecap="round"/>
+              <line x1="200" y1="220" x2="320" y2="310" stroke="url(#nb-tube)" stroke-width="22" stroke-linecap="round"/>
+              <line x1="200" y1="220" x2="135" y2="95" stroke="url(#nb-tube)" stroke-width="22" stroke-linecap="round"/>
+              <line x1="200" y1="220" x2="265" y2="95" stroke="url(#nb-tube)" stroke-width="22" stroke-linecap="round"/>
+              <circle cx="200" cy="80" r="40" fill="url(#nb-blue)"/>
+              <circle cx="200" cy="220" r="30" fill="url(#nb-white)"/>
+              <circle cx="80" cy="310" r="38" fill="url(#nb-orange)"/>
+              <circle cx="320" cy="310" r="38" fill="url(#nb-cyan)"/>
+            </g>
+            <text x="300" y="430" font-family="Inter, -apple-system, sans-serif" font-weight="300" font-size="72" fill="#ffffff" letter-spacing="18" text-anchor="middle">ATOMS</text>
+          </svg>
         </a>
 
         <div class="nav">
