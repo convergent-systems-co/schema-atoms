@@ -88,7 +88,24 @@ const totalAtoms = classes.reduce((sum, c) => sum + c.count, 0);
     <div class="shell">
       <main class="content">
         <section class="hero">
-          <img src="https://brand-atoms.com/dist/brands/atom-family/1.0.0/assets/atom-family-icon.svg" alt="atom-family mark" class="hero-mark" />
+          <svg class="hero-mark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" aria-label="atom-family mark" role="img">
+            <defs>
+              <radialGradient id="s-blue" cx="38%" cy="32%" r="60%"><stop offset="0%" stop-color="#9ad8ff"/><stop offset="40%" stop-color="#3b9fd4"/><stop offset="100%" stop-color="#0a4a7a"/></radialGradient>
+              <radialGradient id="s-white" cx="38%" cy="32%" r="60%"><stop offset="0%" stop-color="#ffffff"/><stop offset="50%" stop-color="#c8d0dc"/><stop offset="100%" stop-color="#7a8090"/></radialGradient>
+              <radialGradient id="s-orange" cx="38%" cy="32%" r="60%"><stop offset="0%" stop-color="#ffcc88"/><stop offset="40%" stop-color="#e87020"/><stop offset="100%" stop-color="#7a2800"/></radialGradient>
+              <radialGradient id="s-cyan" cx="38%" cy="32%" r="60%"><stop offset="0%" stop-color="#aaeeff"/><stop offset="40%" stop-color="#3aaedd"/><stop offset="100%" stop-color="#0a4a6a"/></radialGradient>
+              <linearGradient id="tube-h" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#f0f0f0"/><stop offset="40%" stop-color="#d0d4da"/><stop offset="100%" stop-color="#8890a0"/></linearGradient>
+            </defs>
+            <rect width="400" height="400" fill="#000000" rx="48"/>
+            <line x1="80" y1="310" x2="200" y2="220" stroke="url(#tube-h)" stroke-width="22" stroke-linecap="round"/>
+            <line x1="200" y1="220" x2="320" y2="310" stroke="url(#tube-h)" stroke-width="22" stroke-linecap="round"/>
+            <line x1="200" y1="220" x2="135" y2="95" stroke="url(#tube-h)" stroke-width="22" stroke-linecap="round"/>
+            <line x1="200" y1="220" x2="265" y2="95" stroke="url(#tube-h)" stroke-width="22" stroke-linecap="round"/>
+            <circle cx="200" cy="80" r="40" fill="url(#s-blue)"/>
+            <circle cx="200" cy="220" r="30" fill="url(#s-white)"/>
+            <circle cx="80" cy="310" r="38" fill="url(#s-orange)"/>
+            <circle cx="320" cy="310" r="38" fill="url(#s-cyan)"/>
+          </svg>
           <h1>schema<span>-atoms</span></h1>
           <p class="lede">
             Canonical, versioned schema atoms for the convergent-systems.co ecosystem.
