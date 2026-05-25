@@ -1,6 +1,6 @@
 id          = "schema-atoms/controlled-vocabulary/persona-domains"
 version     = "1.0.0"
-content_hash = ""
+content_hash = "bf9d33cf9dc173d90489e89e82d2497ad3586de56d3921f0ac2cfce09135d040"
 lifecycle   = "draft"
 created_at  = "2026-05-23T00:00:00Z"
 

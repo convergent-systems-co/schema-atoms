@@ -1,7 +1,7 @@
 # atom.toml — class specification atom for graphql-schema
 id          = "schema-atoms/design-spec/graphql-schema-class-spec"
 version     = "1.0.0-draft"
-content_hash = ""
+content_hash = "d5902a9289410396f480e3a9eb4056c4f96272c9908e9d970af6f54d012b81e4"
 lifecycle   = "draft"
 created_at  = "2026-05-23T00:00:00Z"
 

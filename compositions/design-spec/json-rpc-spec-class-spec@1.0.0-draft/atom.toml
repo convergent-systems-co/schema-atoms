@@ -1,7 +1,7 @@
 # atom.toml — class specification atom for json-rpc-spec
 id          = "schema-atoms/design-spec/json-rpc-spec-class-spec"
 version     = "1.0.0-draft"
-content_hash = ""
+content_hash = "92c9799da3848c2075865d3d5db08ca62c907a9daae9c0d39d81c8747815c57f"
 lifecycle   = "draft"
 created_at  = "2026-05-23T00:00:00Z"
 

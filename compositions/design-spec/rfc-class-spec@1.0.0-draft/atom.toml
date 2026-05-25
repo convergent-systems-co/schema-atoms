@@ -1,7 +1,7 @@
 # atom.toml — class specification atom for rfc
 id          = "schema-atoms/design-spec/rfc-class-spec"
 version     = "1.0.0-draft"
-content_hash = ""
+content_hash = "89d0d9e84e763fe50c29e9894e46f3599205ac271d190046110544d27775bf24"
 lifecycle   = "draft"
 created_at  = "2026-05-24T00:00:00Z"
 

@@ -1,7 +1,7 @@
 # atom.toml — class specification atom for openapi-spec
 id          = "schema-atoms/design-spec/openapi-spec-class-spec"
 version     = "1.0.0-draft"
-content_hash = ""
+content_hash = "8651dbc728ebf50c672bb5c89f22a2ab223aff7ee77b20ab6ee372143fc8b8ee"
 lifecycle   = "draft"
 created_at  = "2026-05-23T00:00:00Z"
 
