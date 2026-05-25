@@ -1,0 +1,13 @@
+id          = "schema-atoms/design-spec/skill-catalog-spec"
+version     = "1.0.0-draft"
+content_hash = ""
+lifecycle   = "draft"
+created_at  = "2026-05-24T00:00:00Z"
+
+[spec]
+class       = "design-spec"
+title       = "Skill Catalog Specification"
+summary     = "Defines the structure and governance of skill-atoms, the catalog of AI agent skill definitions covering capabilities, tool use patterns, and task specializations."
+authors     = ["convergent-systems-co"]
+conforms_to = "schema-atoms/design-spec/atom-spec@1.1.0"
+asset       = "spec.md"

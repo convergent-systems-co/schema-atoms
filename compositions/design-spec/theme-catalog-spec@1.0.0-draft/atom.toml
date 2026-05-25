@@ -1,0 +1,13 @@
+id          = "schema-atoms/design-spec/theme-catalog-spec"
+version     = "1.0.0-draft"
+content_hash = ""
+lifecycle   = "draft"
+created_at  = "2026-05-24T00:00:00Z"
+
+[spec]
+class       = "design-spec"
+title       = "Theme Catalog Specification"
+summary     = "Defines the structure and governance of theme-atoms, the catalog of visual and terminal themes covering color palettes, typography, and shell prompt styles."
+authors     = ["convergent-systems-co"]
+conforms_to = "schema-atoms/design-spec/atom-spec@1.1.0"
+asset       = "spec.md"

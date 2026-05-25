@@ -1,0 +1,13 @@
+id          = "schema-atoms/design-spec/knowledge-catalog-spec"
+version     = "1.0.0-draft"
+content_hash = ""
+lifecycle   = "draft"
+created_at  = "2026-05-24T00:00:00Z"
+
+[spec]
+class       = "design-spec"
+title       = "Knowledge Catalog Specification"
+summary     = "Defines the structure and governance of knowledge-atoms, the catalog of structured knowledge base artifacts covering facts, reference data, and domain knowledge."
+authors     = ["convergent-systems-co"]
+conforms_to = "schema-atoms/design-spec/atom-spec@1.1.0"
+asset       = "spec.md"

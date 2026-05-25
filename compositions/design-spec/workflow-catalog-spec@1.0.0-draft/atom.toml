@@ -1,0 +1,13 @@
+id          = "schema-atoms/design-spec/workflow-catalog-spec"
+version     = "1.0.0-draft"
+content_hash = ""
+lifecycle   = "draft"
+created_at  = "2026-05-24T00:00:00Z"
+
+[spec]
+class       = "design-spec"
+title       = "Workflow Catalog Specification"
+summary     = "Defines the structure and governance of workflow-atoms, the catalog of workflow definitions covering multi-step processes, DAGs, and approval chains."
+authors     = ["convergent-systems-co"]
+conforms_to = "schema-atoms/design-spec/atom-spec@1.1.0"
+asset       = "spec.md"

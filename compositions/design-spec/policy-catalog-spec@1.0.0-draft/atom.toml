@@ -1,0 +1,13 @@
+id          = "schema-atoms/design-spec/policy-catalog-spec"
+version     = "1.0.0-draft"
+content_hash = ""
+lifecycle   = "draft"
+created_at  = "2026-05-24T00:00:00Z"
+
+[spec]
+class       = "design-spec"
+title       = "Policy Catalog Specification"
+summary     = "Defines the structure and governance of policy-atoms, the catalog of governance policies covering access control rules, data handling policies, and compliance requirements."
+authors     = ["convergent-systems-co"]
+conforms_to = "schema-atoms/design-spec/atom-spec@1.1.0"
+asset       = "spec.md"

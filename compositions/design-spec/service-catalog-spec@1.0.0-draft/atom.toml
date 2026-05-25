@@ -1,0 +1,13 @@
+id          = "schema-atoms/design-spec/service-catalog-spec"
+version     = "1.0.0-draft"
+content_hash = ""
+lifecycle   = "draft"
+created_at  = "2026-05-24T00:00:00Z"
+
+[spec]
+class       = "design-spec"
+title       = "Service Catalog Specification"
+summary     = "Defines the structure and governance of service-atoms, the catalog of service definitions covering API endpoints, authentication schemes, SLAs, and dependency declarations."
+authors     = ["convergent-systems-co"]
+conforms_to = "schema-atoms/design-spec/atom-spec@1.1.0"
+asset       = "spec.md"
