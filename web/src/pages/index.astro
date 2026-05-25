@@ -48,7 +48,8 @@ const totalAtoms = classes.reduce((sum, c) => sum + c.count, 0);
 
       /* Hero */
       .hero { padding: 48px 0 40px; max-width: 680px; }
-      .hero-mark { width: 72px; height: 72px; margin-bottom: 28px; }
+      .hero-mark { width: 160px; height: 160px; margin-bottom: 20px; object-fit: contain; }
+      .sidenav-wordmark { width: 140px; object-fit: contain; display: block; }
       .hero h1 { font-size: clamp(2.2rem, 5vw, 3.2rem); font-weight: 800; letter-spacing: -0.04em; margin: 0 0 12px; line-height: 1; }
       .hero h1 span { color: var(--gold); }
       .lede { font-size: 1.05rem; color: var(--muted); margin: 0 0 20px; max-width: 520px; line-height: 1.6; }
@@ -88,23 +89,7 @@ const totalAtoms = classes.reduce((sum, c) => sum + c.count, 0);
     <div class="shell">
       <main class="content">
         <section class="hero">
-          <svg class="hero-mark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" aria-label="atom-family mark" role="img">
-            <defs>
-              <radialGradient id="s-blue" cx="38%" cy="32%" r="60%"><stop offset="0%" stop-color="#9ad8ff"/><stop offset="40%" stop-color="#3b9fd4"/><stop offset="100%" stop-color="#0a4a7a"/></radialGradient>
-              <radialGradient id="s-white" cx="38%" cy="32%" r="60%"><stop offset="0%" stop-color="#ffffff"/><stop offset="50%" stop-color="#c8d0dc"/><stop offset="100%" stop-color="#7a8090"/></radialGradient>
-              <radialGradient id="s-orange" cx="38%" cy="32%" r="60%"><stop offset="0%" stop-color="#ffcc88"/><stop offset="40%" stop-color="#e87020"/><stop offset="100%" stop-color="#7a2800"/></radialGradient>
-              <radialGradient id="s-cyan" cx="38%" cy="32%" r="60%"><stop offset="0%" stop-color="#aaeeff"/><stop offset="40%" stop-color="#3aaedd"/><stop offset="100%" stop-color="#0a4a6a"/></radialGradient>
-              <linearGradient id="tube-h" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#f0f0f0"/><stop offset="40%" stop-color="#d0d4da"/><stop offset="100%" stop-color="#8890a0"/></linearGradient>
-            </defs>
-            <line x1="80" y1="310" x2="200" y2="220" stroke="url(#tube-h)" stroke-width="22" stroke-linecap="round"/>
-            <line x1="200" y1="220" x2="320" y2="310" stroke="url(#tube-h)" stroke-width="22" stroke-linecap="round"/>
-            <line x1="200" y1="220" x2="135" y2="95" stroke="url(#tube-h)" stroke-width="22" stroke-linecap="round"/>
-            <line x1="200" y1="220" x2="265" y2="95" stroke="url(#tube-h)" stroke-width="22" stroke-linecap="round"/>
-            <circle cx="200" cy="80" r="40" fill="url(#s-blue)"/>
-            <circle cx="200" cy="220" r="30" fill="url(#s-white)"/>
-            <circle cx="80" cy="310" r="38" fill="url(#s-orange)"/>
-            <circle cx="320" cy="310" r="38" fill="url(#s-cyan)"/>
-          </svg>
+          <img src="/atom-logo.png" alt="atom-family mark" class="hero-mark" />
           <h1>schema<span>-atoms</span></h1>
           <p class="lede">
             Canonical, versioned schema atoms for the convergent-systems.co ecosystem.
@@ -159,26 +144,7 @@ const totalAtoms = classes.reduce((sum, c) => sum + c.count, 0);
 
       <nav class="sidenav">
         <a class="brand" href="/" aria-label="schema-atoms home">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 480" width="140" height="112" aria-hidden="true">
-            <defs>
-              <radialGradient id="nb-blue" cx="38%" cy="32%" r="60%"><stop offset="0%" stop-color="#9ad8ff"/><stop offset="40%" stop-color="#3b9fd4"/><stop offset="100%" stop-color="#0a4a7a"/></radialGradient>
-              <radialGradient id="nb-white" cx="38%" cy="32%" r="60%"><stop offset="0%" stop-color="#ffffff"/><stop offset="50%" stop-color="#c8d0dc"/><stop offset="100%" stop-color="#7a8090"/></radialGradient>
-              <radialGradient id="nb-orange" cx="38%" cy="32%" r="60%"><stop offset="0%" stop-color="#ffcc88"/><stop offset="40%" stop-color="#e87020"/><stop offset="100%" stop-color="#7a2800"/></radialGradient>
-              <radialGradient id="nb-cyan" cx="38%" cy="32%" r="60%"><stop offset="0%" stop-color="#aaeeff"/><stop offset="40%" stop-color="#3aaedd"/><stop offset="100%" stop-color="#0a4a6a"/></radialGradient>
-              <linearGradient id="nb-tube" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#f0f0f0"/><stop offset="40%" stop-color="#d0d4da"/><stop offset="100%" stop-color="#8890a0"/></linearGradient>
-            </defs>
-            <g transform="translate(100, 20) scale(0.8)">
-              <line x1="80" y1="310" x2="200" y2="220" stroke="url(#nb-tube)" stroke-width="22" stroke-linecap="round"/>
-              <line x1="200" y1="220" x2="320" y2="310" stroke="url(#nb-tube)" stroke-width="22" stroke-linecap="round"/>
-              <line x1="200" y1="220" x2="135" y2="95" stroke="url(#nb-tube)" stroke-width="22" stroke-linecap="round"/>
-              <line x1="200" y1="220" x2="265" y2="95" stroke="url(#nb-tube)" stroke-width="22" stroke-linecap="round"/>
-              <circle cx="200" cy="80" r="40" fill="url(#nb-blue)"/>
-              <circle cx="200" cy="220" r="30" fill="url(#nb-white)"/>
-              <circle cx="80" cy="310" r="38" fill="url(#nb-orange)"/>
-              <circle cx="320" cy="310" r="38" fill="url(#nb-cyan)"/>
-            </g>
-            <text x="300" y="430" font-family="Inter, -apple-system, sans-serif" font-weight="300" font-size="72" fill="#ffffff" letter-spacing="18" text-anchor="middle">ATOMS</text>
-          </svg>
+          <img src="/atom-logo-words.png" alt="ATOMS" class="sidenav-wordmark" />
         </a>
 
         <div class="nav">
