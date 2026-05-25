@@ -1,6 +1,6 @@
 id          = "schema-atoms/design-spec/atom-spec"
 version     = "1.1.0"
-content_hash = ""
+content_hash = "0855bb0d7129ab31f98ebae3ec4e842cce01e4864956b18b85517f9af10c8c61"
 lifecycle   = "draft"
 created_at  = "2026-05-23T00:00:00Z"
 supersedes  = "schema-atoms/spec/atom-spec@1.1.0"

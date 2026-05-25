@@ -1,7 +1,7 @@
 # atom.toml — class specification atom for grpc-spec
 id          = "schema-atoms/design-spec/grpc-spec-class-spec"
 version     = "1.0.0-draft"
-content_hash = ""
+content_hash = "9503a47e23f03702788df6ff06b037605ff73694e2f44a4cdf4769585e16f42b"
 lifecycle   = "draft"
 created_at  = "2026-05-23T00:00:00Z"
 

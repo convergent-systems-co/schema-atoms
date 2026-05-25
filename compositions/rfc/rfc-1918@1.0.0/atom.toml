@@ -1,7 +1,7 @@
 # atom.toml — RFC 1918: Address Allocation for Private Internets
 id          = "schema-atoms/rfc/rfc-1918"
 version     = "1.0.0"
-content_hash = ""
+content_hash = "22f7ab91500499faca232a2ef18ca3829e76db9ffea1a07accb0829fdc45e3b8"
 lifecycle   = "draft"
 created_at  = "2026-05-24T00:00:00Z"
 

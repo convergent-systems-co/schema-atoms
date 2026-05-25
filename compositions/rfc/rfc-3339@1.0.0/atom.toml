@@ -1,7 +1,7 @@
 # atom.toml — RFC 3339: Date and Time on the Internet: Timestamps
 id          = "schema-atoms/rfc/rfc-3339"
 version     = "1.0.0"
-content_hash = ""
+content_hash = "b0a1e483ff2033fb33d3cafe9296cc53b762c360ae26fd3f33cf784431f13921"
 lifecycle   = "draft"
 created_at  = "2026-05-24T00:00:00Z"
 

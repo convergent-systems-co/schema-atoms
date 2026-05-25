@@ -1,6 +1,6 @@
 id          = "schema-atoms/controlled-vocabulary/atom-lifecycle-states"
 version     = "1.0.0"
-content_hash = ""
+content_hash = "284f1452ae1bbde6cc11379c29dd29455fdfd5283f95e51a29761ef7643c8ae2"
 lifecycle   = "draft"
 created_at  = "2026-05-23T00:00:00Z"
 

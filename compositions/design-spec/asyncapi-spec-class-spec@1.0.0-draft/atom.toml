@@ -1,7 +1,7 @@
 # atom.toml — class specification atom for asyncapi-spec
 id          = "schema-atoms/design-spec/asyncapi-spec-class-spec"
 version     = "1.0.0-draft"
-content_hash = ""
+content_hash = "b3e87775ac9cf365d8d487b2424095d3cd01c076b292670ec3bd53382f03ba99"
 lifecycle   = "draft"
 created_at  = "2026-05-23T00:00:00Z"
 

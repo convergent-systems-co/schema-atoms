@@ -1,7 +1,7 @@
 # atom.toml — FIPS 204: Module-Lattice-Based Digital Signature Standard (ML-DSA)
 id          = "schema-atoms/fips/fips-204"
 version     = "1.0.0"
-content_hash = ""
+content_hash = "a40aaa9598b94589267046b3ae07355d9c1f79b8af92ac42d41f432623444778"
 lifecycle   = "draft"
 created_at  = "2026-05-24T00:00:00Z"
 

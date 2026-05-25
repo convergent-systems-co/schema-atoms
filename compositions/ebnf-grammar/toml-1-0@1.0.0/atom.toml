@@ -1,6 +1,6 @@
 id          = "schema-atoms/ebnf-grammar/toml-1-0"
 version     = "1.0.0"
-content_hash = ""
+content_hash = "3d21459b0f9b694da2467360c4949f029315d9c8f450cc76489bdf6312b17e54"
 lifecycle   = "draft"
 created_at  = "2026-05-23T00:00:00Z"
 
