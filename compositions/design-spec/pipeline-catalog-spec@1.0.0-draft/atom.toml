@@ -1,0 +1,13 @@
+id          = "schema-atoms/design-spec/pipeline-catalog-spec"
+version     = "1.0.0-draft"
+content_hash = ""
+lifecycle   = "draft"
+created_at  = "2026-05-24T00:00:00Z"
+
+[spec]
+class       = "design-spec"
+title       = "Pipeline Catalog Specification"
+summary     = "Defines the structure and governance of pipeline-atoms, the catalog of CI/CD and data pipeline definitions covering build steps, deployment stages, and data transformation graphs."
+authors     = ["convergent-systems-co"]
+conforms_to = "schema-atoms/design-spec/atom-spec@1.1.0"
+asset       = "spec.md"
