@@ -1,0 +1,21 @@
+# atom.toml — FIPS 204: Module-Lattice-Based Digital Signature Standard (ML-DSA)
+id          = "schema-atoms/fips/fips-204"
+version     = "1.0.0"
+content_hash = ""
+lifecycle   = "draft"
+created_at  = "2026-05-24T00:00:00Z"
+
+[fips]
+fips_number    = 204
+title          = "Module-Lattice-Based Digital Signature Standard"
+short_name     = "ML-DSA"
+published_date = "2024-08"
+status         = "FINAL"
+algorithm      = "ML-DSA"
+parameter_sets = ["ML-DSA-44", "ML-DSA-65", "ML-DSA-87"]
+asset          = "fips204.md"
+asset_source   = "fips204.txt"
+
+[protocol]
+provenance = "https://doi.org/10.6028/NIST.FIPS.204 — NIST FIPS 204, August 2024. Module-Lattice-Based Digital Signature Standard."
+license    = "public-domain"

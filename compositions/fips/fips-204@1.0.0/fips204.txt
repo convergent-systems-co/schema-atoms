@@ -1,0 +1,244 @@
+Federal Information Processing Standards Publication 204
+                                                            August 2024
+
+
+              Module-Lattice-Based Digital Signature Standard
+
+                              (ML-DSA)
+
+CATEGORY: Computer Security
+INFORMATION TECHNOLOGY LABORATORY
+NATIONAL INSTITUTE OF STANDARDS AND TECHNOLOGY
+GAITHERSBURG, MD 20899-8900
+
+
+Abstract
+
+   This standard specifies the Module-Lattice-Based Digital Signature
+   Algorithm (ML-DSA), a post-quantum digital signature scheme based
+   on the hardness of the Module Learning With Errors (MLWE) problem.
+   ML-DSA is derived from the CRYSTALS-Dilithium submission to the
+   NIST Post-Quantum Cryptography Standardization Project. This
+   standard defines three parameter sets — ML-DSA-44, ML-DSA-65, and
+   ML-DSA-87 — targeting NIST security levels 2, 3, and 5 respectively.
+   The standard specifies key generation, signing, and verification
+   operations, as well as deterministic and hedged signing modes.
+
+
+1. Introduction
+
+   Classical digital signature algorithms such as RSA and ECDSA rely
+   on the presumed hardness of factoring large integers or computing
+   discrete logarithms. A sufficiently powerful quantum computer
+   running Shor's algorithm can solve both problems in polynomial time,
+   rendering these algorithms insecure against quantum adversaries.
+
+   NIST initiated the Post-Quantum Cryptography (PQC) Standardization
+   Project in 2016 to identify and standardize cryptographic algorithms
+   resistant to attacks by both classical and quantum computers.
+   ML-DSA, standardized in FIPS 204, is one of the first three
+   algorithms selected for standardization, alongside ML-KEM (FIPS 203)
+   and SLH-DSA (FIPS 205).
+
+   ML-DSA is derived from CRYSTALS-Dilithium, which was selected by
+   NIST following a multi-round public evaluation. The algorithm's
+   security rests on the Module Learning With Errors (MLWE) problem,
+   which is believed to resist attacks by quantum computers. MLWE is
+   a structured variant of the Learning With Errors (LWE) problem,
+   which in turn reduces to hard problems on integer lattices.
+
+
+2. Algorithm Overview
+
+   ML-DSA is a lattice-based digital signature scheme. Its design
+   follows the Fiat-Shamir with Aborts paradigm, adapted for the
+   module lattice setting.
+
+   The core security assumption is the hardness of the Module Learning
+   With Errors (MLWE) problem over rings of polynomials modulo a prime
+   q = 8380417. The module structure allows the algorithm to balance
+   security, key size, and signature size efficiently across multiple
+   security levels.
+
+   ML-DSA supports a context string parameter that enables domain
+   separation. Applications can bind signatures to specific contexts
+   by providing a non-empty context string during signing and
+   verification. The context string MUST be identical between signing
+   and verification; a mismatch causes verification to fail.
+
+
+3. Parameter Sets
+
+   FIPS 204 defines three parameter sets targeting different NIST
+   security levels. NIST security level N corresponds to the security
+   strength of an N-bit classical cipher against the best known attacks.
+
+   ML-DSA-44 — NIST Security Level 2
+     Comparable security to AES-128.
+     Public key size:  1312 bytes
+     Secret key size:  2528 bytes
+     Signature size:   2420 bytes
+
+   ML-DSA-65 — NIST Security Level 3
+     Comparable security to AES-192.
+     Public key size:  1952 bytes
+     Secret key size:  4000 bytes
+     Signature size:   3293 bytes
+     Note: This is the required parameter set for schema-atoms signing.
+
+   ML-DSA-87 — NIST Security Level 5
+     Comparable security to AES-256.
+     Public key size:  2592 bytes
+     Secret key size:  4864 bytes
+     Signature size:   4595 bytes
+
+   All parameter sets share the same algorithmic structure; the
+   differences lie in the lattice dimensions (k, l), the modulus q,
+   and the bound parameters that control the rejection sampling.
+
+
+4. Key Operations
+
+4.1 Key Generation: KeyGen()
+
+   KeyGen() produces a public-private key pair (pk, sk).
+
+   The public key pk is a commitment to a matrix A and a vector t1,
+   derived from the secret polynomials s1 and s2. The secret key sk
+   encodes the matrix seed, the secret vectors s1 and s2, and the
+   hint vector t0.
+
+   Keys MUST be generated using an approved random bit generator. The
+   security of ML-DSA keys depends entirely on the quality of the
+   randomness used during key generation.
+
+4.2 Signing: Sign(sk, message, context_string)
+
+   Sign() takes a secret key sk, a message M of arbitrary length,
+   and an optional context string ctx (0 to 255 bytes), and produces
+   a signature sigma.
+
+   The signing procedure computes a message representative mu by
+   hashing a domain-separation prefix, the public key hash, the
+   context string, and the message using SHAKE-256. A masking vector
+   y is then sampled and a commitment w1 is computed. The challenge
+   hash c is derived from the message representative and w1.
+
+   Two signing modes are defined:
+
+   Deterministic mode: The nonce rho_prime is derived from the secret
+   key and the message. Signing is reproducible given the same inputs.
+   This mode SHOULD be used when randomness of sufficient quality is
+   not available.
+
+   Hedged mode: The nonce rho_prime is derived from the secret key,
+   a random 256-bit value rnd, and the message. This mode is
+   RECOMMENDED when high-quality randomness is available. Hedged
+   signing provides resilience against fault attacks and provides
+   additional protection if the secret key were to be partially
+   exposed.
+
+   The Fiat-Shamir with Aborts design causes the signing loop to
+   restart if the candidate signature fails statistical bounds checks.
+   This rejection sampling step is essential to the zero-knowledge
+   property of the signature scheme.
+
+4.3 Verification: Verify(pk, message, signature, context_string)
+
+   Verify() takes a public key pk, a message M, a signature sigma,
+   and a context string ctx, and returns a boolean indicating whether
+   the signature is valid.
+
+   Verification recomputes the commitment from the signature and checks
+   the challenge against the recomputed message representative. A
+   signature is accepted only if:
+     - The hint vector h has no more than omega non-zero entries.
+     - The response vector z has coefficients within the required bound.
+     - The recomputed challenge matches the one carried in the signature.
+
+   Implementations MUST verify signatures before acting on any data
+   protected by the signature.
+
+
+5. Security Properties
+
+   EUF-CMA Security: ML-DSA achieves existential unforgeability under
+   chosen message attack (EUF-CMA). An adversary with access to a
+   signing oracle cannot produce a valid signature on any message not
+   previously submitted to the oracle, except with negligible probability.
+
+   Context String Binding: Signatures are bound to the context string
+   used during signing. This enables domain separation and prevents
+   cross-protocol signature reuse.
+
+   Key Isolation: The secret key sk encodes both the signing key
+   material and the public key material needed for efficient signature
+   generation. Secret keys MUST NOT be shared or stored in insecure
+   locations.
+
+
+6. Use in schema-atoms
+
+   The schema-atoms catalog uses ML-DSA-65 as the required signing
+   algorithm for atom signatures (ATOMS.yml: signing.required_algorithms).
+   ML-DSA-65 was chosen for the following reasons:
+
+   a) Security level 3 (AES-192 equivalent) provides a strong security
+      margin without requiring the largest key and signature sizes of
+      ML-DSA-87.
+
+   b) The parameter set is well-suited for application-layer signing
+      where key and signature sizes are carried in structured documents
+      rather than bandwidth-constrained network packets.
+
+   c) ML-DSA-65 is among the parameter sets most widely implemented in
+      cryptographic libraries following the FIPS 204 publication.
+
+   Atom signing quorum rules reference ATOMS.yml signing.quorum_rules.
+   For the fips class, the quorum rule is: 1 of role:catalog-maintainer.
+
+
+7. Normative Requirements
+
+   1. Implementations MUST support ML-DSA-44, ML-DSA-65, and ML-DSA-87
+      as defined in FIPS 204.
+
+   2. Keys MUST be generated using an approved random bit generator
+      consistent with NIST SP 800-90A.
+
+   3. Signatures MUST be verified using the Verify() algorithm before
+      accepting any data protected by the signature.
+
+   4. The context string used during signing MUST be identical to the
+      context string supplied during verification; mismatches MUST
+      cause verification to return false.
+
+   5. Secret keys MUST be protected from unauthorized disclosure and
+      MUST NOT be embedded in artifacts, source code, or version control.
+
+   6. Implementations SHOULD use hedged signing mode (with a 256-bit
+      random value) when a high-quality random bit generator is
+      available.
+
+
+8. References
+
+   [1] National Institute of Standards and Technology. "Module-Lattice-
+       Based Digital Signature Standard." FIPS 204, August 2024.
+       https://doi.org/10.6028/NIST.FIPS.204
+
+   [2] Ducas, L. et al. "CRYSTALS-Dilithium Algorithm Specifications
+       and Supporting Documentation." Version 3.1, 2021.
+       Predecessor to FIPS 204.
+
+   [3] National Institute of Standards and Technology. "Post-Quantum
+       Cryptography Standardization Project."
+       https://csrc.nist.gov/projects/post-quantum-cryptography
+
+   [4] National Institute of Standards and Technology. "Module-Lattice-
+       Based Key-Encapsulation Mechanism Standard." FIPS 203, August 2024.
+       (companion standard, ML-KEM / CRYSTALS-Kyber)
+
+   [5] National Institute of Standards and Technology. "Stateless
+       Hash-Based Digital Signature Standard." FIPS 205, August 2024.
+       (companion standard, SLH-DSA / SPHINCS+)
