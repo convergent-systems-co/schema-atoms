@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agent-atoms.com/schemas/composition-v1.json",
+  "title": "agent-atoms v1 composition",
+  "description": "An agent composition assembling persona + tools + capabilities + role boundaries + isolation into a complete agent definition.",
+  "type": "object",
+  "required": ["schema", "type", "id", "version", "name", "references"],
+  "additionalProperties": false,
+  "properties": {
+    "schema": {
+      "type": "string",
+      "const": "https://agent-atoms.com/schemas/composition-v1.json"
+    },
+    "type": { "type": "string", "const": "agent" },
+    "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]{1,62}[a-z0-9]$" },
+    "version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:-[A-Za-z0-9.-]+)?$" },
+    "name": { "type": "string", "minLength": 1, "maxLength": 80 },
+    "description": { "type": "string", "maxLength": 500 },
+    "tags": { "type": "array", "items": { "type": "string", "minLength": 1, "maxLength": 40 }, "uniqueItems": true },
+    "references": {
+      "type": "object",
+      "required": ["persona", "isolation"],
+      "additionalProperties": false,
+      "properties": {
+        "persona":         { "$ref": "#/$defs/ref" },
+        "tools":           { "type": "array", "items": { "$ref": "#/$defs/ref" }, "uniqueItems": true },
+        "capabilities":    { "type": "array", "items": { "$ref": "#/$defs/ref" }, "uniqueItems": true },
+        "role_boundaries": { "type": "array", "items": { "$ref": "#/$defs/ref" }, "uniqueItems": true },
+        "isolation":       { "$ref": "#/$defs/ref" }
+      }
+    }
+  },
+  "$defs": {
+    "ref": {
+      "type": "object",
+      "required": ["ref", "version"],
+      "additionalProperties": false,
+      "properties": {
+        "ref":     { "type": "string", "pattern": "^agent-atoms://atoms/[a-z-]+/[a-z0-9-]+$" },
+        "version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:-[A-Za-z0-9.-]+)?$" }
+      }
+    }
+  }
+}

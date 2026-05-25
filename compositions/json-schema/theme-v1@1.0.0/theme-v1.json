@@ -1,0 +1,233 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://theme-atoms.com/schemas/theme-v1.json",
+  "title": "theme-atoms v1 theme",
+  "description": "A self-contained shell/terminal theme. Consumed by aish v0.2 via a single HTTP GET; no second fetch required for brand-atoms or any external reference.",
+  "type": "object",
+  "required": ["schema", "meta", "palette", "prompt"],
+  "additionalProperties": false,
+  "properties": {
+    "schema": {
+      "type": "string",
+      "format": "uri",
+      "const": "https://theme-atoms.com/schemas/theme-v1.json",
+      "description": "Pin the schema URI so consumers can verify they understand this version."
+    },
+    "meta": {
+      "type": "object",
+      "required": ["id", "version", "display_name"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9-]{1,62}[a-z0-9]$",
+          "description": "URL-safe slug; also the filename stem (id.toml)."
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:-[A-Za-z0-9.-]+)?$",
+          "description": "Semver. Theme content changes bump version."
+        },
+        "display_name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "description": {
+          "type": "string",
+          "maxLength": 280
+        },
+        "extends_brand": {
+          "type": "string",
+          "description": "Documentary reference to a brand-atoms brand. NOT a fetch target — palette below MUST be inlined."
+        }
+      }
+    },
+    "palette": {
+      "type": "object",
+      "minProperties": 2,
+      "additionalProperties": {
+        "type": "string",
+        "pattern": "^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$",
+        "description": "Hex color. 3/6/8-digit (#RGB, #RRGGBB, #RRGGBBAA) accepted."
+      },
+      "required": ["fg", "bg"],
+      "description": "Inlined palette. Keys are role names (e.g., fg, bg, green, blue, accent). Single-fetch contract: do not reference external palettes."
+    },
+    "prompt": {
+      "type": "object",
+      "required": ["character", "character_color"],
+      "additionalProperties": false,
+      "properties": {
+        "character": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 8,
+          "description": "Prompt character(s). Unicode glyphs allowed."
+        },
+        "character_color": {
+          "$ref": "#/$defs/colorRef"
+        },
+        "segments": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/elementId" },
+          "uniqueItems": true,
+          "description": "Ordered list of segments to render. Unknown segments MUST be rejected by the consumer. See docs/elements.md for the data contract."
+        },
+        "separator": {
+          "type": "string",
+          "enum": ["powerline", "minimal", "classic", "none"],
+          "default": "none"
+        },
+        "glyphs": {
+          "type": "string",
+          "enum": ["nerd-default", "ascii", "minimal"],
+          "default": "ascii",
+          "description": "Glyph set. nerd-default requires a Nerd Font."
+        }
+      }
+    },
+    "roles": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/$defs/colorRef"
+      },
+      "description": "Semantic role → color mappings. Consumers look up runtime roles here (e.g., ai_tier_local)."
+    },
+    "syntax": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/$defs/colorRef"
+      },
+      "description": "Syntax-highlighting token → color mappings. Optional; consumers fall back to roles or defaults."
+    },
+    "font": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Preferred font for rendering this theme. A strong preference: aish-term / TUI consumers SHOULD match this font when available; plain CLI consumers MAY ignore. Users always retain a local override.",
+      "properties": {
+        "family": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Primary font family. Should be a monospace font for prompt + segments to line up."
+        },
+        "fallback": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true,
+          "description": "Ordered fallback chain. Consumer walks this list when the primary family is unavailable."
+        },
+        "size": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 96,
+          "description": "Point size (pt) hint. Consumer may scale."
+        },
+        "weight": {
+          "type": "integer",
+          "enum": [100, 200, 300, 400, 500, 600, 700, 800, 900],
+          "default": 400
+        },
+        "ligatures": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable programming ligatures (=> != etc). Requires a font that ships them."
+        },
+        "nerd_font": {
+          "type": "boolean",
+          "default": false,
+          "description": "Asserts the primary family is a Nerd Font patch. Required to be true when prompt.glyphs == 'nerd-default'."
+        }
+      },
+      "required": ["family"]
+    },
+    "layout": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Compass layout: north (top), south (bottom), east (right), west (left) bars surround the always-present middle (the interactive terminal). Each bar holds named elements packed by alignment. Consumers render the bars they can; the middle is always rendered.",
+      "properties": {
+        "north": { "$ref": "#/$defs/horizontalBar" },
+        "south": { "$ref": "#/$defs/horizontalBar" },
+        "east":  { "$ref": "#/$defs/verticalBar" },
+        "west":  { "$ref": "#/$defs/verticalBar" }
+      }
+    }
+  },
+  "$defs": {
+    "colorRef": {
+      "type": "string",
+      "pattern": "^(?:#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})|\\{palette\\.[a-zA-Z0-9_-]+\\})$",
+      "description": "Either a hex color (#RGB / #RRGGBB / #RRGGBBAA) or a palette reference {palette.NAME} that MUST resolve within this theme's own palette block. No external references."
+    },
+    "elementId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64,
+      "enum": [
+        "cwd", "path", "git-status", "git-ahead-behind", "git-stash-count", "hg-status", "jj-status",
+        "user", "host", "hostname-icon", "venv", "shell-level",
+        "exit-code", "duration", "cmd-duration-while-running", "cmd-status", "bg-jobs",
+        "time", "date", "uptime", "battery", "volume", "mute-status", "keyboard-layout",
+        "weather",
+        "ai-tier", "ai-suggestion", "drachma-balance", "session", "agent-model",
+        "k8s-context", "docker-context", "terraform-workspace", "aws-profile", "gcp-project", "azure-subscription",
+        "nix-shell", "direnv-status",
+        "node-version", "python-version", "go-version", "rust-version", "ruby-version", "java-version",
+        "load-avg", "cpu-usage", "mem-usage", "disk-usage",
+        "network-status", "vpn-status", "internal-ip", "external-ip",
+        "os-icon", "prompt-newline"
+      ],
+      "description": "Element ID. Consumers map this to a renderer (data + glyph). Unknown elements MAY be skipped silently. See docs/elements.md for the full catalog and data contracts."
+    },
+    "elementStyle": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Per-element style override. Both fields optional; absent means 'use consumer default'.",
+      "properties": {
+        "icon": {
+          "type": "string",
+          "maxLength": 12,
+          "description": "Glyph (or short string) to render in place of the element's default icon. Empty string disables the icon."
+        },
+        "color": {
+          "$ref": "#/$defs/colorRef",
+          "description": "Text color override for this element (otherwise the bar's foreground applies)."
+        }
+      }
+    },
+    "elementsMap": {
+      "type": "object",
+      "description": "Per-element style overrides keyed by element id. Lets a theme decide each element's icon + text color independently of the bar's bg/fg.",
+      "additionalProperties": { "$ref": "#/$defs/elementStyle" }
+    },
+    "horizontalBar": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "A north or south bar. Elements pack into three alignment buckets.",
+      "properties": {
+        "enabled": { "type": "boolean", "default": false },
+        "background": { "$ref": "#/$defs/colorRef" },
+        "foreground": { "$ref": "#/$defs/colorRef" },
+        "left":   { "type": "array", "items": { "$ref": "#/$defs/elementId" } },
+        "center": { "type": "array", "items": { "$ref": "#/$defs/elementId" } },
+        "right":  { "type": "array", "items": { "$ref": "#/$defs/elementId" } },
+        "elements": { "$ref": "#/$defs/elementsMap" }
+      }
+    },
+    "verticalBar": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "An east or west bar. Renders as a vertical panel of given width. Elements pack into three alignment buckets.",
+      "properties": {
+        "enabled": { "type": "boolean", "default": false },
+        "background": { "$ref": "#/$defs/colorRef" },
+        "foreground": { "$ref": "#/$defs/colorRef" },
+        "width":  { "type": "integer", "minimum": 4, "maximum": 80, "description": "Column width (in monospace cells)." },
+        "top":    { "type": "array", "items": { "$ref": "#/$defs/elementId" } },
+        "center": { "type": "array", "items": { "$ref": "#/$defs/elementId" } },
+        "bottom": { "type": "array", "items": { "$ref": "#/$defs/elementId" } },
+        "elements": { "$ref": "#/$defs/elementsMap" }
+      }
+    }
+  }
+}

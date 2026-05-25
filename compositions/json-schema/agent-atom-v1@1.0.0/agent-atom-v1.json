@@ -1,0 +1,105 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agent-atoms.com/schemas/atom-v1.json",
+  "title": "agent-atoms v1 atom",
+  "description": "A single atom in the agent-atoms catalog. Discriminated by `type`. agent-atoms personas overlap prompt-atoms personas but add agent-specific fields (memory, planner, supervisor).",
+  "type": "object",
+  "required": ["schema", "type", "id", "version", "name"],
+  "additionalProperties": false,
+  "properties": {
+    "schema": {
+      "type": "string",
+      "const": "https://agent-atoms.com/schemas/atom-v1.json"
+    },
+    "type": {
+      "type": "string",
+      "enum": ["persona", "tool-definition", "capability-declaration", "role-boundary", "isolation-constraint"]
+    },
+    "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]{1,62}[a-z0-9]$" },
+    "version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:-[A-Za-z0-9.-]+)?$" },
+    "name": { "type": "string", "minLength": 1, "maxLength": 80 },
+    "description": { "type": "string", "maxLength": 500 },
+    "tags": { "type": "array", "items": { "type": "string", "minLength": 1, "maxLength": 40 }, "uniqueItems": true },
+
+    "persona_profile": {
+      "type": "object",
+      "description": "Only for type=persona. Agent-specific role + planner + memory shape.",
+      "additionalProperties": false,
+      "properties": {
+        "role": { "type": "string", "minLength": 1, "maxLength": 80 },
+        "expertise": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+        "voice": { "type": "string", "maxLength": 280 },
+        "planner": { "type": "string", "enum": ["reactive", "tree-of-thoughts", "react", "plan-and-execute", "none"] },
+        "memory_model": { "type": "string", "enum": ["none", "short-term", "long-term", "vector", "scratchpad"] },
+        "supervisor": { "type": "string", "description": "Ref to an agent-atoms persona that supervises this one, or 'none'." }
+      }
+    },
+
+    "tool_spec": {
+      "type": "object",
+      "description": "Only for type=tool-definition. JSON-schema-like tool signature.",
+      "additionalProperties": false,
+      "required": ["function_name", "parameters", "returns", "side_effects"],
+      "properties": {
+        "function_name": { "type": "string", "minLength": 1 },
+        "summary": { "type": "string", "maxLength": 280 },
+        "parameters": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "required": ["type"],
+            "properties": {
+              "type": { "type": "string", "enum": ["string", "number", "boolean", "object", "array", "null"] },
+              "description": { "type": "string" },
+              "required": { "type": "boolean" }
+            }
+          }
+        },
+        "returns": { "type": "object", "required": ["type"], "properties": { "type": { "type": "string" }, "description": { "type": "string" } } },
+        "side_effects": { "type": "array", "items": { "type": "string", "enum": ["none", "fs-read", "fs-write", "network", "exec", "billable", "user-prompt"] }, "uniqueItems": true }
+      }
+    },
+
+    "capability": {
+      "type": "object",
+      "description": "Only for type=capability-declaration.",
+      "additionalProperties": false,
+      "required": ["grants", "elevation"],
+      "properties": {
+        "grants": { "type": "array", "items": { "type": "string", "enum": ["read-files", "write-files", "exec-commands", "network", "user-prompt", "spawn-subagent", "modify-config", "delete-files"] }, "uniqueItems": true },
+        "elevation": { "type": "string", "enum": ["declared", "runtime-elevated", "user-approved", "never"] },
+        "audit": { "type": "boolean", "description": "If true, every use is logged to the audit trail." }
+      }
+    },
+
+    "boundary": {
+      "type": "object",
+      "description": "Only for type=role-boundary. Hard refusal rules.",
+      "additionalProperties": false,
+      "required": ["refusals"],
+      "properties": {
+        "refusals": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
+        "escalate_to": { "type": "string", "description": "Ref to a supervisor persona on refusal trigger." }
+      }
+    },
+
+    "isolation": {
+      "type": "object",
+      "description": "Only for type=isolation-constraint. Process / network / fs isolation requirements.",
+      "additionalProperties": false,
+      "properties": {
+        "process": { "type": "string", "enum": ["none", "subprocess", "container", "vm", "wasm"] },
+        "network": { "type": "string", "enum": ["full", "allowlist", "loopback-only", "none"] },
+        "filesystem": { "type": "string", "enum": ["full", "read-only", "scoped", "tmpfs", "none"] },
+        "scoped_paths": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  },
+  "allOf": [
+    { "if": { "properties": { "type": { "const": "persona" } } }, "then": { "required": ["persona_profile"] } },
+    { "if": { "properties": { "type": { "const": "tool-definition" } } }, "then": { "required": ["tool_spec"] } },
+    { "if": { "properties": { "type": { "const": "capability-declaration" } } }, "then": { "required": ["capability"] } },
+    { "if": { "properties": { "type": { "const": "role-boundary" } } }, "then": { "required": ["boundary"] } },
+    { "if": { "properties": { "type": { "const": "isolation-constraint" } } }, "then": { "required": ["isolation"] } }
+  ]
+}
