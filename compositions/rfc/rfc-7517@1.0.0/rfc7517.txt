@@ -1,0 +1,165 @@
+RFC 7517 — JSON Web Key (JWK)
+Standards Track
+Published: May 2015
+Author: M. Jones
+
+SUMMARY
+
+RFC 7517 defines the JSON Web Key (JWK) data structure, a JSON object
+that represents a cryptographic key. It is part of the JOSE (JSON Object
+Signing and Encryption) suite, which also includes RFC 7515 (JWS),
+RFC 7516 (JWE), and RFC 7518 (JWA).
+
+A JWK represents a single key. A JWK Set is a JSON object containing
+an array of JWKs, allowing a party to publish multiple keys under a
+single document.
+
+JWK OBJECT STRUCTURE
+
+A JWK is a JSON object. The following parameters are defined for all
+key types. All members of a JWK object MUST be unique.
+
+  kty     REQUIRED. Key Type. Identifies the cryptographic algorithm
+          family for the key. Defined values: "RSA", "EC", "oct".
+          Other values MAY be registered in the IANA JWK Key Types registry.
+
+  use     OPTIONAL. Public Key Use. Indicates the intended use of the key.
+          "sig" = signature; "enc" = encryption.
+          A key with "use" SHOULD NOT be used for the other purpose.
+
+  key_ops OPTIONAL. Key Operations. An array of strings identifying the
+          operations for which the key is intended. Values include:
+          "sign", "verify", "encrypt", "decrypt", "wrapKey", "unwrapKey",
+          "deriveKey", "deriveBits".
+          "use" and "key_ops" SHOULD NOT both be present for the same key.
+
+  alg     OPTIONAL. Algorithm. Identifies the algorithm intended for use
+          with the key. Values are from the JWA registry (RFC 7518).
+
+  kid     OPTIONAL. Key ID. A string that identifies the key within a JWK
+          Set or other context. Values are case-sensitive. The "kid" value
+          SHOULD be unique within a JWK Set.
+
+  x5u     OPTIONAL. X.509 URL. A URI pointing to an X.509 public key
+          certificate or certificate chain.
+
+  x5c     OPTIONAL. X.509 Certificate Chain. A JSON array of base64-encoded
+          DER-encoded X.509 certificates. The first entry MUST contain the
+          key's certificate.
+
+  x5t     OPTIONAL. X.509 Certificate SHA-1 Thumbprint. Base64url-encoded
+          SHA-1 digest of the DER encoding of the X.509 certificate.
+
+  x5t#S256 OPTIONAL. X.509 Certificate SHA-256 Thumbprint. Base64url-encoded
+           SHA-256 digest of the DER encoding of the X.509 certificate.
+           Preferred over x5t.
+
+JWK SET FORMAT
+
+A JWK Set is a JSON object with a single REQUIRED member:
+
+  keys    An array of JWK values. The array MAY contain public keys,
+          private keys, or both. Members other than "keys" MAY appear
+          and MUST be ignored by implementations that do not understand them.
+
+Example JWK Set:
+
+  {
+    "keys": [
+      { "kty": "EC", "kid": "1", "crv": "P-256", "x": "...", "y": "..." },
+      { "kty": "RSA", "kid": "2", "n": "...", "e": "AQAB" }
+    ]
+  }
+
+KEY TYPE PARAMETERS — RSA
+
+For RSA keys (kty = "RSA"), the following parameters are defined.
+All values are Base64urlUInt-encoded (big-endian unsigned integer,
+base64url encoding, no padding, minimum octet count).
+
+  n       REQUIRED for public keys. RSA modulus.
+  e       REQUIRED for public keys. RSA public exponent.
+  d       REQUIRED for private keys. RSA private exponent.
+  p       OPTIONAL. First prime factor.
+  q       OPTIONAL. Second prime factor.
+  dp      OPTIONAL. First factor CRT exponent.
+  dq      OPTIONAL. Second factor CRT exponent.
+  qi      OPTIONAL. First CRT coefficient.
+
+A private RSA JWK MUST include n, e, and d. Including p, q, dp, dq, qi
+enables the Chinese Remainder Theorem optimization for RSA operations
+and is RECOMMENDED when the private key is available in this form.
+
+KEY TYPE PARAMETERS — EC
+
+For Elliptic Curve keys (kty = "EC"), the following parameters are defined:
+
+  crv     REQUIRED. Curve name. Defined values: "P-256", "P-384", "P-521".
+          Other curves MAY be registered.
+
+  x       REQUIRED. x coordinate of the EC public key point.
+          Base64url-encoded, padded to the full coordinate size for the curve.
+
+  y       REQUIRED. y coordinate of the EC public key point.
+          Base64url-encoded, padded to the full coordinate size for the curve.
+
+  d       OPTIONAL. EC private key scalar.
+          Base64url-encoded, padded to the full field element size for the curve.
+          Present only in private key JWKs.
+
+KEY TYPE PARAMETERS — Symmetric (oct)
+
+For symmetric keys (kty = "oct"), a single parameter is defined:
+
+  k       REQUIRED. The base64url-encoded key value (no padding).
+          The key size is implicit in the length of the decoded byte sequence.
+
+ENCODING RULES
+
+  - RSA key parameters (n, e, d, p, q, dp, dq, qi): Base64urlUInt encoding.
+    This is the base64url encoding (RFC 4648 §5) of the unsigned big-endian
+    integer representation, with leading zero octets stripped except to
+    preserve the minimum octet count required by the algorithm.
+
+  - EC coordinates (x, y, d): base64url encoding of the fixed-size byte
+    array for the curve. The coordinate is left-padded with zeros to the
+    required field element length.
+
+  - Symmetric keys (k): base64url encoding of the raw key bytes.
+
+  - No base64 padding characters ("=") are used in any JWK value.
+
+SECURITY CONSIDERATIONS
+
+Key Confidentiality:
+  Private key parameters (RSA: d, p, q, dp, dq, qi; EC: d; oct: k) MUST
+  be kept confidential. JWK Set endpoints that serve private keys MUST
+  require authentication and SHOULD require TLS. Exposing private key
+  parameters is equivalent to compromising the key.
+
+Key Confusion Attacks:
+  Applications that accept JWKs from untrusted sources and use the "kty"
+  field to select a cryptographic operation MUST validate that the key
+  parameters are consistent with the expected algorithm. A symmetric key
+  MUST NOT be used as an RSA public key modulus; an EC key MUST NOT be
+  used in an RSA operation. Failing to enforce these constraints enables
+  an attacker to construct a JWK that passes validation but produces
+  a forgeable signature.
+
+Algorithm Confusion:
+  If an application does not constrain the "alg" member, an attacker
+  may substitute a weaker algorithm. Applications SHOULD either fix the
+  expected algorithm in advance or validate that the "alg" value in the
+  JWK is acceptable for the operation being performed.
+
+Key Uniqueness:
+  Applications that maintain a JWK Set SHOULD ensure that "kid" values
+  are unique within the set. Ambiguous key selection can lead to the
+  wrong key being used for a cryptographic operation.
+
+REFERENCES
+
+  RFC 7515    JSON Web Signature (JWS)
+  RFC 7516    JSON Web Encryption (JWE)
+  RFC 7518    JSON Web Algorithms (JWA) — algorithm identifiers used in "alg"
+  RFC 4648    The Base16, Base32, and Base64 Data Encodings

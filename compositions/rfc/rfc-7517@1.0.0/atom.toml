@@ -1,0 +1,19 @@
+# atom.toml — RFC 7517: JSON Web Key (JWK)
+id          = "schema-atoms/rfc/rfc-7517"
+version     = "1.0.0"
+content_hash = ""
+lifecycle   = "draft"
+created_at  = "2026-05-24T00:00:00Z"
+
+[rfc]
+rfc_number     = 7517
+title          = "JSON Web Key (JWK)"
+authors        = ["M. Jones"]
+published_date = "2015-05"
+status         = "STANDARDS TRACK"
+asset          = "rfc7517.md"
+asset_source   = "rfc7517.txt"
+
+[protocol]
+provenance = "https://www.rfc-editor.org/rfc/rfc7517 — RFC 7517, May 2015, Jones. Part of the JOSE suite."
+license    = "IETF Trust"

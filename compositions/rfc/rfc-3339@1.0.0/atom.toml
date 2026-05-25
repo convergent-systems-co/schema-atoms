@@ -1,0 +1,19 @@
+# atom.toml — RFC 3339: Date and Time on the Internet: Timestamps
+id          = "schema-atoms/rfc/rfc-3339"
+version     = "1.0.0"
+content_hash = ""
+lifecycle   = "draft"
+created_at  = "2026-05-24T00:00:00Z"
+
+[rfc]
+rfc_number     = 3339
+title          = "Date and Time on the Internet: Timestamps"
+authors        = ["G. Klyne", "C. Newman"]
+published_date = "2002-07"
+status         = "INFORMATIONAL"
+asset          = "rfc3339.md"
+asset_source   = "rfc3339.txt"
+
+[protocol]
+provenance = "https://www.rfc-editor.org/rfc/rfc3339 — RFC 3339, July 2002, Klyne and Newman."
+license    = "IETF Trust"
