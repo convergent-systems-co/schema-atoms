@@ -1,0 +1,123 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schema-atoms.com/v1/model-card.schema.json",
+  "title": "ModelCard",
+  "description": "Canonical definition of an AI model variant — capabilities, context window, pricing, and lifecycle state. Used by model-atoms.com compositions.",
+  "type": "object",
+  "required": ["id", "version", "lifecycle", "model_card"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Fully-qualified atom identifier: model-atoms/model-card/<name>",
+      "pattern": "^model-atoms/model-card/.+"
+    },
+    "version": {
+      "type": "string",
+      "description": "SemVer string for this atom revision.",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "lifecycle": {
+      "type": "string",
+      "description": "Atom lifecycle state.",
+      "enum": ["draft", "active", "deprecated", "archived"]
+    },
+    "content_hash": {
+      "type": "string",
+      "description": "SHA-256 hash of the canonical content file (model-card.md). Empty string during authoring."
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "model_card": {
+      "type": "object",
+      "required": ["class", "title", "name", "vendor", "provider", "provider_id", "category"],
+      "properties": {
+        "class": {
+          "const": "model-card"
+        },
+        "title": {
+          "type": "string",
+          "description": "Human-readable model name, e.g. 'Claude Opus 4.7'."
+        },
+        "name": {
+          "type": "string",
+          "description": "Slug identifier used in atom paths, e.g. 'claude-opus-4-7'.",
+          "pattern": "^[a-z0-9][a-z0-9._-]*$"
+        },
+        "description": {
+          "type": "string"
+        },
+        "asset": {
+          "type": "string",
+          "description": "Relative path to the canonical prose document.",
+          "default": "model-card.md"
+        },
+        "vendor": {
+          "type": "string",
+          "description": "Organisation that created the model, e.g. 'Anthropic', 'Meta', 'OpenAI'."
+        },
+        "provider": {
+          "type": "string",
+          "description": "Service that hosts the model, e.g. 'Cloudflare Workers AI', 'Anthropic API'."
+        },
+        "provider_id": {
+          "type": "string",
+          "description": "Provider's canonical model identifier as used in API calls, e.g. '@cf/meta/llama-3.1-70b-instruct'."
+        },
+        "family": {
+          "type": "string",
+          "description": "Model family or series, e.g. 'Llama 3.1', 'Claude 4'."
+        },
+        "category": {
+          "type": "string",
+          "description": "Primary task category.",
+          "enum": [
+            "text-generation",
+            "code-generation",
+            "reasoning",
+            "embedding",
+            "image-generation",
+            "speech-to-text",
+            "text-to-speech",
+            "multimodal"
+          ]
+        },
+        "capabilities": {
+          "type": "array",
+          "description": "Capability atom IDs this model supports.",
+          "items": { "type": "string" },
+          "uniqueItems": true
+        },
+        "context_window_k": {
+          "type": "integer",
+          "description": "Maximum context length in thousands of tokens (e.g. 128 = 128k tokens).",
+          "minimum": 1
+        },
+        "parameters_b": {
+          "type": "number",
+          "description": "Parameter count in billions, when public."
+        },
+        "quantization": {
+          "type": "string",
+          "description": "Quantization level for local/self-hosted variants, e.g. 'Q4_K_M'."
+        },
+        "pricing_tier": {
+          "type": "string",
+          "description": "Reference to a pricing-tier atom ID."
+        },
+        "planned_deprecation": {
+          "type": "boolean",
+          "description": "Whether a deprecation timeline has been announced.",
+          "default": false
+        },
+        "replacement": {
+          "type": "string",
+          "description": "Atom ID of the recommended replacement when this model is deprecated."
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}
