@@ -11,6 +11,18 @@ except ImportError:
 DESIGN_SPEC_REQUIRED_SPEC_FIELDS = ["class", "title", "summary", "authors", "conforms_to", "asset"]
 AMENDMENTS_REQUIRED_FIELDS = ["date", "author", "summary"]
 
+# Top-level keys that are part of the atom envelope, not the payload section.
+ENVELOPE_KEYS = {"id", "version", "content_hash", "lifecycle", "created_at", "spec", "protocol"}
+
+# Classes that require a [protocol] section (imported external-standards atoms).
+REQUIRES_PROTOCOL = {"rfc", "w3c_spec", "iso_spec", "fips", "internal_protocol"}
+
+# License values recognised by the catalog.
+VALID_LICENSES = {
+    "IETF Trust", "public-domain", "W3C", "ISO",
+    "MIT", "Apache-2.0", "BSD-2-Clause", "BSD-3-Clause",
+}
+
 def find_atom_files(root: Path):
     for p in sorted(root.glob("compositions/*/*/atom.toml")):
         yield p
@@ -34,6 +46,53 @@ def validate_design_spec(path: Path, data: dict, violations: list):
         for field in AMENDMENTS_REQUIRED_FIELDS:
             if not entry.get(field):
                 violations.append(f"{path}: [[spec.amendments]][{i}] missing '{field}'")
+
+def validate_protocol_section(path: Path, data: dict, violations: list):
+    """Validate the [protocol] section for atoms that carry one, and require it for external-standard classes."""
+    protocol = data.get("protocol")
+
+    # Determine the payload class by finding the first non-envelope top-level key.
+    payload_key = next((k for k in data if k not in ENVELOPE_KEYS), None)
+    class_name = ""
+    if payload_key:
+        payload = data.get(payload_key)
+        if isinstance(payload, dict):
+            class_name = payload.get("class", payload_key)
+        else:
+            class_name = payload_key
+
+    # Normalise class name: hyphens and underscores are interchangeable.
+    class_norm = class_name.replace("-", "_") if class_name else ""
+    needs_protocol = class_norm in REQUIRES_PROTOCOL
+
+    if needs_protocol and not protocol:
+        violations.append(
+            f"{path}: class '{class_name}' requires a [protocol] section"
+        )
+        return
+
+    if not protocol:
+        return
+
+    # --- provenance ---
+    prov = protocol.get("provenance", "")
+    if not prov:
+        violations.append(f"{path}: [protocol].provenance is required and must be non-empty")
+    elif not (prov.startswith("http://") or prov.startswith("https://")):
+        violations.append(
+            f"{path}: [protocol].provenance must start with http:// or https://"
+        )
+
+    # --- license ---
+    lic = protocol.get("license", "")
+    if not lic:
+        violations.append(f"{path}: [protocol].license is required and must be non-empty")
+    elif lic not in VALID_LICENSES:
+        violations.append(
+            f"{path}: [protocol].license '{lic}' is not a recognized value; "
+            f"expected one of {sorted(VALID_LICENSES)}"
+        )
+
 
 def resolve_conforms_to(root: Path, path: Path, data: dict, violations: list):
     spec = data.get("spec", {})
@@ -60,11 +119,13 @@ def main():
         count += 1
         with open(atom_path, "rb") as f:
             data = tomllib.load(f)
-        validate_envelope(atom_path.relative_to(root), data, violations)
+        rel = atom_path.relative_to(root)
+        validate_envelope(rel, data, violations)
         spec = data.get("spec", {})
         if spec.get("class") == "design-spec":
-            validate_design_spec(atom_path.relative_to(root), data, violations)
-        resolve_conforms_to(root, atom_path.relative_to(root), data, violations)
+            validate_design_spec(rel, data, violations)
+        resolve_conforms_to(root, rel, data, violations)
+        validate_protocol_section(rel, data, violations)
     print(f"Validated {count} atoms")
     if violations:
         for v in violations:
