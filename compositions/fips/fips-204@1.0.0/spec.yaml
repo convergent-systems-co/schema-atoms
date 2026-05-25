@@ -1,0 +1,64 @@
+# spec.yaml — structured extract of FIPS 204 for AI/application consumption
+# atom: schema-atoms/fips/fips-204@1.0.0
+
+fips_number: 204
+title: "Module-Lattice-Based Digital Signature Standard"
+short_name: ML-DSA
+status: FINAL
+published_date: "2024-08"
+
+algorithm_family: Module-Lattice (MLWE)
+predecessor: CRYSTALS-Dilithium
+
+parameter_sets:
+  ML-DSA-44:
+    nist_security_level: 2
+    comparable_to: AES-128
+    public_key_bytes: 1312
+    secret_key_bytes: 2528
+    signature_bytes: 2420
+  ML-DSA-65:
+    nist_security_level: 3
+    comparable_to: AES-192
+    public_key_bytes: 1952
+    secret_key_bytes: 4000
+    signature_bytes: 3293
+    note: "Required algorithm for schema-atoms signing"
+  ML-DSA-87:
+    nist_security_level: 5
+    comparable_to: AES-256
+    public_key_bytes: 2592
+    secret_key_bytes: 4864
+    signature_bytes: 4595
+
+key_operations:
+  - KeyGen()
+  - Sign(sk, message, context_string)
+  - Verify(pk, message, signature, context_string)
+
+security_property: EUF-CMA
+signing_modes: [deterministic, hedged]
+context_strings: supported
+
+schema_atoms_usage:
+  required_parameter_set: ML-DSA-65
+  role: atom_signing
+  quorum_rules_reference: "ATOMS.yml signing.quorum_rules"
+
+normative_requirements:
+  - "Implementations MUST support ML-DSA-44, ML-DSA-65, and ML-DSA-87"
+  - "Keys MUST be generated using the approved KeyGen algorithm"
+  - "Signatures MUST be verified using Verify() before accepting any signed data"
+  - "The context string used during signing MUST be identical to the context string supplied during verification"
+  - "Secret keys MUST NOT be embedded in artifacts, source code, or version control"
+  - "Implementations SHOULD use hedged signing mode when a high-quality random bit generator is available"
+
+references:
+  - title: "CRYSTALS-Dilithium Algorithm Specifications and Supporting Documentation"
+    relationship: predecessor
+  - title: "NIST PQC Standardization Project"
+    relationship: see_also
+  - title: "NIST FIPS 203 — Module-Lattice-Based Key-Encapsulation Mechanism Standard"
+    relationship: see_also
+  - title: "NIST FIPS 205 — Stateless Hash-Based Digital Signature Standard"
+    relationship: see_also
