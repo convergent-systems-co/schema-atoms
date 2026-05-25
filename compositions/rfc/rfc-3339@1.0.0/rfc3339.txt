@@ -1,0 +1,136 @@
+RFC 3339 — Date and Time on the Internet: Timestamps
+Informational RFC
+Published: July 2002
+Authors: G. Klyne, C. Newman
+
+SUMMARY
+
+RFC 3339 defines an Internet profile of ISO 8601 for the representation
+of dates and times as strings. It specifies a restricted, unambiguous
+format intended for use in Internet protocols where interoperability
+requires a single, well-defined representation.
+
+PURPOSE
+
+Internet protocols frequently need to express timestamps — for example,
+in HTTP headers, email messages, log files, and data feeds. ISO 8601 is
+deliberately flexible, allowing many equivalent representations of the
+same moment. RFC 3339 narrows this flexibility to a single canonical
+profile suitable for machine parsing and interchange.
+
+TIMESTAMP FORMAT
+
+A conforming RFC 3339 timestamp takes the form:
+
+  YYYY-MM-DDTHH:MM:SS[.frac](Z|+HH:MM|-HH:MM)
+
+Components:
+
+  YYYY        Four-digit year (proleptic Gregorian calendar)
+  MM          Two-digit month (01–12)
+  DD          Two-digit day of month (01–28/29/30/31)
+  T           Literal separator between date and time portions;
+              may be replaced by a space character if both sender
+              and receiver agree (mutual agreement required)
+  HH          Two-digit hour (00–23)
+  MM          Two-digit minute (00–59)
+  SS          Two-digit second (00–58, 00–59, or 00–60 for leap seconds)
+  [.frac]     Optional fractional seconds — one or more decimal digits
+              following a period; no implied precision limit
+  Z           Literal "Z" indicating UTC (Zulu) offset; preferred
+              when the timezone is known to be UTC
+  +HH:MM      Positive offset from UTC
+  -HH:MM      Negative offset from UTC
+
+TIME OFFSETS
+
+An offset indicates the difference between local time and UTC. An offset
+of +05:30 means local time is 5 hours and 30 minutes ahead of UTC.
+The special designator Z is equivalent to +00:00 but is the preferred
+notation for UTC timestamps.
+
+Offsets represent civil time zone offsets in effect at the stated time;
+they are not the same as a named time zone identifier and do not encode
+daylight saving rules.
+
+FRACTIONAL SECONDS
+
+The fractional seconds component is optional. When present, it consists
+of a period followed by one or more decimal digits. The number of digits
+is not constrained to a fixed length; implementations MUST NOT assume a
+fixed precision. Leading and trailing zeros in the fractional part are
+significant only in that they affect the value.
+
+LEAP SECONDS
+
+The seconds value 60 is permitted to represent a positive leap second.
+A timestamp ending in :60 is a valid leap second notation. Receiving
+applications MUST handle a seconds value of 60 gracefully — either by
+mapping it to 59 or by processing it as a leap second — and MUST NOT
+reject such values as malformed.
+
+RESTRICTIONS OVER ISO 8601
+
+RFC 3339 is a strict subset of ISO 8601. The following ISO 8601
+representations are explicitly excluded:
+
+  - Week dates        (e.g., 1985-W15-5 for the 5th day of week 15)
+  - Ordinal dates     (e.g., 1985-102 for the 102nd day of 1985)
+  - Truncated formats (e.g., omitting the year or using two-digit years)
+  - Expanded years    (years with more than four digits)
+  - The representation of midnight as 24:00:00
+
+These restrictions ensure that any RFC 3339 timestamp can be parsed by
+a fixed grammar without ambiguity about which ISO 8601 variant is in use.
+
+ABNF GRAMMAR (normative summary)
+
+  date-fullyear   = 4DIGIT
+  date-month      = 2DIGIT            ; 01-12
+  date-mday       = 2DIGIT            ; 01-28, 01-29, 01-30, 01-31
+  time-hour       = 2DIGIT            ; 00-23
+  time-minute     = 2DIGIT            ; 00-59
+  time-second     = 2DIGIT            ; 00-58, 00-59, 00-60
+  time-secfrac    = "." 1*DIGIT
+  time-numoffset  = ("+" / "-") time-hour ":" time-minute
+  time-offset     = "Z" / time-numoffset
+  partial-time    = time-hour ":" time-minute ":" time-second [time-secfrac]
+  full-date       = date-fullyear "-" date-month "-" date-mday
+  full-time       = partial-time time-offset
+  date-time       = full-date "T" full-time
+
+EXAMPLES
+
+  1985-04-12T23:20:50.52Z
+    12 April 1985, 23:20:50.52 UTC.
+
+  1996-12-19T16:39:57-08:00
+    19 December 1996, 16:39:57 local time at UTC-8 (e.g., Pacific Standard Time).
+
+  1990-12-31T23:59:60Z
+    31 December 1990, 23:59:60 UTC — a leap second.
+
+  1937-01-01T12:00:27.87+00:20
+    1 January 1937, 12:00:27.87 local time at UTC+0:20 (historical Dutch time).
+
+SECURITY CONSIDERATIONS
+
+Timestamps can be manipulated. A timestamp in a message reflects the
+clock of the originating system, not an independently verified time.
+An attacker can set an arbitrary clock on a system under their control,
+producing plausible but false timestamps. Applications that depend on
+timestamps for security purposes (e.g., replay-attack prevention,
+certificate validity windows, audit logs) SHOULD use an authenticated
+time source such as NTP (RFC 1305) and SHOULD validate that received
+timestamps are within an expected range.
+
+Timestamps do not authenticate the order or integrity of events by
+themselves. Pairing timestamps with cryptographic signatures or message
+authentication codes provides stronger ordering guarantees.
+
+REFERENCES
+
+  ISO 8601      Representations of dates and times.
+  RFC 2234      Augmented BNF for Syntax Specifications (ABNF).
+  RFC 2822      Internet Message Format (email date format).
+  RFC 1305      Network Time Protocol (NTP).

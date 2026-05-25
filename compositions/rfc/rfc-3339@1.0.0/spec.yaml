@@ -1,0 +1,43 @@
+# spec.yaml — structured extract of RFC 3339 for AI/application consumption
+# atom: schema-atoms/rfc/rfc-3339@1.0.0
+
+rfc_number: 3339
+title: "Date and Time on the Internet: Timestamps"
+status: INFORMATIONAL
+published_date: "2002-07"
+authors:
+  - "G. Klyne"
+  - "C. Newman"
+
+timestamp_format:
+  pattern: "date-time = full-date 'T' full-time"
+  utc_suffix: "Z"
+  offset_format: "+HH:MM or -HH:MM"
+  fractional_seconds: optional
+  separator: "T (may be space by mutual agreement)"
+
+grammar:
+  full_date: "YYYY-MM-DD"
+  full_time: "HH:MM:SS[.frac](Z|offset)"
+  time_offset: "+HH:MM | -HH:MM"
+
+examples:
+  - "1985-04-12T23:20:50.52Z"
+  - "1996-12-19T16:39:57-08:00"
+  - "1990-12-31T23:59:60Z"
+  - "1937-01-01T12:00:27.87+00:20"
+
+restrictions_over_iso8601:
+  - "No week dates (e.g. 1985-W15-5)"
+  - "No ordinal dates (e.g. 1985-102)"
+  - "No truncated formats"
+  - "Fractional seconds have no implied precision"
+
+normative_requirements:
+  - "A timestamp MUST conform to the date-time production"
+  - "Implementors SHOULD use Z (UTC) when the time zone is known"
+  - "Leap seconds (60) are permitted but receivers MUST handle gracefully"
+
+references:
+  - rfc: 2822
+    relationship: see_also
