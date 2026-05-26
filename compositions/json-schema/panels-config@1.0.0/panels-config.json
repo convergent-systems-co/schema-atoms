@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schema-atoms.com/schemas/panels-config/1.0.0/panels-config.json",
+  "title": "Panels Configuration",
+  "description": "Schema for the `panels` list in a project.yaml AI configuration file. Panels are named review panels (code-review, security-review, threat-modeling, etc.) that the Olympus governance system runs on every change. Required panels are enforced by the active policy profile (default: code-review, security-review, threat-modeling, cost-analysis, documentation-review, data-governance-review).",
+  "type": "array",
+  "minItems": 0,
+  "uniqueItems": true,
+  "items": {
+    "oneOf": [
+      {
+        "type": "string",
+        "description": "A panel slug or filename reference (with or without .md extension). Recognized slug values correspond to governance panel definitions in the active policy profile.",
+        "minLength": 1,
+        "maxLength": 120,
+        "examples": [
+          "code-review",
+          "security-review",
+          "threat-modeling",
+          "cost-analysis",
+          "documentation-review",
+          "data-governance-review",
+          "architecture-review",
+          "production-readiness-review",
+          "performance-review",
+          "code-review.md",
+          "security-review.md"
+        ]
+      },
+      {
+        "type": "object",
+        "description": "An inline panel configuration object when per-panel settings are needed.",
+        "required": ["name"],
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120,
+            "description": "Panel slug or filename."
+          },
+          "enabled": {
+            "type": "boolean",
+            "default": true,
+            "description": "Set false to disable this panel without removing it from the list."
+          },
+          "required": {
+            "type": "boolean",
+            "description": "Override the policy default; true means a failing verdict blocks merge."
+          },
+          "threshold": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1,
+            "description": "Panel-level passing confidence threshold, overriding the policy default."
+          }
+        }
+      }
+    ]
+  },
+  "examples": [
+    ["code-review", "security-review", "threat-modeling", "cost-analysis", "documentation-review", "data-governance-review"],
+    ["code-review.md", "security-review.md", "architecture-review.md"],
+    [
+      {"name": "code-review", "required": true},
+      {"name": "security-review", "required": true, "threshold": 0.8},
+      {"name": "architecture-review", "enabled": false}
+    ]
+  ]
+}
