@@ -1,0 +1,153 @@
+# atoms/service.toml — Grammar atom for the service atom class
+#
+# Defines the structural contract that every service atom must satisfy.
+# This is a grammar atom: kind = "grammar", class = "service".
+#
+# Conforms to:
+#   - Atom Spec v1.2.0 (universal envelope, Part I)
+#   - Grammar atom envelope: schema-atoms/toml-schema/grammar-envelope@1.0.0-draft
+
+# ── Universal envelope ──────────────────────────────────────────────────────
+id           = "schema-atoms/toml-schema/grammar-service"
+version      = "1.0.0-draft"
+content_hash = "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+lifecycle    = "draft"
+created_at   = "2026-05-26T00:00:00Z"
+
+# ── Grammar discriminators ────────────────────────────────────────────────────
+kind  = "grammar"
+name  = "Service Grammar"
+class = "service"
+
+description = """
+A service atom defines a registered service with its endpoints, communication
+protocol, supported authentication schemes, and SLA characteristics. Service
+atoms are the primary input for service discovery, capability routing, and
+integration configuration.
+"""
+
+# ── Field definitions ─────────────────────────────────────────────────────────
+
+[[fields]]
+name        = "id"
+type        = "string"
+required    = true
+description = "Atom identifier: service-atoms/service/<slug>"
+
+[[fields]]
+name        = "version"
+type        = "string"
+required    = true
+description = "SemVer string. Immutable once published."
+
+[[fields]]
+name        = "content_hash"
+type        = "string"
+required    = true
+description = "SHA-256 hex of canonical TOML body excluding [signatures]."
+
+[[fields]]
+name        = "lifecycle"
+type        = "string"
+required    = true
+description = "One of: draft | published | adopted | historic"
+
+[[fields]]
+name        = "created_at"
+type        = "datetime"
+required    = true
+description = "RFC 3339 creation timestamp."
+
+[[fields]]
+name        = "name"
+type        = "string"
+required    = true
+description = "Human-readable display name for this service."
+
+[[fields]]
+name        = "description"
+type        = "string"
+required    = false
+description = "Prose description of the service's purpose and capabilities."
+
+[[fields]]
+name        = "service_type"
+type        = "string"
+required    = true
+description = "One of: api | rpc | event-stream | webhook | mcp-server"
+
+[[fields]]
+name        = "base_url"
+type        = "string"
+required    = false
+description = "Canonical base URL for the service. Omit for protocol-level or local services."
+
+[[fields]]
+name        = "protocol"
+type        = "string"
+required    = true
+description = "One of: http | grpc | websocket | tcp | mqtt"
+
+[[fields]]
+name        = "auth_schemes"
+type        = "array"
+required    = false
+description = "Supported authentication schemes (e.g. bearer, api-key, oauth2, mtls)."
+
+[[fields]]
+name        = "sla_tier"
+type        = "string"
+required    = false
+description = "One of: best-effort | standard | premium | critical"
+
+[[fields]]
+name        = "health_endpoint"
+type        = "string"
+required    = false
+description = "Relative path to the service's health check endpoint (e.g. /healthz)."
+
+# ── Cross-references to other grammar atoms ───────────────────────────────────
+
+[[references]]
+name        = "grammar_envelope"
+target      = "schema-atoms/toml-schema/grammar-envelope@1.0.0-draft"
+cardinality = "one"
+# This grammar atom conforms to the grammar envelope contract.
+
+[[references]]
+name        = "identity_grammar"
+target      = "schema-atoms/toml-schema/grammar-identity@1.0.0-draft"
+cardinality = "zero-or-one"
+# Service atoms may be associated with an identity atom for auth context.
+
+# ── Validation constraints ─────────────────────────────────────────────────────
+
+[[constraints]]
+rule = "kind MUST equal \"grammar\""
+
+[[constraints]]
+rule = "class MUST equal \"service\""
+
+[[constraints]]
+rule = "service_type MUST be one of: api, rpc, event-stream, webhook, mcp-server"
+
+[[constraints]]
+rule = "protocol MUST be one of: http, grpc, websocket, tcp, mqtt"
+
+[[constraints]]
+rule = "sla_tier, if present, MUST be one of: best-effort, standard, premium, critical"
+
+[[constraints]]
+rule = "auth_schemes entries, if present, MUST be non-empty strings"
+
+[[constraints]]
+rule = "id MUST match the pattern service-atoms/service/<slug>"
+
+# ── Signatures (unsigned placeholder) ─────────────────────────────────────────
+[[signatures]]
+algorithm     = "ml-dsa-65"
+signer_role   = "catalog-maintainer"
+signer_key_id = "k_cs_schema_2026"
+signature     = "UNSIGNED-PLACEHOLDER"
+signed_at     = "2026-05-26T00:00:00Z"
+covers        = "content_hash"

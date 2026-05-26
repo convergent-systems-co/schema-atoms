@@ -1,0 +1,150 @@
+# atoms/context.toml — Grammar atom for the context atom class
+#
+# Defines the structural contract that every context atom must satisfy.
+# This is a grammar atom: kind = "grammar", class = "context".
+#
+# Conforms to:
+#   - Atom Spec v1.2.0 (universal envelope, Part I)
+#   - Grammar atom envelope: schema-atoms/toml-schema/grammar-envelope@1.0.0-draft
+
+# ── Universal envelope ──────────────────────────────────────────────────────
+id           = "schema-atoms/toml-schema/grammar-context"
+version      = "1.0.0-draft"
+content_hash = "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+lifecycle    = "draft"
+created_at   = "2026-05-26T00:00:00Z"
+
+# ── Grammar discriminators ────────────────────────────────────────────────────
+kind  = "grammar"
+name  = "Context Grammar"
+class = "context"
+
+description = """
+A context atom defines an agent working context: attention budgets, situational
+frames, working memory shapes, and context-window eviction policies. Context
+atoms are the primary input for context-aware agent orchestration and token
+budget management across multi-step agent pipelines.
+"""
+
+# ── Field definitions ─────────────────────────────────────────────────────────
+
+[[fields]]
+name        = "id"
+type        = "string"
+required    = true
+description = "Atom identifier: context-atoms/context/<slug>"
+
+[[fields]]
+name        = "version"
+type        = "string"
+required    = true
+description = "SemVer string. Immutable once published."
+
+[[fields]]
+name        = "content_hash"
+type        = "string"
+required    = true
+description = "SHA-256 hex of canonical TOML body excluding [signatures]."
+
+[[fields]]
+name        = "lifecycle"
+type        = "string"
+required    = true
+description = "One of: draft | published | adopted | historic"
+
+[[fields]]
+name        = "created_at"
+type        = "datetime"
+required    = true
+description = "RFC 3339 creation timestamp."
+
+[[fields]]
+name        = "name"
+type        = "string"
+required    = true
+description = "Human-readable display name for this context definition."
+
+[[fields]]
+name        = "description"
+type        = "string"
+required    = false
+description = "Prose description of the context's purpose and governing policy."
+
+[[fields]]
+name        = "context_type"
+type        = "string"
+required    = true
+description = "One of: attention-budget | situational-frame | working-memory-shape | context-window-policy"
+
+[[fields]]
+name        = "token_budget"
+type        = "integer"
+required    = false
+description = "Maximum token allocation for this context window. Omit for unlimited."
+
+[[fields]]
+name        = "eviction_policy"
+type        = "string"
+required    = false
+description = "One of: fifo | lru | priority | none"
+
+[[fields]]
+name        = "compression_threshold"
+type        = "float"
+required    = false
+description = "Utilization fraction [0.0, 1.0] at which context compression is triggered."
+
+[[fields]]
+name        = "priority_domains"
+type        = "array"
+required    = false
+description = "Domain label strings that receive priority retention during eviction (e.g. \"system\", \"task\", \"user\")."
+
+# ── Cross-references to other grammar atoms ───────────────────────────────────
+
+[[references]]
+name        = "grammar_envelope"
+target      = "schema-atoms/toml-schema/grammar-envelope@1.0.0-draft"
+cardinality = "one"
+# This grammar atom conforms to the grammar envelope contract.
+
+[[references]]
+name        = "persona_grammar"
+target      = "schema-atoms/toml-schema/grammar-persona@1.0.0-draft"
+cardinality = "zero-or-many"
+# Context atoms may be composed with persona atoms for role-conditioned budgeting.
+
+# ── Validation constraints ─────────────────────────────────────────────────────
+
+[[constraints]]
+rule = "kind MUST equal \"grammar\""
+
+[[constraints]]
+rule = "class MUST equal \"context\""
+
+[[constraints]]
+rule = "context_type MUST be one of: attention-budget, situational-frame, working-memory-shape, context-window-policy"
+
+[[constraints]]
+rule = "token_budget, if present, MUST be a positive integer"
+
+[[constraints]]
+rule = "compression_threshold, if present, MUST be in [0.0, 1.0]"
+
+[[constraints]]
+rule = "eviction_policy, if present, MUST be one of: fifo, lru, priority, none"
+
+[[constraints]]
+rule = "priority_domains entries, if present, MUST be non-empty strings"
+
+[[constraints]]
+rule = "id MUST match the pattern context-atoms/context/<slug>"
+
+# ── Signatures (unsigned placeholder) ─────────────────────────────────────────
+[[signatures]]
+algorithm     = "ml-dsa-65"
+signer_role   = "catalog-maintainer"
+signer_key_id = "k_cs_schema_2026"
+signature     = "UNSIGNED-PLACEHOLDER"
+signed_at     = "2026-05-26T00:00:00Z"
+covers        = "content_hash"

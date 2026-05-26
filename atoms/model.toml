@@ -1,0 +1,175 @@
+# atoms/model.toml — Grammar atom for the model atom class
+#
+# Defines the structural contract that every model atom must satisfy.
+# This is a grammar atom: kind = "grammar", class = "model".
+#
+# Conforms to:
+#   - Atom Spec v1.2.0 (universal envelope, Part I)
+#   - Grammar atom envelope: schema-atoms/toml-schema/grammar-envelope@1.0.0-draft
+
+# ── Universal envelope ──────────────────────────────────────────────────────
+id           = "schema-atoms/toml-schema/grammar-model"
+version      = "1.0.0-draft"
+content_hash = "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+lifecycle    = "draft"
+created_at   = "2026-05-26T00:00:00Z"
+
+# ── Grammar discriminators ────────────────────────────────────────────────────
+kind  = "grammar"
+name  = "Model Grammar"
+class = "model"
+
+description = """
+A model atom defines AI model metadata: provider identity, provider-specific model
+identifier, context window capacity, tool-use and vision support flags, pricing
+tier, supported output modalities, and training cutoff date. Model atoms are the
+primary input for model selection, capability-aware routing, and cost estimation
+in agent pipelines.
+"""
+
+# ── Field definitions ─────────────────────────────────────────────────────────
+
+[[fields]]
+name        = "id"
+type        = "string"
+required    = true
+description = "Atom identifier: model-atoms/model/<slug> or model-atoms/model-card/<slug>"
+
+[[fields]]
+name        = "version"
+type        = "string"
+required    = true
+description = "SemVer string. Immutable once published."
+
+[[fields]]
+name        = "content_hash"
+type        = "string"
+required    = true
+description = "SHA-256 hex of canonical TOML body excluding [signatures]."
+
+[[fields]]
+name        = "lifecycle"
+type        = "string"
+required    = true
+description = "One of: draft | published | adopted | historic"
+
+[[fields]]
+name        = "created_at"
+type        = "datetime"
+required    = true
+description = "RFC 3339 creation timestamp."
+
+[[fields]]
+name        = "name"
+type        = "string"
+required    = true
+description = "Human-readable display name for this model (e.g. \"Claude Sonnet 4\")."
+
+[[fields]]
+name        = "description"
+type        = "string"
+required    = false
+description = "Prose description of the model's strengths, intended use, and positioning."
+
+[[fields]]
+name        = "provider"
+type        = "string"
+required    = true
+description = "Provider identifier (e.g. anthropic | openai | google | meta | mistral | ollama)."
+
+[[fields]]
+name        = "model_id"
+type        = "string"
+required    = true
+description = "Provider-specific model identifier used in API calls (e.g. claude-sonnet-4-5)."
+
+[[fields]]
+name        = "context_window_tokens"
+type        = "integer"
+required    = true
+description = "Maximum context window size in tokens."
+
+[[fields]]
+name        = "supports_tool_use"
+type        = "boolean"
+required    = true
+description = "Whether this model supports structured tool/function calling."
+
+[[fields]]
+name        = "supports_vision"
+type        = "boolean"
+required    = false
+description = "Whether this model accepts image inputs."
+
+[[fields]]
+name        = "supports_streaming"
+type        = "boolean"
+required    = false
+description = "Whether this model supports streaming response generation."
+
+[[fields]]
+name        = "pricing_tier"
+type        = "string"
+required    = false
+description = "One of: free | standard | premium | enterprise"
+
+[[fields]]
+name        = "output_modalities"
+type        = "array"
+required    = false
+description = "Output modalities supported by this model (e.g. text | image | audio | code)."
+
+[[fields]]
+name        = "training_cutoff"
+type        = "string"
+required    = false
+description = "ISO 8601 date string representing the model's knowledge cutoff (e.g. 2025-08-01)."
+
+# ── Cross-references to other grammar atoms ───────────────────────────────────
+
+[[references]]
+name        = "grammar_envelope"
+target      = "schema-atoms/toml-schema/grammar-envelope@1.0.0-draft"
+cardinality = "one"
+# This grammar atom conforms to the grammar envelope contract.
+
+[[references]]
+name        = "persona_grammar"
+target      = "schema-atoms/toml-schema/grammar-persona@1.0.0-draft"
+cardinality = "zero-or-many"
+# Persona atoms reference model atoms via model_preferences to declare preferred models.
+
+[[references]]
+name        = "context_grammar"
+target      = "schema-atoms/toml-schema/grammar-context@1.0.0-draft"
+cardinality = "zero-or-many"
+# Context atoms reference model atoms to apply budget policies per model capability.
+
+# ── Validation constraints ─────────────────────────────────────────────────────
+
+[[constraints]]
+rule = "kind MUST equal \"grammar\""
+
+[[constraints]]
+rule = "class MUST equal \"model\""
+
+[[constraints]]
+rule = "context_window_tokens MUST be a positive integer"
+
+[[constraints]]
+rule = "pricing_tier, if present, MUST be one of: free, standard, premium, enterprise"
+
+[[constraints]]
+rule = "output_modalities entries, if present, MUST be non-empty strings"
+
+[[constraints]]
+rule = "id MUST match the pattern model-atoms/model/<slug> or model-atoms/model-card/<slug>"
+
+# ── Signatures (unsigned placeholder) ─────────────────────────────────────────
+[[signatures]]
+algorithm     = "ml-dsa-65"
+signer_role   = "catalog-maintainer"
+signer_key_id = "k_cs_schema_2026"
+signature     = "UNSIGNED-PLACEHOLDER"
+signed_at     = "2026-05-26T00:00:00Z"
+covers        = "content_hash"

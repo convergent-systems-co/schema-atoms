@@ -1,0 +1,150 @@
+# atoms/channel.toml — Grammar atom for the channel atom class
+#
+# Defines the structural contract that every channel atom must satisfy.
+# This is a grammar atom: kind = "grammar", class = "channel".
+#
+# Conforms to:
+#   - Atom Spec v1.2.0 (universal envelope, Part I)
+#   - Grammar atom envelope: schema-atoms/toml-schema/grammar-envelope@1.0.0-draft
+
+# ── Universal envelope ──────────────────────────────────────────────────────
+id           = "schema-atoms/toml-schema/grammar-channel"
+version      = "1.0.0-draft"
+content_hash = "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+lifecycle    = "draft"
+created_at   = "2026-05-26T00:00:00Z"
+
+# ── Grammar discriminators ────────────────────────────────────────────────────
+kind  = "grammar"
+name  = "Channel Grammar"
+class = "channel"
+
+description = """
+A channel atom defines a communication endpoint: its protocol family, delivery
+semantics, message size limits, and threading/reaction capabilities. Channel
+atoms are the primary input for message routing, notification dispatch, and
+multi-channel delivery orchestration.
+"""
+
+# ── Field definitions ─────────────────────────────────────────────────────────
+
+[[fields]]
+name        = "id"
+type        = "string"
+required    = true
+description = "Atom identifier: channel-atoms/channel/<slug>"
+
+[[fields]]
+name        = "version"
+type        = "string"
+required    = true
+description = "SemVer string. Immutable once published."
+
+[[fields]]
+name        = "content_hash"
+type        = "string"
+required    = true
+description = "SHA-256 hex of canonical TOML body excluding [signatures]."
+
+[[fields]]
+name        = "lifecycle"
+type        = "string"
+required    = true
+description = "One of: draft | published | adopted | historic"
+
+[[fields]]
+name        = "created_at"
+type        = "datetime"
+required    = true
+description = "RFC 3339 creation timestamp."
+
+[[fields]]
+name        = "name"
+type        = "string"
+required    = true
+description = "Human-readable display name for this channel."
+
+[[fields]]
+name        = "description"
+type        = "string"
+required    = false
+description = "Prose description of the channel's purpose and characteristics."
+
+[[fields]]
+name        = "channel_type"
+type        = "string"
+required    = true
+description = "One of: protocol | endpoint | delivery-semantic | transport | auth-method"
+
+[[fields]]
+name        = "protocol_family"
+type        = "string"
+required    = false
+description = "Protocol family for this channel: slack | email | sms | webhook | irc | matrix | discord | rss | imessage"
+
+[[fields]]
+name        = "delivery_guarantee"
+type        = "string"
+required    = false
+description = "One of: at-most-once | at-least-once | exactly-once"
+
+[[fields]]
+name        = "max_message_size_bytes"
+type        = "integer"
+required    = false
+description = "Maximum message payload size in bytes. Omit if unbounded or unknown."
+
+[[fields]]
+name        = "supports_threading"
+type        = "boolean"
+required    = false
+description = "Whether this channel supports threaded replies."
+
+[[fields]]
+name        = "supports_reactions"
+type        = "boolean"
+required    = false
+description = "Whether this channel supports message reactions or emoji responses."
+
+# ── Cross-references to other grammar atoms ───────────────────────────────────
+
+[[references]]
+name        = "grammar_envelope"
+target      = "schema-atoms/toml-schema/grammar-envelope@1.0.0-draft"
+cardinality = "one"
+# This grammar atom conforms to the grammar envelope contract.
+
+[[references]]
+name        = "service_grammar"
+target      = "schema-atoms/toml-schema/grammar-service@1.0.0-draft"
+cardinality = "zero-or-one"
+# Channel atoms backed by a service endpoint may reference a service atom.
+
+# ── Validation constraints ─────────────────────────────────────────────────────
+
+[[constraints]]
+rule = "kind MUST equal \"grammar\""
+
+[[constraints]]
+rule = "class MUST equal \"channel\""
+
+[[constraints]]
+rule = "channel_type MUST be one of: protocol, endpoint, delivery-semantic, transport, auth-method"
+
+[[constraints]]
+rule = "delivery_guarantee, if present, MUST be one of: at-most-once, at-least-once, exactly-once"
+
+[[constraints]]
+rule = "max_message_size_bytes, if present, MUST be a positive integer"
+
+[[constraints]]
+rule = "id MUST match the pattern channel-atoms/channel/<slug>"
+
+# ── Signatures (unsigned placeholder) ─────────────────────────────────────────
+[[signatures]]
+algorithm     = "ml-dsa-65"
+signer_role   = "catalog-maintainer"
+signer_key_id = "k_cs_schema_2026"
+signature     = "UNSIGNED-PLACEHOLDER"
+signed_at     = "2026-05-26T00:00:00Z"
+covers        = "content_hash"
