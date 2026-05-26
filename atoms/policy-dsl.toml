@@ -1,0 +1,171 @@
+# atoms/policy-dsl.toml — Grammar atom for the policy DSL atom class
+#
+# Defines the structural contract that every policy DSL atom must satisfy.
+# This is a grammar atom: kind = "grammar", class = "policy-dsl".
+#
+# Conforms to:
+#   - Atom Spec v1.2.0 (universal envelope, Part I)
+#   - Grammar atom envelope: schema-atoms/toml-schema/grammar-envelope@1.0.0-draft
+
+# ── Universal envelope ──────────────────────────────────────────────────────
+id           = "schema-atoms/toml-schema/grammar-policy-dsl"
+version      = "1.0.0-draft"
+content_hash = "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+lifecycle    = "draft"
+created_at   = "2026-05-26T00:00:00Z"
+
+# ── Grammar discriminators ────────────────────────────────────────────────────
+kind  = "grammar"
+name  = "Policy DSL Grammar"
+class = "policy-dsl"
+
+description = """
+A policy DSL atom encodes a single declarative rule in the platform's policy
+expression language. Each atom names a subject, an action, zero or more
+conditions, and the effect to apply when the rule matches. Rules are evaluated
+by the policy engine at invocation time; the expression grammar is defined in
+grammars/policy-dsl.ebnf.
+"""
+
+# ── Field definitions ─────────────────────────────────────────────────────────
+
+[[fields]]
+name        = "id"
+type        = "string"
+required    = true
+description = "Atom identifier: policy-atoms/policy-dsl/<slug>"
+
+[[fields]]
+name        = "version"
+type        = "string"
+required    = true
+description = "SemVer string. Immutable once published."
+
+[[fields]]
+name        = "content_hash"
+type        = "string"
+required    = true
+description = "SHA-256 hex of canonical TOML body excluding [signatures]."
+
+[[fields]]
+name        = "lifecycle"
+type        = "string"
+required    = true
+description = "One of: draft | published | adopted | historic"
+
+[[fields]]
+name        = "created_at"
+type        = "datetime"
+required    = true
+description = "RFC 3339 creation timestamp."
+
+[[fields]]
+name        = "name"
+type        = "string"
+required    = true
+description = "Human-readable display name for this policy DSL rule."
+
+[[fields]]
+name        = "expression_type"
+type        = "string"
+required    = false
+description = """
+Classifies the intent of this DSL expression. One of:
+  allow — grants access when conditions are met
+  deny  — blocks access when conditions are met
+  audit — permits access but records a structured audit event
+Absent expression_type defaults to the effect field value.
+"""
+
+[[fields]]
+name        = "subject"
+type        = "string"
+required    = false
+description = """
+The principal or principal pattern this rule applies to. May be a concrete
+identity reference (e.g. \"identity-atoms/identity/svc-ingestion\"), a role
+glob (e.g. \"role:operator*\"), or the wildcard \"*\" for any subject.
+Absent means the rule applies to all subjects.
+"""
+
+[[fields]]
+name        = "action"
+type        = "string"
+required    = false
+description = """
+The operation or operation pattern this rule governs (e.g. \"tool-use\",
+\"file-read\", \"model-invoke\"). Supports glob patterns. Absent means
+the rule applies to all actions.
+"""
+
+[[fields]]
+name        = "conditions"
+type        = "array"
+required    = false
+description = """
+List of predicate expressions that MUST ALL evaluate to true for the rule to
+match. Each entry is a string conforming to the condition production in
+grammars/policy-dsl.ebnf:
+  condition = field comparator value
+  field     = identifier ("." identifier)*
+  comparator = "==" | "!=" | "in" | "not-in" | "<" | ">"
+An empty or absent array means no additional conditions: the rule matches on
+subject and action alone.
+"""
+
+[[fields]]
+name        = "effect"
+type        = "string"
+required    = true
+description = """
+The enforcement outcome applied when this rule matches. One of:
+  allow — permit the action; emit an informational event
+  deny  — block the action; return a policy-violation error
+  audit — permit the action; record a structured audit event for review
+"""
+
+# ── Cross-references to other grammar atoms ───────────────────────────────────
+
+[[references]]
+name        = "grammar_envelope"
+target      = "schema-atoms/toml-schema/grammar-envelope@1.0.0-draft"
+cardinality = "one"
+# This grammar atom conforms to the grammar envelope contract.
+
+[[references]]
+name        = "policy_grammar"
+target      = "schema-atoms/toml-schema/grammar-policy@1.0.0-draft"
+cardinality = "many"
+# Policy DSL atoms are composed into policy atoms via the policy.rules array.
+
+# ── Validation constraints ─────────────────────────────────────────────────────
+
+[[constraints]]
+rule = "kind MUST equal \"grammar\""
+
+[[constraints]]
+rule = "class MUST equal \"policy-dsl\""
+
+[[constraints]]
+rule = "name MUST be a non-empty string"
+
+[[constraints]]
+rule = "effect MUST be one of: allow | deny | audit"
+
+[[constraints]]
+rule = "expression_type, if present, MUST be one of: allow | deny | audit"
+
+[[constraints]]
+rule = "each conditions entry MUST be a non-empty string conforming to the condition production in grammars/policy-dsl.ebnf"
+
+[[constraints]]
+rule = "id MUST match the pattern policy-atoms/policy-dsl/<slug>"
+
+# ── Signatures (unsigned placeholder) ─────────────────────────────────────────
+[[signatures]]
+algorithm     = "ml-dsa-65"
+signer_role   = "catalog-maintainer"
+signer_key_id = "k_cs_schema_2026"
+signature     = "UNSIGNED-PLACEHOLDER"
+signed_at     = "2026-05-26T00:00:00Z"
+covers        = "content_hash"
