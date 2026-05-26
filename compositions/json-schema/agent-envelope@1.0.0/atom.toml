@@ -1,0 +1,15 @@
+id          = "schema-atoms/json-schema/agent-envelope"
+version     = "1.0.0"
+content_hash = ""
+lifecycle   = "draft"
+created_at  = "2026-05-25T00:00:00Z"
+
+[spec]
+class          = "json-schema"
+schema_version = "2020-12"
+root_schema_id = "https://convergent-systems-co.github.io/olympus/schemas/agent-envelope.schema.json"
+asset          = "agent-envelope.json"
+
+[protocol]
+provenance = "https://github.com/convergent-systems-co/olympus-central/blob/main/src/core/embed/_content/schemas/agent-envelope.schema.json — olympus-central agent context envelope schema v1"
+license    = "Apache-2.0"
