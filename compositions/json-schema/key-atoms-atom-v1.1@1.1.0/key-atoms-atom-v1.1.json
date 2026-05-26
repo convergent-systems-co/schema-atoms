@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://key-atoms.com/schemas/atom-v1.1.json",
+  "title": "key-atoms v1.1 atom (placeholder)",
+  "description": "Placeholder permissive schema for the key/revocation/succession atom types under atoms-spec/v1.1.0. The full structured schema for the [key] block (key_id, algorithm, public_key, role, holder, issued_at, expires_at, succeeded_by) and the [[signatures]] array is deferred to schema-atoms and to a follow-up commit by the principal. CI uses this placeholder to validate JSON shape and required identity fields only; structural validation of the trust-bearing content happens out-of-band during the bootstrap period.",
+  "type": "object",
+  "required": ["id", "type", "version"],
+  "properties": {
+    "id": { "type": "string", "minLength": 1 },
+    "type": { "type": "string", "enum": ["key", "revocation", "succession"] },
+    "version": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+" },
+    "content_hash": { "type": "string" },
+    "lifecycle": { "type": "string" },
+    "spec_version": { "type": "string" }
+  },
+  "additionalProperties": true
+}

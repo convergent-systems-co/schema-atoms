@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://doc-atoms.com/schemas/atom-v1.json",
+  "title": "doc-atoms v1 atom",
+  "description": "A single atom in the doc-atoms catalog. Discriminated by `type`. doc-atoms holds explanatory documentation — tutorials, explanations, runbooks, how-tos, reference guides. Distinct from schema-atoms (normative specs and JSON Schemas).",
+  "type": "object",
+  "required": ["schema", "type", "id", "version", "name"],
+  "additionalProperties": false,
+  "properties": {
+    "schema": {
+      "type": "string",
+      "const": "https://doc-atoms.com/schemas/atom-v1.json"
+    },
+    "type": {
+      "type": "string",
+      "enum": ["tutorial", "explanation", "runbook", "how-to", "reference-guide"]
+    },
+    "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]{1,62}[a-z0-9]$" },
+    "version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:-[A-Za-z0-9.-]+)?$" },
+    "name": { "type": "string", "minLength": 1, "maxLength": 120 },
+    "summary": { "type": "string", "maxLength": 500 },
+    "tags": { "type": "array", "items": { "type": "string", "minLength": 1, "maxLength": 40 }, "uniqueItems": true },
+    "audience": {
+      "type": "array",
+      "description": "Who this document is for — e.g., operator, contributor, end-user, future-maintainer.",
+      "items": { "type": "string", "minLength": 1, "maxLength": 40 },
+      "uniqueItems": true
+    },
+    "prerequisites": {
+      "type": "array",
+      "description": "Refs to other doc-atoms or knowledge expected before reading.",
+      "items": { "type": "string" },
+      "uniqueItems": true
+    },
+    "body": {
+      "type": "object",
+      "description": "The document content. Either inline markdown or a reference to a file in the repo.",
+      "additionalProperties": false,
+      "properties": {
+        "format": { "type": "string", "enum": ["markdown", "mdx", "rst"] },
+        "inline": { "type": "string", "description": "Inline body content." },
+        "path": { "type": "string", "description": "Path relative to the atom file pointing at the body source." }
+      }
+    },
+    "tutorial_profile": {
+      "type": "object",
+      "description": "Only for type=tutorial. Guided learning, opinionated path.",
+      "additionalProperties": false,
+      "properties": {
+        "estimated_minutes": { "type": "integer", "minimum": 1 },
+        "outcome": { "type": "string", "maxLength": 500, "description": "What the reader can do after finishing." }
+      }
+    },
+    "runbook_profile": {
+      "type": "object",
+      "description": "Only for type=runbook. Operational procedure.",
+      "additionalProperties": false,
+      "properties": {
+        "scenario": { "type": "string", "maxLength": 500 },
+        "severity": { "type": "string", "enum": ["info", "low", "medium", "high", "critical"] },
+        "escalation": { "type": "string", "description": "Whom to escalate to if the procedure fails." }
+      }
+    },
+    "explanation_profile": {
+      "type": "object",
+      "description": "Only for type=explanation. Clarifying narrative.",
+      "additionalProperties": false,
+      "properties": {
+        "concept": { "type": "string", "maxLength": 200 },
+        "depth": { "type": "string", "enum": ["overview", "intermediate", "deep-dive"] }
+      }
+    },
+    "how_to_profile": {
+      "type": "object",
+      "description": "Only for type=how-to. Focused task answer.",
+      "additionalProperties": false,
+      "properties": {
+        "task": { "type": "string", "maxLength": 200 },
+        "applies_to": { "type": "array", "items": { "type": "string" }, "uniqueItems": true }
+      }
+    },
+    "reference_profile": {
+      "type": "object",
+      "description": "Only for type=reference-guide. Lookup-organized material.",
+      "additionalProperties": false,
+      "properties": {
+        "covers": { "type": "array", "items": { "type": "string" }, "uniqueItems": true }
+      }
+    }
+  }
+}
