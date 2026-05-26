@@ -1,0 +1,147 @@
+# atoms/theme.toml — Grammar atom for the theme atom class
+#
+# Defines the structural contract that every theme atom must satisfy.
+# This is a grammar atom: kind = "grammar", class = "theme".
+#
+# Conforms to:
+#   - Atom Spec v1.2.0 (universal envelope, Part I)
+#   - Grammar atom envelope: schema-atoms/toml-schema/grammar-envelope@1.0.0-draft
+
+# ── Universal envelope ──────────────────────────────────────────────────────
+id           = "schema-atoms/toml-schema/grammar-theme"
+version      = "1.0.0-draft"
+content_hash = "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+lifecycle    = "draft"
+created_at   = "2026-05-26T00:00:00Z"
+
+# ── Grammar discriminators ────────────────────────────────────────────────────
+kind  = "grammar"
+name  = "Theme Grammar"
+class = "theme"
+
+description = """
+A theme atom specifies the complete visual styling contract for a rendered
+surface: the base design system it extends, the primary typeface, the
+accent color, and whether dark mode is enabled by default. Theme atoms are
+consumed by front-end renderers, white-label configuration pipelines, and
+design-token generators.
+"""
+
+# ── Field definitions ─────────────────────────────────────────────────────────
+
+[[fields]]
+name        = "id"
+type        = "string"
+required    = true
+description = "Atom identifier: theme-atoms/theme/<slug>"
+
+[[fields]]
+name        = "version"
+type        = "string"
+required    = true
+description = "SemVer string. Immutable once published."
+
+[[fields]]
+name        = "content_hash"
+type        = "string"
+required    = true
+description = "SHA-256 hex of canonical TOML body excluding [signatures]."
+
+[[fields]]
+name        = "lifecycle"
+type        = "string"
+required    = true
+description = "One of: draft | published | adopted | historic"
+
+[[fields]]
+name        = "created_at"
+type        = "datetime"
+required    = true
+description = "RFC 3339 creation timestamp."
+
+[[fields]]
+name        = "name"
+type        = "string"
+required    = true
+description = "Human-readable display name for this theme atom."
+
+[[fields]]
+name        = "base_theme"
+type        = "string"
+required    = false
+description = """
+Identifier of the parent design system or theme this atom extends
+(e.g. \"olympus-base\", \"material-3\", \"tailwind-default\"). Consumers
+MUST load the base theme first and then apply this atom's overrides.
+When absent, the theme is treated as a standalone root theme.
+"""
+
+[[fields]]
+name        = "font_family"
+type        = "string"
+required    = false
+description = """
+CSS font-family string for the primary typeface (e.g. \"Inter, sans-serif\",
+\"'JetBrains Mono', monospace\"). Applied as the default body font by
+renderers that support typography tokens.
+"""
+
+[[fields]]
+name        = "accent_color"
+type        = "string"
+required    = false
+description = """
+Accent or interactive-element color expressed as a CSS hex color code
+(e.g. \"#5B6AF0\"). MUST be a 6-digit hex string prefixed with \"#\" when
+present. Used for buttons, links, focus rings, and highlight states.
+"""
+
+[[fields]]
+name        = "dark_mode"
+type        = "bool"
+required    = false
+description = """
+When true, this theme activates a dark-mode color palette as its default
+rendering mode. Renderers MUST respect this declaration and SHOULD expose
+a user override. Defaults to false when absent.
+"""
+
+# ── Cross-references to other grammar atoms ───────────────────────────────────
+
+[[references]]
+name        = "grammar_envelope"
+target      = "schema-atoms/toml-schema/grammar-envelope@1.0.0-draft"
+cardinality = "one"
+# This grammar atom conforms to the grammar envelope contract.
+
+[[references]]
+name        = "brand_grammar"
+target      = "schema-atoms/toml-schema/grammar-brand@1.0.0-draft"
+cardinality = "optional"
+# Theme atoms may be associated with a brand atom for full identity resolution.
+
+# ── Validation constraints ─────────────────────────────────────────────────────
+
+[[constraints]]
+rule = "kind MUST equal \"grammar\""
+
+[[constraints]]
+rule = "class MUST equal \"theme\""
+
+[[constraints]]
+rule = "accent_color, if present, MUST match the pattern #[0-9A-Fa-f]{6}"
+
+[[constraints]]
+rule = "dark_mode, if present, MUST be a boolean"
+
+[[constraints]]
+rule = "id MUST match the pattern theme-atoms/theme/<slug>"
+
+# ── Signatures (unsigned placeholder) ─────────────────────────────────────────
+[[signatures]]
+algorithm     = "ml-dsa-65"
+signer_role   = "catalog-maintainer"
+signer_key_id = "k_cs_schema_2026"
+signature     = "UNSIGNED-PLACEHOLDER"
+signed_at     = "2026-05-26T00:00:00Z"
+covers        = "content_hash"

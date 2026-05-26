@@ -1,0 +1,143 @@
+# atoms/doc.toml — Grammar atom for the doc atom class
+#
+# Defines the structural contract that every doc atom must satisfy.
+# This is a grammar atom: kind = "grammar", class = "doc".
+#
+# Conforms to:
+#   - Atom Spec v1.2.0 (universal envelope, Part I)
+#   - Grammar atom envelope: schema-atoms/toml-schema/grammar-envelope@1.0.0-draft
+
+# ── Universal envelope ──────────────────────────────────────────────────────
+id           = "schema-atoms/toml-schema/grammar-doc"
+version      = "1.0.0-draft"
+content_hash = "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+lifecycle    = "draft"
+created_at   = "2026-05-26T00:00:00Z"
+
+# ── Grammar discriminators ────────────────────────────────────────────────────
+kind  = "grammar"
+name  = "Doc Grammar"
+class = "doc"
+
+description = """
+A doc atom represents a discrete document artifact: its human-readable title,
+serialization format, intended audience, and a content hash for integrity
+verification. Doc atoms are used in knowledge pipelines, agent memory, and
+content-management contexts where document identity must be stable and auditable.
+"""
+
+# ── Field definitions ─────────────────────────────────────────────────────────
+
+[[fields]]
+name        = "id"
+type        = "string"
+required    = true
+description = "Atom identifier: doc-atoms/doc/<slug>"
+
+[[fields]]
+name        = "version"
+type        = "string"
+required    = true
+description = "SemVer string. Immutable once published."
+
+[[fields]]
+name        = "content_hash"
+type        = "string"
+required    = true
+description = "SHA-256 hex of canonical TOML body excluding [signatures]."
+
+[[fields]]
+name        = "lifecycle"
+type        = "string"
+required    = true
+description = "One of: draft | published | adopted | historic"
+
+[[fields]]
+name        = "created_at"
+type        = "datetime"
+required    = true
+description = "RFC 3339 creation timestamp."
+
+[[fields]]
+name        = "name"
+type        = "string"
+required    = true
+description = "Human-readable display name for this doc atom."
+
+[[fields]]
+name        = "title"
+type        = "string"
+required    = true
+description = """
+The canonical title of the document as it should appear in navigation, search
+results, and citations. MUST be a non-empty string.
+"""
+
+[[fields]]
+name        = "format"
+type        = "string"
+required    = false
+description = """
+Serialization format of the document body (e.g. \"markdown\", \"html\", \"pdf\",
+\"plaintext\", \"rst\"). Informs renderers and parsers at retrieval time.
+"""
+
+[[fields]]
+name        = "audience"
+type        = "string"
+required    = false
+description = """
+Intended readership for this document (e.g. \"operator\", \"end-user\",
+\"contributor\", \"executive\"). Used for audience-scoped content delivery
+and context-sensitive retrieval filtering.
+"""
+
+[[fields]]
+name        = "content_hash"
+type        = "string"
+required    = false
+description = """
+SHA-256 hex of the document's raw content body (distinct from the atom
+envelope's content_hash which covers the TOML itself). Used to detect
+content drift between the registered atom and the stored artifact.
+"""
+
+# ── Cross-references to other grammar atoms ───────────────────────────────────
+
+[[references]]
+name        = "grammar_envelope"
+target      = "schema-atoms/toml-schema/grammar-envelope@1.0.0-draft"
+cardinality = "one"
+# This grammar atom conforms to the grammar envelope contract.
+
+[[references]]
+name        = "knowledge_grammar"
+target      = "schema-atoms/toml-schema/grammar-knowledge@1.0.0-draft"
+cardinality = "many"
+# Doc atoms may be indexed as knowledge atoms in retrieval pipelines.
+
+# ── Validation constraints ─────────────────────────────────────────────────────
+
+[[constraints]]
+rule = "kind MUST equal \"grammar\""
+
+[[constraints]]
+rule = "class MUST equal \"doc\""
+
+[[constraints]]
+rule = "title MUST be a non-empty string"
+
+[[constraints]]
+rule = "content_hash (body), if present, MUST be a valid sha256:<hex> string"
+
+[[constraints]]
+rule = "id MUST match the pattern doc-atoms/doc/<slug>"
+
+# ── Signatures (unsigned placeholder) ─────────────────────────────────────────
+[[signatures]]
+algorithm     = "ml-dsa-65"
+signer_role   = "catalog-maintainer"
+signer_key_id = "k_cs_schema_2026"
+signature     = "UNSIGNED-PLACEHOLDER"
+signed_at     = "2026-05-26T00:00:00Z"
+covers        = "content_hash"

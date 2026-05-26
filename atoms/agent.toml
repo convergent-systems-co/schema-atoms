@@ -1,0 +1,165 @@
+# atoms/agent.toml — Grammar atom for the agent atom class
+#
+# Defines the structural contract that every agent atom must satisfy.
+# This is a grammar atom: kind = "grammar", class = "agent".
+#
+# Conforms to:
+#   - Atom Spec v1.2.0 (universal envelope, Part I)
+#   - Grammar atom envelope: schema-atoms/toml-schema/grammar-envelope@1.0.0-draft
+
+# ── Universal envelope ──────────────────────────────────────────────────────
+id           = "schema-atoms/toml-schema/grammar-agent"
+version      = "1.0.0-draft"
+content_hash = "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+lifecycle    = "draft"
+created_at   = "2026-05-26T00:00:00Z"
+
+# ── Grammar discriminators ────────────────────────────────────────────────────
+kind  = "grammar"
+name  = "Agent Grammar"
+class = "agent"
+
+description = """
+An agent atom declares a deployable AI agent: its functional role, the
+capabilities it advertises, the memory tier it operates at, and the trust
+level granted to it by the system. Agent atoms are the primary unit of
+agent registration in an Olympus catalog and drive routing, policy
+enforcement, and capability-aware dispatch.
+"""
+
+# ── Field definitions ─────────────────────────────────────────────────────────
+
+[[fields]]
+name        = "id"
+type        = "string"
+required    = true
+description = "Atom identifier: agent-atoms/agent/<slug>"
+
+[[fields]]
+name        = "version"
+type        = "string"
+required    = true
+description = "SemVer string. Immutable once published."
+
+[[fields]]
+name        = "content_hash"
+type        = "string"
+required    = true
+description = "SHA-256 hex of canonical TOML body excluding [signatures]."
+
+[[fields]]
+name        = "lifecycle"
+type        = "string"
+required    = true
+description = "One of: draft | published | adopted | historic"
+
+[[fields]]
+name        = "created_at"
+type        = "datetime"
+required    = true
+description = "RFC 3339 creation timestamp."
+
+[[fields]]
+name        = "name"
+type        = "string"
+required    = true
+description = "Human-readable display name for this agent atom."
+
+[[fields]]
+name        = "role"
+type        = "string"
+required    = true
+description = """
+Functional classification of this agent's primary responsibility
+(e.g. \"code-reviewer\", \"data-analyst\", \"customer-support\",
+\"orchestrator\"). MUST be a non-empty string. Used for role-based
+routing and policy scoping.
+"""
+
+[[fields]]
+name        = "capabilities"
+type        = "array"
+required    = false
+description = """
+List of capability strings this agent declares (e.g. \"tool-use\",
+\"long-context\", \"code-generation\", \"web-search\"). Used for
+capability-aware dispatch and policy enforcement. Each entry MUST
+be a non-empty string.
+"""
+
+[[fields]]
+name        = "memory_tier"
+type        = "string"
+required    = false
+description = """
+Memory access tier granted to this agent. Indicates which persistence
+layers the agent may read from and write to. Expected values:
+  ephemeral  — in-context only; no persistence between invocations
+  session    — persists for the duration of a user session
+  persistent — persists across sessions; requires elevated trust
+"""
+
+[[fields]]
+name        = "trust_level"
+type        = "string"
+required    = false
+description = """
+Trust classification assigned to this agent by the governing policy.
+Expected values:
+  untrusted  — sandboxed; no access to sensitive data or tools
+  low        — limited tool access; output reviewed before acting
+  standard   — default operational trust; policy-gated tool use
+  elevated   — broad tool access; reserved for first-party agents
+"""
+
+# ── Cross-references to other grammar atoms ───────────────────────────────────
+
+[[references]]
+name        = "grammar_envelope"
+target      = "schema-atoms/toml-schema/grammar-envelope@1.0.0-draft"
+cardinality = "one"
+# This grammar atom conforms to the grammar envelope contract.
+
+[[references]]
+name        = "persona_grammar"
+target      = "schema-atoms/toml-schema/grammar-persona@1.0.0-draft"
+cardinality = "optional"
+# Agent atoms may reference a persona atom for role conditioning.
+
+[[references]]
+name        = "policy_grammar"
+target      = "schema-atoms/toml-schema/grammar-policy@1.0.0-draft"
+cardinality = "many"
+# Agent atoms are governed by one or more policy atoms at dispatch time.
+
+# ── Validation constraints ─────────────────────────────────────────────────────
+
+[[constraints]]
+rule = "kind MUST equal \"grammar\""
+
+[[constraints]]
+rule = "class MUST equal \"agent\""
+
+[[constraints]]
+rule = "role MUST be a non-empty string"
+
+[[constraints]]
+rule = "capabilities entries MUST be non-empty strings"
+
+[[constraints]]
+rule = "memory_tier, if present, MUST be one of: ephemeral | session | persistent"
+
+[[constraints]]
+rule = "trust_level, if present, MUST be one of: untrusted | low | standard | elevated"
+
+[[constraints]]
+rule = "id MUST match the pattern agent-atoms/agent/<slug>"
+
+# ── Signatures (unsigned placeholder) ─────────────────────────────────────────
+[[signatures]]
+algorithm     = "ml-dsa-65"
+signer_role   = "catalog-maintainer"
+signer_key_id = "k_cs_schema_2026"
+signature     = "UNSIGNED-PLACEHOLDER"
+signed_at     = "2026-05-26T00:00:00Z"
+covers        = "content_hash"

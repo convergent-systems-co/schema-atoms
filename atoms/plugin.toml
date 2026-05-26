@@ -1,0 +1,155 @@
+# atoms/plugin.toml — Grammar atom for the plugin atom class
+#
+# Defines the structural contract that every plugin atom must satisfy.
+# This is a grammar atom: kind = "grammar", class = "plugin".
+#
+# Conforms to:
+#   - Atom Spec v1.2.0 (universal envelope, Part I)
+#   - Grammar atom envelope: schema-atoms/toml-schema/grammar-envelope@1.0.0-draft
+
+# ── Universal envelope ──────────────────────────────────────────────────────
+id           = "schema-atoms/toml-schema/grammar-plugin"
+version      = "1.0.0-draft"
+content_hash = "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+lifecycle    = "draft"
+created_at   = "2026-05-26T00:00:00Z"
+
+# ── Grammar discriminators ────────────────────────────────────────────────────
+kind  = "grammar"
+name  = "Plugin Grammar"
+class = "plugin"
+
+description = """
+A plugin atom registers an extension point in the Olympus platform: the
+module entry point that the runtime loads, the permissions required for
+execution, the version of the host API it targets, and whether it executes
+in a sandbox. Plugin atoms are consumed by the plugin loader at agent startup
+and by the catalog for discoverability and security review.
+"""
+
+# ── Field definitions ─────────────────────────────────────────────────────────
+
+[[fields]]
+name        = "id"
+type        = "string"
+required    = true
+description = "Atom identifier: plugin-atoms/plugin/<slug>"
+
+[[fields]]
+name        = "version"
+type        = "string"
+required    = true
+description = "SemVer string. Immutable once published."
+
+[[fields]]
+name        = "content_hash"
+type        = "string"
+required    = true
+description = "SHA-256 hex of canonical TOML body excluding [signatures]."
+
+[[fields]]
+name        = "lifecycle"
+type        = "string"
+required    = true
+description = "One of: draft | published | adopted | historic"
+
+[[fields]]
+name        = "created_at"
+type        = "datetime"
+required    = true
+description = "RFC 3339 creation timestamp."
+
+[[fields]]
+name        = "name"
+type        = "string"
+required    = true
+description = "Human-readable display name for this plugin atom."
+
+[[fields]]
+name        = "entry_point"
+type        = "string"
+required    = true
+description = """
+The module path or symbol the runtime invokes to load this plugin
+(e.g. \"plugins/billing-connector/main.go\", \"@olympus/plugin-slack/index.js\",
+\"convergent_systems.billing_connector:BillingPlugin\"). MUST be a non-empty
+string. The format is runtime-dependent; the loader interprets it.
+"""
+
+[[fields]]
+name        = "permissions"
+type        = "array"
+required    = false
+description = """
+List of permission strings this plugin requires from the host runtime
+(e.g. \"network:outbound\", \"storage:read\", \"tool:invoke\", \"agent:spawn\").
+The plugin loader MUST deny load if any declared permission is not granted
+by the host's active policy. Each entry MUST be a non-empty string.
+"""
+
+[[fields]]
+name        = "version_constraint"
+type        = "string"
+required    = false
+description = """
+SemVer range expression constraining the minimum compatible host API version
+(e.g. \">=1.2.0\", \"^2.0.0\", \"~1.4\"). The plugin loader MUST reject the
+plugin if the running host API version does not satisfy this constraint.
+"""
+
+[[fields]]
+name        = "sandboxed"
+type        = "bool"
+required    = false
+description = """
+When true, the plugin MUST execute inside the platform's isolation sandbox
+(e.g. WASM sandbox, subprocess with restricted syscalls). When false, the
+plugin runs in the host process with full runtime access. Defaults to false
+when absent; setting to true is RECOMMENDED for third-party plugins.
+"""
+
+# ── Cross-references to other grammar atoms ───────────────────────────────────
+
+[[references]]
+name        = "grammar_envelope"
+target      = "schema-atoms/toml-schema/grammar-envelope@1.0.0-draft"
+cardinality = "one"
+# This grammar atom conforms to the grammar envelope contract.
+
+[[references]]
+name        = "policy_grammar"
+target      = "schema-atoms/toml-schema/grammar-policy@1.0.0-draft"
+cardinality = "many"
+# Plugin permissions are enforced against policy atoms at load time.
+
+# ── Validation constraints ─────────────────────────────────────────────────────
+
+[[constraints]]
+rule = "kind MUST equal \"grammar\""
+
+[[constraints]]
+rule = "class MUST equal \"plugin\""
+
+[[constraints]]
+rule = "entry_point MUST be a non-empty string"
+
+[[constraints]]
+rule = "permissions entries MUST be non-empty strings"
+
+[[constraints]]
+rule = "version_constraint, if present, MUST be a valid SemVer range expression"
+
+[[constraints]]
+rule = "sandboxed, if present, MUST be a boolean"
+
+[[constraints]]
+rule = "id MUST match the pattern plugin-atoms/plugin/<slug>"
+
+# ── Signatures (unsigned placeholder) ─────────────────────────────────────────
+[[signatures]]
+algorithm     = "ml-dsa-65"
+signer_role   = "catalog-maintainer"
+signer_key_id = "k_cs_schema_2026"
+signature     = "UNSIGNED-PLACEHOLDER"
+signed_at     = "2026-05-26T00:00:00Z"
+covers        = "content_hash"

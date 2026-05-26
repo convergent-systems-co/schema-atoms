@@ -1,0 +1,148 @@
+# atoms/event.toml — Grammar atom for the event atom class
+#
+# Defines the structural contract that every event atom must satisfy.
+# This is a grammar atom: kind = "grammar", class = "event".
+#
+# Conforms to:
+#   - Atom Spec v1.2.0 (universal envelope, Part I)
+#   - Grammar atom envelope: schema-atoms/toml-schema/grammar-envelope@1.0.0-draft
+
+# ── Universal envelope ──────────────────────────────────────────────────────
+id           = "schema-atoms/toml-schema/grammar-event"
+version      = "1.0.0-draft"
+content_hash = "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+lifecycle    = "draft"
+created_at   = "2026-05-26T00:00:00Z"
+
+# ── Grammar discriminators ────────────────────────────────────────────────────
+kind  = "grammar"
+name  = "Event Grammar"
+class = "event"
+
+description = """
+An event atom describes a system-level or domain-level occurrence: its
+classification type, the schema of its payload, the component that emits it,
+and whether a timestamp is mandatory. Event atoms are consumed by workflow
+triggers, audit pipelines, and event-driven agent orchestrators.
+"""
+
+# ── Field definitions ─────────────────────────────────────────────────────────
+
+[[fields]]
+name        = "id"
+type        = "string"
+required    = true
+description = "Atom identifier: event-atoms/event/<slug>"
+
+[[fields]]
+name        = "version"
+type        = "string"
+required    = true
+description = "SemVer string. Immutable once published."
+
+[[fields]]
+name        = "content_hash"
+type        = "string"
+required    = true
+description = "SHA-256 hex of canonical TOML body excluding [signatures]."
+
+[[fields]]
+name        = "lifecycle"
+type        = "string"
+required    = true
+description = "One of: draft | published | adopted | historic"
+
+[[fields]]
+name        = "created_at"
+type        = "datetime"
+required    = true
+description = "RFC 3339 creation timestamp."
+
+[[fields]]
+name        = "name"
+type        = "string"
+required    = true
+description = "Human-readable display name for this event atom."
+
+[[fields]]
+name        = "event_type"
+type        = "string"
+required    = true
+description = """
+Machine-readable event classification string (e.g. \"user.created\",
+\"workflow.completed\", \"policy.violated\"). MUST be a non-empty string.
+Consumers use this field for subscription filtering and routing.
+"""
+
+[[fields]]
+name        = "payload_schema"
+type        = "string"
+required    = false
+description = """
+Reference to a JSON Schema or atom reference that describes the structure of
+the event's payload. Format: a schema atom ref or an inline JSON Schema URI.
+When absent, the payload is treated as untyped.
+"""
+
+[[fields]]
+name        = "emitter"
+type        = "string"
+required    = false
+description = """
+Identifier of the system component or service that produces this event
+(e.g. \"olympus-api\", \"prometheus-agent\", \"billing-service\").
+Used for source filtering in event buses and audit systems.
+"""
+
+[[fields]]
+name        = "timestamp_required"
+type        = "bool"
+required    = false
+description = """
+When true, every emitted instance of this event MUST include an RFC 3339
+timestamp in its payload under the key \"occurred_at\". Defaults to false
+when absent.
+"""
+
+# ── Cross-references to other grammar atoms ───────────────────────────────────
+
+[[references]]
+name        = "grammar_envelope"
+target      = "schema-atoms/toml-schema/grammar-envelope@1.0.0-draft"
+cardinality = "one"
+# This grammar atom conforms to the grammar envelope contract.
+
+[[references]]
+name        = "workflow_grammar"
+target      = "schema-atoms/toml-schema/grammar-workflow@1.0.0-draft"
+cardinality = "many"
+# Event atoms may be referenced as triggers in workflow atoms.
+
+# ── Validation constraints ─────────────────────────────────────────────────────
+
+[[constraints]]
+rule = "kind MUST equal \"grammar\""
+
+[[constraints]]
+rule = "class MUST equal \"event\""
+
+[[constraints]]
+rule = "event_type MUST be a non-empty string"
+
+[[constraints]]
+rule = "event_type MUST use dot-notation (e.g. \"domain.action\")"
+
+[[constraints]]
+rule = "timestamp_required, if present, MUST be a boolean"
+
+[[constraints]]
+rule = "id MUST match the pattern event-atoms/event/<slug>"
+
+# ── Signatures (unsigned placeholder) ─────────────────────────────────────────
+[[signatures]]
+algorithm     = "ml-dsa-65"
+signer_role   = "catalog-maintainer"
+signer_key_id = "k_cs_schema_2026"
+signature     = "UNSIGNED-PLACEHOLDER"
+signed_at     = "2026-05-26T00:00:00Z"
+covers        = "content_hash"
