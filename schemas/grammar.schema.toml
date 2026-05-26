@@ -1,0 +1,109 @@
+# schemas/grammar.schema.toml — Machine-readable validator for grammar atoms
+#
+# This is the normative schema for the grammar atom envelope.
+# Validators that consume grammar atoms MUST enforce the rules here.
+# Human-readable rationale lives in spec/grammar-envelope.toml (atoms repo).
+#
+# Schema style: TOML-native structural schema (see atom-schema-spec Part II,
+# Family 3 — data-schema, class: toml-schema).
+#
+# Version: 1.0.0-draft
+
+[meta]
+schema_id      = "schema-atoms/toml-schema/grammar-envelope"
+schema_version = "1.0.0-draft"
+validates      = "grammar atoms (kind = \"grammar\") in any catalog"
+conforms_to    = "atoms-spec/v1.2.0"
+created_at     = "2026-05-26T00:00:00Z"
+
+# ── Required top-level fields ──────────────────────────────────────────────────
+#
+# Every field listed under [required_fields] MUST be present and non-empty
+# on a grammar atom.  The validator returns a FAIL for each missing or empty field.
+
+[required_fields]
+id           = { type = "string",   pattern = ".+/.+/.+" }
+version      = { type = "string",   pattern = "^[0-9]+\\.[0-9]+\\.[0-9]+(-[a-zA-Z0-9.]+)?$" }
+content_hash = { type = "string",   pattern = "^sha256:[0-9a-f]{64}$" }
+lifecycle    = { type = "string",   enum    = ["draft", "published", "adopted", "historic"] }
+created_at   = { type = "datetime" }
+kind         = { type = "string",   const   = "grammar" }
+name         = { type = "string",   min_length = 1 }
+class        = { type = "string",   min_length = 1 }
+
+# ── Required sections ─────────────────────────────────────────────────────────
+#
+# A grammar atom MUST contain at least one [[fields]] entry.
+# The [[signatures]] section MUST contain at least one entry (Atom Spec Part IV).
+
+[required_sections]
+fields     = { type = "array", min_items = 1 }
+signatures = { type = "array", min_items = 1 }
+
+# ── Optional top-level fields ─────────────────────────────────────────────────
+
+[optional_fields]
+description    = { type = "string" }
+supersedes     = { type = "string" }
+superseded_by  = { type = "string" }
+migration_notes = { type = "string" }
+
+# ── [[fields]] entry schema ────────────────────────────────────────────────────
+#
+# Each entry in the [[fields]] array MUST conform to this shape.
+
+[fields_entry]
+name        = { type = "string",  required = true,  min_length = 1 }
+type        = { type = "string",  required = true,
+                enum = ["string", "bool", "integer", "float", "datetime", "array", "table", "atom-ref"] }
+required    = { type = "bool",    required = true }
+description = { type = "string",  required = false }
+
+# ── [[references]] entry schema ────────────────────────────────────────────────
+#
+# Each entry in the [[references]] array, if present, MUST conform to this shape.
+
+[references_entry]
+name        = { type = "string", required = true, min_length = 1 }
+target      = { type = "string", required = true,
+                description = "atom-ref: <catalog>/<class>/<slug>@<version>" }
+cardinality = { type = "string", required = true,
+                enum = ["one", "many", "optional"] }
+
+# ── [[constraints]] entry schema ───────────────────────────────────────────────
+#
+# Each entry in the [[constraints]] array, if present, MUST conform to this shape.
+
+[constraints_entry]
+rule = { type = "string", required = true, min_length = 1 }
+
+# ── [[signatures]] entry schema ────────────────────────────────────────────────
+#
+# Mirrors the signature object definition from Atom Spec v1.2.0 Part IV.
+
+[signatures_entry]
+algorithm     = { type = "string",   required = true }
+signer_role   = { type = "string",   required = true }
+signer_key_id = { type = "string",   required = true }
+signature     = { type = "string",   required = true }
+signed_at     = { type = "datetime", required = true }
+covers        = { type = "string",   required = true, const = "content_hash" }
+
+# ── Validation rules (summary) ─────────────────────────────────────────────────
+#
+# A conforming grammar atom MUST pass all of the following checks:
+#
+# V1.  All [required_fields] are present and non-empty.
+# V2.  kind equals "grammar" (enforced via required_fields.kind.const).
+# V3.  [[fields]] has at least one entry (enforced via required_sections.fields.min_items).
+# V4.  Each [[fields]] entry satisfies [fields_entry] (name, type, required present; type in enum).
+# V5.  [[signatures]] has at least one entry (enforced via required_sections.signatures.min_items).
+# V6.  Each [[signatures]] entry satisfies [signatures_entry].
+# V7.  lifecycle is one of the four permitted values.
+# V8.  version matches SemVer pattern.
+# V9.  content_hash matches sha256:<64 hex chars> pattern.
+# V10. Each [[references]] entry, if present, satisfies [references_entry].
+# V11. Each [[constraints]] entry, if present, satisfies [constraints_entry] (rule non-empty).
+
+[validation]
+fail_fast = false   # validators SHOULD collect all failures before reporting

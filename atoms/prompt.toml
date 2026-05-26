@@ -1,0 +1,149 @@
+# atoms/prompt.toml — Grammar atom for the prompt atom class
+#
+# Defines the structural contract that every prompt atom must satisfy.
+# This is a grammar atom: kind = "grammar", class = "prompt".
+#
+# Conforms to:
+#   - Atom Spec v1.2.0 (universal envelope, Part I)
+#   - Grammar atom envelope: schema-atoms/toml-schema/grammar-envelope@1.0.0-draft
+
+# ── Universal envelope ──────────────────────────────────────────────────────
+id           = "schema-atoms/toml-schema/grammar-prompt"
+version      = "1.0.0-draft"
+content_hash = "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+lifecycle    = "draft"
+created_at   = "2026-05-26T00:00:00Z"
+
+# ── Grammar discriminators ────────────────────────────────────────────────────
+kind  = "grammar"
+name  = "Prompt Grammar"
+class = "prompt"
+
+description = """
+A prompt atom is a parameterized template for LLM input. It declares its
+variables, its expected rendering shape, and an optional persona reference
+that should be loaded alongside the prompt at invocation time.
+"""
+
+# ── Field definitions ─────────────────────────────────────────────────────────
+
+[[fields]]
+name        = "id"
+type        = "string"
+required    = true
+description = "Atom identifier: prompt-atoms/prompt/<slug>"
+
+[[fields]]
+name        = "version"
+type        = "string"
+required    = true
+description = "SemVer string. Immutable once published."
+
+[[fields]]
+name        = "content_hash"
+type        = "string"
+required    = true
+description = "SHA-256 hex of canonical TOML body excluding [signatures]."
+
+[[fields]]
+name        = "lifecycle"
+type        = "string"
+required    = true
+description = "One of: draft | published | adopted | historic"
+
+[[fields]]
+name        = "created_at"
+type        = "datetime"
+required    = true
+description = "RFC 3339 creation timestamp."
+
+[[fields]]
+name        = "name"
+type        = "string"
+required    = true
+description = "Human-readable display name for this prompt."
+
+[[fields]]
+name        = "template"
+type        = "string"
+required    = true
+description = """
+The prompt template string. Variable placeholders use {{variable_name}} syntax.
+All placeholders MUST have a corresponding entry in the variables array.
+"""
+
+[[fields]]
+name        = "variables"
+type        = "array"
+required    = false
+description = """
+List of variable definitions. Each entry is a table with keys:
+  name     (string, required) — placeholder identifier matching template
+  type     (string, required) — expected value type: string | integer | float | bool | atom-ref
+  required (bool, optional, default true) — whether the variable must be provided
+  default  (string, optional) — default value if not provided; only valid when required = false
+"""
+
+[[fields]]
+name        = "persona_ref"
+type        = "atom-ref"
+required    = false
+description = """
+Reference to a persona atom to load alongside this prompt.
+Format: persona-atoms/persona/<slug>@<version>
+The referenced persona's system_prompt conditions the model before this
+prompt's template is rendered.
+"""
+
+# ── Cross-references to other grammar atoms ───────────────────────────────────
+
+[[references]]
+name        = "grammar_envelope"
+target      = "schema-atoms/toml-schema/grammar-envelope@1.0.0-draft"
+cardinality = "one"
+# This grammar atom conforms to the grammar envelope contract.
+
+[[references]]
+name        = "persona_grammar"
+target      = "schema-atoms/toml-schema/grammar-persona@1.0.0-draft"
+cardinality = "optional"
+# persona_ref, when present, MUST resolve to a persona atom that satisfies
+# the persona grammar.
+
+# ── Validation constraints ─────────────────────────────────────────────────────
+
+[[constraints]]
+rule = "kind MUST equal \"grammar\""
+
+[[constraints]]
+rule = "class MUST equal \"prompt\""
+
+[[constraints]]
+rule = "template MUST be a non-empty string"
+
+[[constraints]]
+rule = "every {{placeholder}} in template MUST have a matching entry in variables[].name"
+
+[[constraints]]
+rule = "variables[].name MUST be unique within the array"
+
+[[constraints]]
+rule = "variables[].type MUST be one of: string | integer | float | bool | atom-ref"
+
+[[constraints]]
+rule = "a variable with required = false MUST either supply a default or be documented as nil-safe"
+
+[[constraints]]
+rule = "persona_ref, if present, MUST be a valid atom reference string"
+
+[[constraints]]
+rule = "id MUST match the pattern prompt-atoms/prompt/<slug>"
+
+# ── Signatures (unsigned placeholder) ─────────────────────────────────────────
+[[signatures]]
+algorithm     = "ml-dsa-65"
+signer_role   = "catalog-maintainer"
+signer_key_id = "k_cs_schema_2026"
+signature     = "UNSIGNED-PLACEHOLDER"
+signed_at     = "2026-05-26T00:00:00Z"
+covers        = "content_hash"
