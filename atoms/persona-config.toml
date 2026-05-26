@@ -1,0 +1,67 @@
+# atoms/persona-config.toml — Grammar atom for aiConstitution persona configuration
+#
+# Defines the structural contract for the JSON persona configuration format
+# (governance/schemas/persona.schema.json), which covers reviewer personas
+# and agentic persona settings files.
+# Distinct from atoms/persona.toml (which covers persona atoms in persona-atoms.com).
+
+# ── Universal envelope ──────────────────────────────────────────────────────
+id           = "schema-atoms/toml-schema/grammar-persona-config"
+version      = "1.0.0-draft"
+content_hash = "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+lifecycle    = "draft"
+created_at   = "2026-05-26T00:00:00Z"
+
+# ── Grammar discriminators ────────────────────────────────────────────────────
+kind  = "grammar"
+name  = "Persona Configuration Grammar"
+class = "persona-config"
+
+description = """
+A persona-config atom represents a JSON-format persona configuration file
+as used in governance/personas/ and governance/agentic/. Defines: persona name,
+functional domains (array form per spec §17.2), role description, and optional
+model/system-prompt overrides. The canonical JSON Schema is published as
+schema-atoms/json-schema/persona-config.
+"""
+
+# ── Field definitions ─────────────────────────────────────────────────────────
+
+[[fields]]
+name        = "name"
+type        = "string"
+required    = true
+description = "Persona slug identifier."
+
+[[fields]]
+name        = "version"
+type        = "string"
+required    = true
+description = "SemVer version string."
+
+[[fields]]
+name        = "role"
+type        = "string"
+required    = true
+description = "Human-readable role description for this persona."
+
+[[fields]]
+name        = "domains"
+type        = "array"
+required    = true
+description = "Functional domains: [security, engineering, operations, architecture, data, documentation, finops]. minItems: 1."
+
+[[fields]]
+name        = "system_prompt"
+type        = "string"
+required    = false
+description = "Optional system-level instruction override."
+
+[[fields]]
+name        = "model_preference"
+type        = "string"
+required    = false
+description = "Optional model hint (e.g. claude-sonnet-4-6)."
+
+# ── Cross-references ──────────────────────────────────────────────────────────
+json_schema_ref = "schema-atoms/json-schema/persona-config@1.0.0-draft"

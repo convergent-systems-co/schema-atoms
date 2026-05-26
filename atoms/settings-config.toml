@@ -1,0 +1,71 @@
+# atoms/settings-config.toml — Grammar atom for the aiConstitution settings configuration
+#
+# Defines the structural contract for settings.toml / ~/.config/aiConstitution/settings.toml.
+# This is a grammar atom: kind = "grammar", class = "settings-config".
+
+# ── Universal envelope ──────────────────────────────────────────────────────
+id           = "schema-atoms/toml-schema/grammar-settings-config"
+version      = "1.0.0-draft"
+content_hash = "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+lifecycle    = "draft"
+created_at   = "2026-05-26T00:00:00Z"
+
+# ── Grammar discriminators ────────────────────────────────────────────────────
+kind  = "grammar"
+name  = "Settings Configuration Grammar"
+class = "settings-config"
+
+description = """
+A settings-config atom represents a validated aiConstitution runtime configuration.
+It covers all sections of ~/.config/aiConstitution/settings.toml: upstream sharing,
+memory review cadence, atom cache policy, plugin management, sync targets,
+and per-tool path overrides. The canonical JSON Schema is published as
+schema-atoms/json-schema/settings-config.
+"""
+
+# ── Field definitions ─────────────────────────────────────────────────────────
+
+[[fields]]
+name        = "schemaVersion"
+type        = "string"
+required    = true
+description = "Schema version string (e.g. '0.4'). Used to gate migrations."
+
+[[fields]]
+name        = "upstream"
+type        = "object"
+required    = false
+description = "Upstream contribution settings: shareNewHooks, shareNewSkills, shareMajorFindings, upstreamRepo."
+
+[[fields]]
+name        = "review"
+type        = "object"
+required    = false
+description = "Memory review cadence and reporting configuration."
+
+[[fields]]
+name        = "atoms"
+type        = "object"
+required    = false
+description = "Atom cache policy and GitHub integration settings."
+
+[[fields]]
+name        = "plugins"
+type        = "object"
+required    = false
+description = "Plugin management: enabled list, auto-enable, fallback behavior."
+
+[[fields]]
+name        = "sync"
+type        = "object"
+required    = false
+description = "Sync target configuration (remote URL, branch, auto-sync)."
+
+[[fields]]
+name        = "paths"
+type        = "object"
+required    = false
+description = "Per-path overrides for hooks, skills, memory, config directories."
+
+# ── Cross-references ──────────────────────────────────────────────────────────
+json_schema_ref = "schema-atoms/json-schema/settings-config@1.0.0-draft"
