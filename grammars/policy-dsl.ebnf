@@ -1,0 +1,83 @@
+(* grammars/policy-dsl.ebnf — EBNF grammar for the Olympus policy DSL
+ *
+ * Defines the expression language used in policy-dsl atoms. Each policy
+ * document contains one or more rules; each rule names an effect and a
+ * conjunction of conditions. The grammar is intentionally minimal: complex
+ * authorization logic is composed from multiple policy atoms rather than
+ * expressed in a single monolithic rule.
+ *
+ * Conforms to:
+ *   - ISO/IEC 14977:1996 EBNF notation
+ *   - Atom Spec v1.2.0, grammar reference in atoms/policy-dsl.toml
+ *
+ * Status: draft (lifecycle = "draft"; see atoms/policy-dsl.toml)
+ *)
+
+(* ── Top-level production ────────────────────────────────────────────────── *)
+
+policy     = "policy" , name , "{" , rule , { rule } , "}" ;
+
+(* ── Rule production ─────────────────────────────────────────────────────── *)
+
+rule       = effect , "if" , condition , { "and" , condition } ;
+
+(* ── Effect production ───────────────────────────────────────────────────── *)
+
+effect     = "allow" | "deny" | "audit" ;
+
+(* ── Condition production ────────────────────────────────────────────────── *)
+
+condition  = field , comparator , value ;
+
+(* ── Field production ────────────────────────────────────────────────────── *)
+
+field      = identifier , { "." , identifier } ;
+
+(* ── Comparator production ───────────────────────────────────────────────── *)
+
+comparator = "==" | "!=" | "in" | "not-in" | "<" | ">" ;
+
+(* ── Value production ────────────────────────────────────────────────────── *)
+
+value      = string | number | list ;
+
+list       = "[" , value , { "," , value } , "]" ;
+
+(* ── Lexical productions ─────────────────────────────────────────────────── *)
+
+string     = '"' , { char } , '"' ;
+
+number     = digit , { digit } ;
+
+name       = identifier ;
+
+identifier = letter , { letter | digit | "_" } ;
+
+(* ── Character classes ───────────────────────────────────────────────────── *)
+
+char       = ? any Unicode scalar value except U+0022 (") and U+000A (LF) ? ;
+
+letter     = ? Unicode letter (Lu | Ll | Lt | Lm | Lo categories) ? ;
+
+digit      = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" ;
+
+(* ── Notes ───────────────────────────────────────────────────────────────── *)
+(*
+ * 1. Whitespace (spaces, tabs, newlines) is insignificant between tokens and
+ *    MUST be ignored by parsers. It is not expressed in the grammar above for
+ *    conciseness.
+ *
+ * 2. A policy block with zero rules is syntactically invalid; the rule+
+ *    quantifier (one or more) is intentional.
+ *
+ * 3. The "in" and "not-in" comparators require the RHS value to be a list.
+ *    Parsers SHOULD validate this constraint at the semantic analysis phase,
+ *    not in the grammar layer.
+ *
+ * 4. Numeric literals are non-negative integers in this version of the
+ *    grammar. Floating-point and negative number support is deferred to a
+ *    future minor revision.
+ *
+ * 5. This grammar covers the condition production referenced in
+ *    atoms/policy-dsl.toml under the conditions[] field.
+ *)

@@ -1,0 +1,203 @@
+# atoms/capability.toml — Grammar atom for the capability atom class
+#
+# Defines the structural contract that every capability atom must satisfy.
+# This is a grammar atom: kind = "grammar", class = "capability".
+#
+# Conforms to:
+#   - Atom Spec v1.2.0 (universal envelope, Part I)
+#   - Grammar atom envelope: schema-atoms/toml-schema/grammar-envelope@1.0.0-draft
+
+# ── Universal envelope ──────────────────────────────────────────────────────
+id           = "schema-atoms/toml-schema/grammar-capability"
+version      = "1.0.0-draft"
+content_hash = "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+lifecycle    = "draft"
+created_at   = "2026-05-26T00:00:00Z"
+
+# ── Grammar discriminators ────────────────────────────────────────────────────
+kind  = "grammar"
+name  = "Capability Grammar"
+class = "capability"
+
+description = """
+A capability atom declares a discrete, named capability that an identity may
+exercise within the platform. It specifies the intent class (what category of
+action is permitted), resource consumption limits, and any constraints on the
+output produced. Capability atoms are referenced by identity atoms to define
+the allowed action surface for a principal.
+"""
+
+# ── Field definitions ─────────────────────────────────────────────────────────
+
+[[fields]]
+name        = "id"
+type        = "string"
+required    = true
+description = "Atom identifier: capability-atoms/capability/<slug>"
+
+[[fields]]
+name        = "version"
+type        = "string"
+required    = true
+description = "SemVer string. Immutable once published."
+
+[[fields]]
+name        = "content_hash"
+type        = "string"
+required    = true
+description = "SHA-256 hex of canonical TOML body excluding [signatures]."
+
+[[fields]]
+name        = "lifecycle"
+type        = "string"
+required    = true
+description = "One of: draft | published | adopted | historic"
+
+[[fields]]
+name        = "created_at"
+type        = "datetime"
+required    = true
+description = "RFC 3339 creation timestamp."
+
+[[fields]]
+name        = "name"
+type        = "string"
+required    = true
+description = "Human-readable display name for this capability atom."
+
+[[fields]]
+name        = "capability_name"
+type        = "string"
+required    = true
+description = """
+Stable machine identifier for this capability. Used in policy rules and
+identity atoms to reference the capability by name (e.g. \"tool-use\",
+\"file-read\", \"model-invoke\", \"memory-write\"). MUST be kebab-case,
+lower-case, non-empty.
+"""
+
+[[fields]]
+name        = "intent_class"
+type        = "string"
+required    = true
+description = """
+Broad classification of the capability's operational intent. Recommended
+vocabulary (extensible):
+  read         — read-only access to data or state
+  write        — mutation of data or state
+  execute      — invocation of tools, functions, or models
+  communicate  — outbound messaging or network I/O
+  administer   — privileged platform or tenant administration
+Consumers MUST treat unrecognized values as opaque strings and MUST NOT
+silently promote them to a known intent class.
+"""
+
+[[fields]]
+name        = "max_duration_ms"
+type        = "integer"
+required    = false
+description = """
+Maximum wall-clock duration in milliseconds the capability may consume in a
+single invocation. A value of 0 or absent means no declared limit; runtime
+defaults apply. MUST be a non-negative integer when present.
+"""
+
+[[fields]]
+name        = "max_cost_tokens"
+type        = "integer"
+required    = false
+description = """
+Maximum token budget (prompt + completion) the capability may consume in a
+single invocation. A value of 0 or absent means no declared limit. MUST be a
+non-negative integer when present.
+"""
+
+[[fields]]
+name        = "output_constraints"
+type        = "array"
+required    = false
+description = """
+List of constraint strings that govern the output produced when this capability
+is exercised. Each entry is a free-form descriptor understood by the output
+validation layer (e.g. \"no-pii\", \"redact-secrets\", \"max-length:4096\").
+An empty or absent array means no additional output constraints beyond platform
+defaults.
+"""
+
+[[fields]]
+name        = "provider"
+type        = "string"
+required    = false
+description = """
+Name of the subsystem, plugin, or external service that satisfies this
+capability (e.g. \"anthropic\", \"openai\", \"internal-tool-registry\").
+Absent means the capability is satisfied by the core platform.
+"""
+
+[[fields]]
+name        = "identity_ref"
+type        = "string"
+required    = false
+description = """
+Cross-reference to a grammar-identity atom that defines the principal class
+permitted to hold this capability. Value is the id of the target atom
+(e.g. \"schema-atoms/toml-schema/grammar-identity\"). When present, the
+capability MUST only be granted to identities whose class matches the
+referenced grammar.
+"""
+
+# ── Cross-references to other grammar atoms ───────────────────────────────────
+
+[[references]]
+name        = "grammar_envelope"
+target      = "schema-atoms/toml-schema/grammar-envelope@1.0.0-draft"
+cardinality = "one"
+# This grammar atom conforms to the grammar envelope contract.
+
+[[references]]
+name        = "identity_grammar"
+target      = "schema-atoms/toml-schema/grammar-identity@1.0.0-draft"
+cardinality = "one"
+# Capability atoms are referenced by identity atoms via the capabilities array.
+# identity_ref points back to the grammar that defines the holder's class.
+
+# ── Validation constraints ─────────────────────────────────────────────────────
+
+[[constraints]]
+rule = "kind MUST equal \"grammar\""
+
+[[constraints]]
+rule = "class MUST equal \"capability\""
+
+[[constraints]]
+rule = "name MUST be a non-empty string"
+
+[[constraints]]
+rule = "capability_name MUST be a non-empty kebab-case lower-case string"
+
+[[constraints]]
+rule = "intent_class MUST be a non-empty string"
+
+[[constraints]]
+rule = "max_duration_ms, if present, MUST be a non-negative integer"
+
+[[constraints]]
+rule = "max_cost_tokens, if present, MUST be a non-negative integer"
+
+[[constraints]]
+rule = "output_constraints entries MUST be non-empty strings"
+
+[[constraints]]
+rule = "identity_ref, if present, MUST be a valid atom id string"
+
+[[constraints]]
+rule = "id MUST match the pattern capability-atoms/capability/<slug>"
+
+# ── Signatures (unsigned placeholder) ─────────────────────────────────────────
+[[signatures]]
+algorithm     = "ml-dsa-65"
+signer_role   = "catalog-maintainer"
+signer_key_id = "k_cs_schema_2026"
+signature     = "UNSIGNED-PLACEHOLDER"
+signed_at     = "2026-05-26T00:00:00Z"
+covers        = "content_hash"
