@@ -1,0 +1,150 @@
+# atoms/brand.toml — Grammar atom for the brand atom class
+#
+# Defines the structural contract that every brand atom must satisfy.
+# This is a grammar atom: kind = "grammar", class = "brand".
+#
+# Conforms to:
+#   - Atom Spec v1.2.0 (universal envelope, Part I)
+#   - Grammar atom envelope: schema-atoms/toml-schema/grammar-envelope@1.0.0-draft
+
+# ── Universal envelope ──────────────────────────────────────────────────────
+id           = "schema-atoms/toml-schema/grammar-brand"
+version      = "1.0.0-draft"
+content_hash = "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+lifecycle    = "draft"
+created_at   = "2026-05-26T00:00:00Z"
+
+# ── Grammar discriminators ────────────────────────────────────────────────────
+kind  = "grammar"
+name  = "Brand Grammar"
+class = "brand"
+
+description = """
+A brand atom encodes the visual and tonal identity of a product, organization,
+or service: its display name, primary color, logo asset location, and tone
+keywords that guide AI-generated content. Brand atoms are consumed by
+front-end renderers, content generation pipelines, and white-label
+configuration systems.
+"""
+
+# ── Field definitions ─────────────────────────────────────────────────────────
+
+[[fields]]
+name        = "id"
+type        = "string"
+required    = true
+description = "Atom identifier: brand-atoms/brand/<slug>"
+
+[[fields]]
+name        = "version"
+type        = "string"
+required    = true
+description = "SemVer string. Immutable once published."
+
+[[fields]]
+name        = "content_hash"
+type        = "string"
+required    = true
+description = "SHA-256 hex of canonical TOML body excluding [signatures]."
+
+[[fields]]
+name        = "lifecycle"
+type        = "string"
+required    = true
+description = "One of: draft | published | adopted | historic"
+
+[[fields]]
+name        = "created_at"
+type        = "datetime"
+required    = true
+description = "RFC 3339 creation timestamp."
+
+[[fields]]
+name        = "name"
+type        = "string"
+required    = true
+description = "Human-readable slug-style name for this brand atom."
+
+[[fields]]
+name        = "display_name"
+type        = "string"
+required    = false
+description = """
+The canonical human-facing name of the brand as it appears in product
+interfaces, marketing materials, and legal contexts (e.g. \"Olympus\",
+\"Convergent Systems\"). May differ from the atom's name slug.
+"""
+
+[[fields]]
+name        = "color_primary"
+type        = "string"
+required    = false
+description = """
+Primary brand color expressed as a CSS hex color code (e.g. \"#1A2B3C\").
+MUST be a 6-digit hex string prefixed with \"#\" when present.
+Used by theme generators and front-end renderers.
+"""
+
+[[fields]]
+name        = "logo_url"
+type        = "string"
+required    = false
+description = """
+Absolute URL of the canonical brand logo asset. MUST be a valid absolute
+URL when present. The asset SHOULD be an SVG or high-resolution raster
+accessible without authentication.
+"""
+
+[[fields]]
+name        = "tone_keywords"
+type        = "array"
+required    = false
+description = """
+List of tone descriptor strings that guide AI content generation for this
+brand (e.g. \"professional\", \"concise\", \"approachable\", \"authoritative\").
+Each entry MUST be a non-empty string. Consumed by persona and prompt atoms
+during brand-conditioned content generation.
+"""
+
+# ── Cross-references to other grammar atoms ───────────────────────────────────
+
+[[references]]
+name        = "grammar_envelope"
+target      = "schema-atoms/toml-schema/grammar-envelope@1.0.0-draft"
+cardinality = "one"
+# This grammar atom conforms to the grammar envelope contract.
+
+[[references]]
+name        = "theme_grammar"
+target      = "schema-atoms/toml-schema/grammar-theme@1.0.0-draft"
+cardinality = "optional"
+# Brand atoms may reference a theme atom for full visual-system specification.
+
+# ── Validation constraints ─────────────────────────────────────────────────────
+
+[[constraints]]
+rule = "kind MUST equal \"grammar\""
+
+[[constraints]]
+rule = "class MUST equal \"brand\""
+
+[[constraints]]
+rule = "color_primary, if present, MUST match the pattern #[0-9A-Fa-f]{6}"
+
+[[constraints]]
+rule = "logo_url, if present, MUST be a valid absolute URL"
+
+[[constraints]]
+rule = "tone_keywords entries MUST be non-empty strings"
+
+[[constraints]]
+rule = "id MUST match the pattern brand-atoms/brand/<slug>"
+
+# ── Signatures (unsigned placeholder) ─────────────────────────────────────────
+[[signatures]]
+algorithm     = "ml-dsa-65"
+signer_role   = "catalog-maintainer"
+signer_key_id = "k_cs_schema_2026"
+signature     = "UNSIGNED-PLACEHOLDER"
+signed_at     = "2026-05-26T00:00:00Z"
+covers        = "content_hash"

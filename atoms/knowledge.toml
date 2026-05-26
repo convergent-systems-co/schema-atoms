@@ -1,0 +1,139 @@
+# atoms/knowledge.toml — Grammar atom for the knowledge atom class
+#
+# Defines the structural contract that every knowledge atom must satisfy.
+# This is a grammar atom: kind = "grammar", class = "knowledge".
+#
+# Conforms to:
+#   - Atom Spec v1.2.0 (universal envelope, Part I)
+#   - Grammar atom envelope: schema-atoms/toml-schema/grammar-envelope@1.0.0-draft
+
+# ── Universal envelope ──────────────────────────────────────────────────────
+id           = "schema-atoms/toml-schema/grammar-knowledge"
+version      = "1.0.0-draft"
+content_hash = "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+lifecycle    = "draft"
+created_at   = "2026-05-26T00:00:00Z"
+
+# ── Grammar discriminators ────────────────────────────────────────────────────
+kind  = "grammar"
+name  = "Knowledge Grammar"
+class = "knowledge"
+
+description = """
+A knowledge atom encapsulates a retrievable unit of domain information: its
+subject domain, serialization format, originating source, and a confidence
+score reflecting the reliability of its content. Knowledge atoms are the
+primary input to retrieval-augmented generation and agent memory pipelines.
+"""
+
+# ── Field definitions ─────────────────────────────────────────────────────────
+
+[[fields]]
+name        = "id"
+type        = "string"
+required    = true
+description = "Atom identifier: knowledge-atoms/knowledge/<slug>"
+
+[[fields]]
+name        = "version"
+type        = "string"
+required    = true
+description = "SemVer string. Immutable once published."
+
+[[fields]]
+name        = "content_hash"
+type        = "string"
+required    = true
+description = "SHA-256 hex of canonical TOML body excluding [signatures]."
+
+[[fields]]
+name        = "lifecycle"
+type        = "string"
+required    = true
+description = "One of: draft | published | adopted | historic"
+
+[[fields]]
+name        = "created_at"
+type        = "datetime"
+required    = true
+description = "RFC 3339 creation timestamp."
+
+[[fields]]
+name        = "name"
+type        = "string"
+required    = true
+description = "Human-readable display name for this knowledge atom."
+
+[[fields]]
+name        = "domain"
+type        = "string"
+required    = false
+description = """
+Subject domain or topic area this knowledge atom covers (e.g. \"cloud-infrastructure\",
+\"regulatory-compliance\", \"product-catalog\"). Used for domain-scoped retrieval routing.
+"""
+
+[[fields]]
+name        = "format"
+type        = "string"
+required    = false
+description = """
+Serialization format of the knowledge content (e.g. \"markdown\", \"json\",
+\"plaintext\", \"structured-table\"). Informs the parser at retrieval time.
+"""
+
+[[fields]]
+name        = "source_url"
+type        = "string"
+required    = false
+description = """
+Canonical URL of the originating source document. MUST be a valid absolute URL
+when present. Used for provenance tracking and freshness checks.
+"""
+
+[[fields]]
+name        = "confidence_score"
+type        = "float"
+required    = false
+description = """
+Normalized confidence in the accuracy of this knowledge atom's content.
+MUST be in the range [0.0, 1.0] when present. 1.0 = fully authoritative;
+0.0 = speculative or unverified.
+"""
+
+# ── Cross-references to other grammar atoms ───────────────────────────────────
+
+[[references]]
+name        = "grammar_envelope"
+target      = "schema-atoms/toml-schema/grammar-envelope@1.0.0-draft"
+cardinality = "one"
+# This grammar atom conforms to the grammar envelope contract.
+
+# ── Validation constraints ─────────────────────────────────────────────────────
+
+[[constraints]]
+rule = "kind MUST equal \"grammar\""
+
+[[constraints]]
+rule = "class MUST equal \"knowledge\""
+
+[[constraints]]
+rule = "name MUST be a non-empty string"
+
+[[constraints]]
+rule = "confidence_score, if present, MUST be in [0.0, 1.0]"
+
+[[constraints]]
+rule = "source_url, if present, MUST be a valid absolute URL"
+
+[[constraints]]
+rule = "id MUST match the pattern knowledge-atoms/knowledge/<slug>"
+
+# ── Signatures (unsigned placeholder) ─────────────────────────────────────────
+[[signatures]]
+algorithm     = "ml-dsa-65"
+signer_role   = "catalog-maintainer"
+signer_key_id = "k_cs_schema_2026"
+signature     = "UNSIGNED-PLACEHOLDER"
+signed_at     = "2026-05-26T00:00:00Z"
+covers        = "content_hash"

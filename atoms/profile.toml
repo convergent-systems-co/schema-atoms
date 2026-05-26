@@ -1,0 +1,161 @@
+# atoms/profile.toml — Grammar atom for the profile atom class
+#
+# Defines the structural contract that every profile atom must satisfy.
+# This is a grammar atom: kind = "grammar", class = "profile".
+#
+# Conforms to:
+#   - Atom Spec v1.2.0 (universal envelope, Part I)
+#   - Grammar atom envelope: schema-atoms/toml-schema/grammar-envelope@1.0.0-draft
+
+# ── Universal envelope ──────────────────────────────────────────────────────
+id           = "schema-atoms/toml-schema/grammar-profile"
+version      = "1.0.0-draft"
+content_hash = "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+lifecycle    = "draft"
+created_at   = "2026-05-26T00:00:00Z"
+
+# ── Grammar discriminators ────────────────────────────────────────────────────
+kind  = "grammar"
+name  = "Profile Grammar"
+class = "profile"
+
+description = """
+A profile atom binds per-user or per-tenant configuration: the persona to
+apply, model preferences, the memory tier the user operates at, and UI
+presentation preferences. Profile atoms are resolved at session initialization
+and drive personalization across agent invocations, interface rendering,
+and memory scope selection.
+"""
+
+# ── Field definitions ─────────────────────────────────────────────────────────
+
+[[fields]]
+name        = "id"
+type        = "string"
+required    = true
+description = "Atom identifier: profile-atoms/profile/<slug>"
+
+[[fields]]
+name        = "version"
+type        = "string"
+required    = true
+description = "SemVer string. Immutable once published."
+
+[[fields]]
+name        = "content_hash"
+type        = "string"
+required    = true
+description = "SHA-256 hex of canonical TOML body excluding [signatures]."
+
+[[fields]]
+name        = "lifecycle"
+type        = "string"
+required    = true
+description = "One of: draft | published | adopted | historic"
+
+[[fields]]
+name        = "created_at"
+type        = "datetime"
+required    = true
+description = "RFC 3339 creation timestamp."
+
+[[fields]]
+name        = "name"
+type        = "string"
+required    = true
+description = "Human-readable display name for this profile atom."
+
+[[fields]]
+name        = "persona_ref"
+type        = "string"
+required    = false
+description = """
+Reference to a persona atom that conditions agent behavior for this profile.
+Format: persona-atoms/persona/<slug>@<version>. The referenced persona's
+system_prompt is injected at the start of each agent session.
+"""
+
+[[fields]]
+name        = "model_preferences"
+type        = "array"
+required    = false
+description = """
+Ordered list of preferred model identifiers for this profile
+(e.g. [\"claude-sonnet-4-5\", \"claude-haiku-3-5\"]). The routing layer
+selects the first available model from the list. Each entry MUST be a
+non-empty string. When absent, the system default model applies.
+"""
+
+[[fields]]
+name        = "memory_tier"
+type        = "string"
+required    = false
+description = """
+Memory persistence tier granted to this profile. Determines what the agent
+retains between invocations when acting under this profile.
+Expected values:
+  ephemeral  — in-context only; nothing persists between sessions
+  session    — persists for the duration of the active session
+  persistent — persists across sessions; backed by the memory store
+"""
+
+[[fields]]
+name        = "ui_preferences"
+type        = "string"
+required    = false
+description = """
+Opaque string or serialized JSON blob capturing UI customization preferences
+for this profile (e.g. theme overrides, dashboard layout, language locale).
+The front-end renderer interprets this field; the atom layer treats it as an
+opaque string. SHOULD be documented by the consuming application.
+"""
+
+# ── Cross-references to other grammar atoms ───────────────────────────────────
+
+[[references]]
+name        = "grammar_envelope"
+target      = "schema-atoms/toml-schema/grammar-envelope@1.0.0-draft"
+cardinality = "one"
+# This grammar atom conforms to the grammar envelope contract.
+
+[[references]]
+name        = "persona_grammar"
+target      = "schema-atoms/toml-schema/grammar-persona@1.0.0-draft"
+cardinality = "optional"
+# persona_ref, when present, MUST resolve to a persona atom satisfying
+# the persona grammar.
+
+[[references]]
+name        = "agent_grammar"
+target      = "schema-atoms/toml-schema/grammar-agent@1.0.0-draft"
+cardinality = "many"
+# Profile atoms configure the agent invocations that execute under them.
+
+# ── Validation constraints ─────────────────────────────────────────────────────
+
+[[constraints]]
+rule = "kind MUST equal \"grammar\""
+
+[[constraints]]
+rule = "class MUST equal \"profile\""
+
+[[constraints]]
+rule = "persona_ref, if present, MUST be a valid atom reference string"
+
+[[constraints]]
+rule = "model_preferences entries MUST be non-empty strings"
+
+[[constraints]]
+rule = "memory_tier, if present, MUST be one of: ephemeral | session | persistent"
+
+[[constraints]]
+rule = "id MUST match the pattern profile-atoms/profile/<slug>"
+
+# ── Signatures (unsigned placeholder) ─────────────────────────────────────────
+[[signatures]]
+algorithm     = "ml-dsa-65"
+signer_role   = "catalog-maintainer"
+signer_key_id = "k_cs_schema_2026"
+signature     = "UNSIGNED-PLACEHOLDER"
+signed_at     = "2026-05-26T00:00:00Z"
+covers        = "content_hash"
