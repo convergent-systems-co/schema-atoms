@@ -1,0 +1,157 @@
+# atoms/channel.toml — Grammar atom for the channel atom class
+#
+# Defines the structural contract that every channel atom must satisfy.
+# This is a grammar atom: kind = "grammar", class = "channel".
+#
+# Conforms to:
+#   - Atom Spec v1.2.0 (universal envelope, Part I)
+#   - Grammar atom envelope: schema-atoms/toml-schema/grammar-envelope@1.0.0-draft
+
+# ── Universal envelope ──────────────────────────────────────────────────────
+id           = "schema-atoms/toml-schema/grammar-channel"
+version      = "1.0.0-draft"
+content_hash = "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+lifecycle    = "draft"
+created_at   = "2026-05-26T00:00:00Z"
+
+# ── Grammar discriminators ────────────────────────────────────────────────────
+kind  = "grammar"
+name  = "Channel Grammar"
+class = "channel"
+
+description = """
+A channel atom describes a communication channel through which messages flow
+between agents, services, or human principals. It specifies the channel type,
+message direction, encoding format, and payload size constraints. Channel
+atoms are referenced by context atoms to enumerate the communication paths
+available within a session.
+"""
+
+# ── Field definitions ─────────────────────────────────────────────────────────
+
+[[fields]]
+name        = "id"
+type        = "string"
+required    = true
+description = "Atom identifier: channel-atoms/channel/<slug>"
+
+[[fields]]
+name        = "version"
+type        = "string"
+required    = true
+description = "SemVer string. Immutable once published."
+
+[[fields]]
+name        = "content_hash"
+type        = "string"
+required    = true
+description = "SHA-256 hex of canonical TOML body excluding [signatures]."
+
+[[fields]]
+name        = "lifecycle"
+type        = "string"
+required    = true
+description = "One of: draft | published | adopted | historic"
+
+[[fields]]
+name        = "created_at"
+type        = "datetime"
+required    = true
+description = "RFC 3339 creation timestamp."
+
+[[fields]]
+name        = "name"
+type        = "string"
+required    = true
+description = "Human-readable display name for this channel."
+
+[[fields]]
+name        = "type"
+type        = "string"
+required    = true
+description = """
+The channel mechanism. Recommended vocabulary:
+  http-request | websocket | sse | queue | stream | stdio | webhook
+Consumers MUST reject an atom with an absent or empty type.
+"""
+
+[[fields]]
+name        = "direction"
+type        = "string"
+required    = false
+description = """
+Message flow direction relative to the agent consuming this channel:
+  inbound  — messages arrive at the agent
+  outbound — the agent sends messages
+  duplex   — bidirectional flow
+Consumers MUST treat an absent direction as duplex.
+"""
+
+[[fields]]
+name        = "encoding"
+type        = "string"
+required    = false
+description = """
+Content encoding format for messages on this channel. Recommended vocabulary:
+  json | ndjson | msgpack | protobuf | text | binary
+Consumers MUST treat an absent encoding as json.
+"""
+
+[[fields]]
+name        = "max_payload_bytes"
+type        = "integer"
+required    = false
+description = """
+Maximum permitted payload size in bytes for a single message on this channel.
+A value of 0 or absent means no limit is declared by the atom; actual limits
+may still be enforced by the underlying transport.
+"""
+
+# ── Cross-references to other grammar atoms ───────────────────────────────────
+
+[[references]]
+name        = "grammar_envelope"
+target      = "schema-atoms/toml-schema/grammar-envelope@1.0.0-draft"
+cardinality = "one"
+# This grammar atom conforms to the grammar envelope contract.
+
+[[references]]
+name        = "context_grammar"
+target      = "schema-atoms/toml-schema/grammar-context@1.0.0-draft"
+cardinality = "many"
+# Channel atoms are referenced by context atoms via channel_refs.
+
+# ── Validation constraints ─────────────────────────────────────────────────────
+
+[[constraints]]
+rule = "kind MUST equal \"grammar\""
+
+[[constraints]]
+rule = "class MUST equal \"channel\""
+
+[[constraints]]
+rule = "name MUST be a non-empty string"
+
+[[constraints]]
+rule = "type MUST be a non-empty string"
+
+[[constraints]]
+rule = "direction, if present, MUST be one of: inbound | outbound | duplex"
+
+[[constraints]]
+rule = "encoding, if present, MUST be one of: json | ndjson | msgpack | protobuf | text | binary"
+
+[[constraints]]
+rule = "max_payload_bytes, if present, MUST be a non-negative integer"
+
+[[constraints]]
+rule = "id MUST match the pattern channel-atoms/channel/<slug>"
+
+# ── Signatures (unsigned placeholder) ─────────────────────────────────────────
+[[signatures]]
+algorithm     = "ml-dsa-65"
+signer_role   = "catalog-maintainer"
+signer_key_id = "k_cs_schema_2026"
+signature     = "UNSIGNED-PLACEHOLDER"
+signed_at     = "2026-05-26T00:00:00Z"
+covers        = "content_hash"

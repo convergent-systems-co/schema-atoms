@@ -1,0 +1,134 @@
+# atoms/identity.toml — Grammar atom for the identity atom class
+#
+# Defines the structural contract that every identity atom must satisfy.
+# This is a grammar atom: kind = "grammar", class = "identity".
+#
+# Conforms to:
+#   - Atom Spec v1.2.0 (universal envelope, Part I)
+#   - Grammar atom envelope: schema-atoms/toml-schema/grammar-envelope@1.0.0-draft
+
+# ── Universal envelope ──────────────────────────────────────────────────────
+id           = "schema-atoms/toml-schema/grammar-identity"
+version      = "1.0.0-draft"
+content_hash = "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+lifecycle    = "draft"
+created_at   = "2026-05-26T00:00:00Z"
+
+# ── Grammar discriminators ────────────────────────────────────────────────────
+kind  = "grammar"
+name  = "Identity Grammar"
+class = "identity"
+
+description = """
+An identity atom represents a principal in the system: a human user, a service
+account, or an agent. It declares a trust level and the capabilities that the
+principal is permitted to exercise. Identity atoms are referenced by context
+atoms to bind a session to a known principal.
+"""
+
+# ── Field definitions ─────────────────────────────────────────────────────────
+
+[[fields]]
+name        = "id"
+type        = "string"
+required    = true
+description = "Atom identifier: identity-atoms/identity/<slug>"
+
+[[fields]]
+name        = "version"
+type        = "string"
+required    = true
+description = "SemVer string. Immutable once published."
+
+[[fields]]
+name        = "content_hash"
+type        = "string"
+required    = true
+description = "SHA-256 hex of canonical TOML body excluding [signatures]."
+
+[[fields]]
+name        = "lifecycle"
+type        = "string"
+required    = true
+description = "One of: draft | published | adopted | historic"
+
+[[fields]]
+name        = "created_at"
+type        = "datetime"
+required    = true
+description = "RFC 3339 creation timestamp."
+
+[[fields]]
+name        = "name"
+type        = "string"
+required    = true
+description = "Human-readable display name for this identity (e.g. a username or service label)."
+
+[[fields]]
+name        = "description"
+type        = "string"
+required    = false
+description = "Prose description of the identity's purpose, owner, or role in the system."
+
+[[fields]]
+name        = "trust_level"
+type        = "string"
+required    = false
+description = """
+Named trust tier assigned to this identity. Recommended vocabulary:
+  untrusted | low | medium | high | system
+Consumers MUST treat an absent trust_level as untrusted.
+"""
+
+[[fields]]
+name        = "capabilities"
+type        = "array"
+required    = false
+description = """
+List of capability strings this identity is permitted to exercise
+(e.g. "tool-use", "file-read", "admin"). Used for capability-aware
+authorization checks at invocation time.
+"""
+
+# ── Cross-references to other grammar atoms ───────────────────────────────────
+
+[[references]]
+name        = "grammar_envelope"
+target      = "schema-atoms/toml-schema/grammar-envelope@1.0.0-draft"
+cardinality = "one"
+# This grammar atom conforms to the grammar envelope contract.
+
+[[references]]
+name        = "context_grammar"
+target      = "schema-atoms/toml-schema/grammar-context@1.0.0-draft"
+cardinality = "many"
+# Identity atoms are referenced by context atoms via identity_ref.
+
+# ── Validation constraints ─────────────────────────────────────────────────────
+
+[[constraints]]
+rule = "kind MUST equal \"grammar\""
+
+[[constraints]]
+rule = "class MUST equal \"identity\""
+
+[[constraints]]
+rule = "name MUST be a non-empty string"
+
+[[constraints]]
+rule = "trust_level, if present, MUST be one of: untrusted | low | medium | high | system"
+
+[[constraints]]
+rule = "capabilities entries MUST be non-empty strings"
+
+[[constraints]]
+rule = "id MUST match the pattern identity-atoms/identity/<slug>"
+
+# ── Signatures (unsigned placeholder) ─────────────────────────────────────────
+[[signatures]]
+algorithm     = "ml-dsa-65"
+signer_role   = "catalog-maintainer"
+signer_key_id = "k_cs_schema_2026"
+signature     = "UNSIGNED-PLACEHOLDER"
+signed_at     = "2026-05-26T00:00:00Z"
+covers        = "content_hash"
