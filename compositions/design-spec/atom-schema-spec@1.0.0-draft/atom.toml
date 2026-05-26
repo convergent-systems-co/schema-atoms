@@ -1,0 +1,17 @@
+id          = "schema-atoms/design-spec/atom-schema-spec"
+version     = "1.0.0-draft"
+content_hash = "f6f2b6d147bb1d7aa632de7271bd6db01018972b6962c5fe9dba413e970d0575"
+lifecycle   = "draft"
+created_at  = "2026-05-26T00:00:00Z"
+
+[spec]
+class       = "design-spec"
+title       = "Atom Schema Spec"
+summary     = "The Atom Schema Spec defines schema-atoms.com — the canonical registry for all specifications, schemas, and machine-readable contracts in the Convergent Systems ecosystem."
+authors     = ["convergent-systems-co"]
+conforms_to = "schema-atoms/design-spec/atom-spec@1.1.0"
+asset       = "atom-schema-spec@1.0.0-draft.md"
+
+[protocol]
+provenance = "https://github.com/convergent-systems-co/atoms/blob/main/specs/atom-schema-spec-v1.0.0-draft.md"
+license    = "Apache-2.0"
