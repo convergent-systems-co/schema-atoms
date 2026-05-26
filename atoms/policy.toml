@@ -1,0 +1,133 @@
+# atoms/policy.toml — Grammar atom for the policy atom class
+#
+# Defines the structural contract that every policy atom must satisfy.
+# This is a grammar atom: kind = "grammar", class = "policy".
+#
+# Conforms to:
+#   - Atom Spec v1.2.0 (universal envelope, Part I)
+#   - Grammar atom envelope: schema-atoms/toml-schema/grammar-envelope@1.0.0-draft
+
+# ── Universal envelope ──────────────────────────────────────────────────────
+id           = "schema-atoms/toml-schema/grammar-policy"
+version      = "1.0.0-draft"
+content_hash = "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+lifecycle    = "draft"
+created_at   = "2026-05-26T00:00:00Z"
+
+# ── Grammar discriminators ────────────────────────────────────────────────────
+kind  = "grammar"
+name  = "Policy Grammar"
+class = "policy"
+
+description = """
+A policy atom declares a set of rules that govern agent behavior, content
+filtering, or access control. Each rule is evaluated by a policy engine at
+runtime. The enforcement field determines what happens when a rule is triggered.
+"""
+
+# ── Field definitions ─────────────────────────────────────────────────────────
+
+[[fields]]
+name        = "id"
+type        = "string"
+required    = true
+description = "Atom identifier: policy-atoms/policy/<slug>"
+
+[[fields]]
+name        = "version"
+type        = "string"
+required    = true
+description = "SemVer string. Immutable once published."
+
+[[fields]]
+name        = "content_hash"
+type        = "string"
+required    = true
+description = "SHA-256 hex of canonical TOML body excluding [signatures]."
+
+[[fields]]
+name        = "lifecycle"
+type        = "string"
+required    = true
+description = "One of: draft | published | adopted | historic"
+
+[[fields]]
+name        = "created_at"
+type        = "datetime"
+required    = true
+description = "RFC 3339 creation timestamp."
+
+[[fields]]
+name        = "name"
+type        = "string"
+required    = true
+description = "Human-readable display name for this policy."
+
+[[fields]]
+name        = "rules"
+type        = "array"
+required    = true
+description = """
+List of rule definitions. Each entry is a table with keys:
+  id          (string, required) — stable identifier for this rule within the policy
+  description (string, required) — human-readable statement of what the rule checks
+  condition   (string, optional) — machine-evaluable predicate expression
+  action      (string, optional) — override action for this rule: allow | deny | audit
+                                   If absent, the policy-level enforcement applies.
+At least one rule MUST be present.
+"""
+
+[[fields]]
+name        = "enforcement"
+type        = "string"
+required    = true
+description = """
+Default enforcement mode applied when a rule triggers and the rule has no
+per-rule action. One of:
+  allow — permit the action; emit an informational event
+  deny  — block the action; return a policy-violation error
+  audit — permit the action; record a structured audit event for review
+"""
+
+# ── Cross-references to other grammar atoms ───────────────────────────────────
+
+[[references]]
+name        = "grammar_envelope"
+target      = "schema-atoms/toml-schema/grammar-envelope@1.0.0-draft"
+cardinality = "one"
+# This grammar atom conforms to the grammar envelope contract.
+
+# ── Validation constraints ─────────────────────────────────────────────────────
+
+[[constraints]]
+rule = "kind MUST equal \"grammar\""
+
+[[constraints]]
+rule = "class MUST equal \"policy\""
+
+[[constraints]]
+rule = "rules MUST contain at least one entry"
+
+[[constraints]]
+rule = "each rules[].id MUST be unique within the array"
+
+[[constraints]]
+rule = "each rules[].description MUST be a non-empty string"
+
+[[constraints]]
+rule = "enforcement MUST be one of: allow | deny | audit"
+
+[[constraints]]
+rule = "rules[].action, if present, MUST be one of: allow | deny | audit"
+
+[[constraints]]
+rule = "id MUST match the pattern policy-atoms/policy/<slug>"
+
+# ── Signatures (unsigned placeholder) ─────────────────────────────────────────
+[[signatures]]
+algorithm     = "ml-dsa-65"
+signer_role   = "catalog-maintainer"
+signer_key_id = "k_cs_schema_2026"
+signature     = "UNSIGNED-PLACEHOLDER"
+signed_at     = "2026-05-26T00:00:00Z"
+covers        = "content_hash"
