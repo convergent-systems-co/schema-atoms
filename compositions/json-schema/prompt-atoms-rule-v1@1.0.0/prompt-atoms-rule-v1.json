@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://prompt-atoms.com/schemas/rule-v1.json",
+  "title": "prompt-atoms v1 rule",
+  "description": "A rule constrains how atoms and compositions can be combined. Examples: model-compatibility, token-length-constraint, format-compatibility.",
+  "type": "object",
+  "required": ["schema", "type", "id", "version", "name", "predicate", "effect"],
+  "additionalProperties": false,
+  "properties": {
+    "schema": {
+      "type": "string",
+      "const": "https://prompt-atoms.com/schemas/rule-v1.json"
+    },
+    "type": {
+      "type": "string",
+      "enum": ["model-compatibility", "token-length-constraint", "format-compatibility"]
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]{1,62}[a-z0-9]$"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:-[A-Za-z0-9.-]+)?$"
+    },
+    "name": { "type": "string", "minLength": 1, "maxLength": 80 },
+    "description": { "type": "string", "maxLength": 500 },
+    "tags": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1, "maxLength": 40 },
+      "uniqueItems": true
+    },
+    "vendors": {
+      "type": "array",
+      "items": { "type": "string", "enum": ["claude", "gpt", "llama", "gemini", "mistral", "any"] },
+      "uniqueItems": true
+    },
+    "predicate": {
+      "type": "object",
+      "required": ["subject_ref", "condition", "value"],
+      "additionalProperties": false,
+      "properties": {
+        "subject_ref": {
+          "type": "string",
+          "pattern": "^prompt-atoms://(atoms|prompts|rules)/[a-z-]+(?:/[a-z0-9-]+)?$"
+        },
+        "condition": {
+          "type": "string",
+          "enum": ["eq", "neq", "in", "not_in", "gte", "lte", "matches"]
+        },
+        "value": {}
+      }
+    },
+    "effect": {
+      "type": "string",
+      "enum": ["require", "forbid", "warn"]
+    },
+    "rationale": { "type": "string", "maxLength": 500 }
+  }
+}

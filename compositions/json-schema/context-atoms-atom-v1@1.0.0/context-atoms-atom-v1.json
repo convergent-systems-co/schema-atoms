@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://context-atoms.com/schemas/atom-v1.json",
+  "title": "context-atoms v1 atom",
+  "description": "A single atom in the context-atoms catalog. Discriminated by `type`. Type-specific subschemas (situational_frame, environment_descriptor, conversation_scope, working_memory_shape, attention_budget) will be added in a future revision once atom publication begins.",
+  "type": "object",
+  "required": ["schema", "type", "id", "version", "name"],
+  "additionalProperties": true,
+  "properties": {
+    "schema": {
+      "type": "string",
+      "const": "https://context-atoms.com/schemas/atom-v1.json"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "situational-frame",
+        "environment-descriptor",
+        "conversation-scope",
+        "working-memory-shape",
+        "attention-budget"
+      ]
+    },
+    "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]{1,62}[a-z0-9]$" },
+    "version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:-[A-Za-z0-9.-]+)?$" },
+    "name": { "type": "string", "minLength": 1, "maxLength": 80 },
+    "description": { "type": "string", "maxLength": 500 },
+    "tags": { "type": "array", "items": { "type": "string", "minLength": 1, "maxLength": 40 }, "uniqueItems": true }
+  }
+}
