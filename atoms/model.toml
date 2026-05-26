@@ -1,0 +1,159 @@
+# atoms/model.toml — Grammar atom for the model atom class
+#
+# Defines the structural contract that every model atom must satisfy.
+# This is a grammar atom: kind = "grammar", class = "model".
+#
+# Conforms to:
+#   - Atom Spec v1.2.0 (universal envelope, Part I)
+#   - Grammar atom envelope: schema-atoms/toml-schema/grammar-envelope@1.0.0-draft
+
+# ── Universal envelope ──────────────────────────────────────────────────────
+id           = "schema-atoms/toml-schema/grammar-model"
+version      = "1.0.0-draft"
+content_hash = "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+lifecycle    = "draft"
+created_at   = "2026-05-26T00:00:00Z"
+
+# ── Grammar discriminators ────────────────────────────────────────────────────
+kind  = "grammar"
+name  = "Model Grammar"
+class = "model"
+
+description = """
+A model atom is the canonical registry entry for an LLM or other AI model
+available in the platform. It records the provider, model family, context
+window size, a narration quality score, and the capability set the model
+exposes. Model atoms are the authoritative source for routing decisions that
+require model selection based on capability or quality constraints.
+"""
+
+# ── Field definitions ─────────────────────────────────────────────────────────
+
+[[fields]]
+name        = "id"
+type        = "string"
+required    = true
+description = "Atom identifier: model-atoms/model/<slug>"
+
+[[fields]]
+name        = "version"
+type        = "string"
+required    = true
+description = "SemVer string. Immutable once published."
+
+[[fields]]
+name        = "content_hash"
+type        = "string"
+required    = true
+description = "SHA-256 hex of canonical TOML body excluding [signatures]."
+
+[[fields]]
+name        = "lifecycle"
+type        = "string"
+required    = true
+description = "One of: draft | published | adopted | historic"
+
+[[fields]]
+name        = "created_at"
+type        = "datetime"
+required    = true
+description = "RFC 3339 creation timestamp."
+
+[[fields]]
+name        = "name"
+type        = "string"
+required    = true
+description = "Human-readable display name for this model (e.g. \"claude-sonnet-4-6\")."
+
+[[fields]]
+name        = "provider"
+type        = "string"
+required    = true
+description = """
+Name of the organization or service that hosts this model
+(e.g. \"anthropic\", \"openai\", \"google\", \"ollama\", \"mistral\").
+Consumers MUST reject an atom with an absent or empty provider.
+"""
+
+[[fields]]
+name        = "family"
+type        = "string"
+required    = false
+description = """
+Model family or series within the provider's lineup (e.g. \"claude-3\",
+\"gpt-4\", \"gemini-1.5\", \"llama-3\"). Used for family-level routing
+when a specific model version is not required.
+"""
+
+[[fields]]
+name        = "context_window"
+type        = "integer"
+required    = false
+description = """
+Maximum context window size in tokens. A value of 0 or absent means the
+limit is not declared in the atom; callers MUST consult the provider's
+documentation for the actual limit.
+"""
+
+[[fields]]
+name        = "narration_quality"
+type        = "float"
+required    = false
+description = """
+Normalized quality score in [0.0, 1.0] representing the model's suitability
+for narration and long-form prose tasks. 1.0 is best; 0.0 is worst. Derived
+from internal benchmarks. Absent means no score has been assigned.
+"""
+
+[[fields]]
+name        = "capabilities"
+type        = "array"
+required    = false
+description = """
+List of capability strings this model supports (e.g. \"tool-use\",
+\"vision\", \"code-generation\", \"long-context\", \"function-calling\").
+Used for capability-aware model routing.
+"""
+
+# ── Cross-references to other grammar atoms ───────────────────────────────────
+
+[[references]]
+name        = "grammar_envelope"
+target      = "schema-atoms/toml-schema/grammar-envelope@1.0.0-draft"
+cardinality = "one"
+# This grammar atom conforms to the grammar envelope contract.
+
+# ── Validation constraints ─────────────────────────────────────────────────────
+
+[[constraints]]
+rule = "kind MUST equal \"grammar\""
+
+[[constraints]]
+rule = "class MUST equal \"model\""
+
+[[constraints]]
+rule = "name MUST be a non-empty string"
+
+[[constraints]]
+rule = "provider MUST be a non-empty string"
+
+[[constraints]]
+rule = "context_window, if present, MUST be a non-negative integer"
+
+[[constraints]]
+rule = "narration_quality, if present, MUST be in [0.0, 1.0]"
+
+[[constraints]]
+rule = "capabilities entries MUST be non-empty strings"
+
+[[constraints]]
+rule = "id MUST match the pattern model-atoms/model/<slug>"
+
+# ── Signatures (unsigned placeholder) ─────────────────────────────────────────
+[[signatures]]
+algorithm     = "ml-dsa-65"
+signer_role   = "catalog-maintainer"
+signer_key_id = "k_cs_schema_2026"
+signature     = "UNSIGNED-PLACEHOLDER"
+signed_at     = "2026-05-26T00:00:00Z"
+covers        = "content_hash"

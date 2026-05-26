@@ -1,0 +1,166 @@
+# atoms/context.toml — Grammar atom for the context atom class
+#
+# Defines the structural contract that every context atom must satisfy.
+# This is a grammar atom: kind = "grammar", class = "context".
+#
+# Conforms to:
+#   - Atom Spec v1.2.0 (universal envelope, Part I)
+#   - Grammar atom envelope: schema-atoms/toml-schema/grammar-envelope@1.0.0-draft
+
+# ── Universal envelope ──────────────────────────────────────────────────────
+id           = "schema-atoms/toml-schema/grammar-context"
+version      = "1.0.0-draft"
+content_hash = "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+lifecycle    = "draft"
+created_at   = "2026-05-26T00:00:00Z"
+
+# ── Grammar discriminators ────────────────────────────────────────────────────
+kind  = "grammar"
+name  = "Context Grammar"
+class = "context"
+
+description = """
+A context atom is the session envelope for an agent invocation. It binds a
+known identity to one or more communication channels, enumerates the policies
+active for the session, and declares the session lifetime. The context atom
+is the primary composition root for routing and policy enforcement: every
+non-trivial invocation carries one.
+"""
+
+# ── Field definitions ─────────────────────────────────────────────────────────
+
+[[fields]]
+name        = "id"
+type        = "string"
+required    = true
+description = "Atom identifier: context-atoms/context/<slug>"
+
+[[fields]]
+name        = "version"
+type        = "string"
+required    = true
+description = "SemVer string. Immutable once published."
+
+[[fields]]
+name        = "content_hash"
+type        = "string"
+required    = true
+description = "SHA-256 hex of canonical TOML body excluding [signatures]."
+
+[[fields]]
+name        = "lifecycle"
+type        = "string"
+required    = true
+description = "One of: draft | published | adopted | historic"
+
+[[fields]]
+name        = "created_at"
+type        = "datetime"
+required    = true
+description = "RFC 3339 creation timestamp."
+
+[[fields]]
+name        = "name"
+type        = "string"
+required    = true
+description = "Human-readable display name for this context."
+
+[[fields]]
+name        = "identity_ref"
+type        = "atom-ref"
+required    = false
+description = """
+Reference to the identity atom for the principal that owns this session.
+Format: identity-atoms/identity/<slug>@<version>
+When absent, the session is treated as anonymous (trust_level = untrusted).
+"""
+
+[[fields]]
+name        = "channel_refs"
+type        = "array"
+required    = false
+description = """
+List of atom references to channel atoms available in this session.
+Format of each entry: channel-atoms/channel/<slug>@<version>
+An empty or absent list means no channels are declared; I/O is handled
+by default transport.
+"""
+
+[[fields]]
+name        = "active_policies"
+type        = "array"
+required    = false
+description = """
+List of atom references to policy atoms enforced for this session.
+Format of each entry: policy-atoms/policy/<slug>@<version>
+Policies are evaluated in list order; the first matching rule wins.
+An empty or absent list means no policy atoms are active; behavior is
+governed solely by platform defaults.
+"""
+
+[[fields]]
+name        = "session_ttl_seconds"
+type        = "integer"
+required    = false
+description = """
+Maximum session lifetime in seconds from the time the context atom is
+activated. A value of 0 or absent means the session has no declared
+expiry; the platform may still enforce a hard ceiling.
+"""
+
+# ── Cross-references to other grammar atoms ───────────────────────────────────
+
+[[references]]
+name        = "grammar_envelope"
+target      = "schema-atoms/toml-schema/grammar-envelope@1.0.0-draft"
+cardinality = "one"
+# This grammar atom conforms to the grammar envelope contract.
+
+[[references]]
+name        = "identity_ref"
+target      = "schema-atoms/toml-schema/grammar-identity@1.0.0-draft"
+cardinality = "optional"
+# identity_ref, when present, MUST resolve to an identity atom that satisfies
+# the identity grammar.
+
+[[references]]
+name        = "channel_refs"
+target      = "schema-atoms/toml-schema/grammar-channel@1.0.0-draft"
+cardinality = "many"
+# Each entry in channel_refs MUST resolve to a channel atom that satisfies
+# the channel grammar.
+
+# ── Validation constraints ─────────────────────────────────────────────────────
+
+[[constraints]]
+rule = "kind MUST equal \"grammar\""
+
+[[constraints]]
+rule = "class MUST equal \"context\""
+
+[[constraints]]
+rule = "name MUST be a non-empty string"
+
+[[constraints]]
+rule = "identity_ref, if present, MUST be a valid atom reference string"
+
+[[constraints]]
+rule = "each entry in channel_refs MUST be a valid atom reference string"
+
+[[constraints]]
+rule = "each entry in active_policies MUST be a valid atom reference string"
+
+[[constraints]]
+rule = "session_ttl_seconds, if present, MUST be a non-negative integer"
+
+[[constraints]]
+rule = "id MUST match the pattern context-atoms/context/<slug>"
+
+# ── Signatures (unsigned placeholder) ─────────────────────────────────────────
+[[signatures]]
+algorithm     = "ml-dsa-65"
+signer_role   = "catalog-maintainer"
+signer_key_id = "k_cs_schema_2026"
+signature     = "UNSIGNED-PLACEHOLDER"
+signed_at     = "2026-05-26T00:00:00Z"
+covers        = "content_hash"
