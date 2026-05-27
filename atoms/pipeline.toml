@@ -1,0 +1,190 @@
+# atoms/pipeline.toml — Grammar atom for the pipeline atom class
+#
+# Defines the structural contract that every pipeline atom must satisfy.
+# This is a grammar atom: kind = "grammar", class = "pipeline".
+#
+# Conforms to:
+#   - Atom Spec v1.2.0 (universal envelope, Part I)
+#   - Grammar atom envelope: schema-atoms/toml-schema/grammar-envelope@1.0.0-draft
+
+# ── Universal envelope ──────────────────────────────────────────────────────
+id           = "schema-atoms/toml-schema/grammar-pipeline"
+version      = "1.0.0-draft"
+content_hash = "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+lifecycle    = "draft"
+created_at   = "2026-05-26T00:00:00Z"
+
+# ── Grammar discriminators ────────────────────────────────────────────────────
+kind  = "grammar"
+name  = "Pipeline Grammar"
+class = "pipeline"
+
+description = """
+A pipeline atom defines a CI/CD pipeline element — a stage (ordered set of
+steps), step (single runnable unit), or gate (condition that must pass before
+execution proceeds). Pipeline atoms are the building blocks for workflow-atoms
+pipeline compositions and compile to GitHub Actions, Temporal, or other
+workflow runtimes.
+"""
+
+# ── Field definitions ─────────────────────────────────────────────────────────
+
+[[fields]]
+name        = "id"
+type        = "string"
+required    = true
+description = "Atom identifier: pipeline-atoms/pipeline/<slug>"
+
+[[fields]]
+name        = "version"
+type        = "string"
+required    = true
+description = "SemVer string. Immutable once published."
+
+[[fields]]
+name        = "content_hash"
+type        = "string"
+required    = true
+description = "SHA-256 hex of canonical TOML body excluding [signatures]."
+
+[[fields]]
+name        = "lifecycle"
+type        = "string"
+required    = true
+description = "One of: draft | published | adopted | historic"
+
+[[fields]]
+name        = "created_at"
+type        = "datetime"
+required    = true
+description = "RFC 3339 creation timestamp."
+
+[[fields]]
+name        = "name"
+type        = "string"
+required    = true
+description = "Human-readable display name for this pipeline atom."
+
+[[fields]]
+name        = "pipeline_type"
+type        = "string"
+required    = true
+description = """
+The structural role of this pipeline atom. One of:
+  stage — an ordered collection of step references; the unit of parallelism
+          in most CI systems
+  step  — a single runnable unit of work; carries a command and environment
+  gate  — a boolean condition that must evaluate to true before downstream
+          stages or steps execute
+"""
+
+[[fields]]
+name        = "runtime"
+type        = "string"
+required    = true
+description = """
+The workflow runtime this atom targets (e.g. \"github-actions\", \"temporal\",
+\"olympus\", \"argo\", \"tekton\"). Used by compilers to emit runtime-specific
+workflow definitions.
+"""
+
+[[fields]]
+name        = "steps"
+type        = "array"
+required    = false
+description = """
+Ordered list of step references for a stage-type pipeline atom. Each entry
+is a reference string of the form pipeline-atoms/pipeline/<slug>@<version>.
+Only applicable when pipeline_type = \"stage\".
+"""
+
+[[fields]]
+name        = "command"
+type        = "string"
+required    = false
+description = """
+Shell command or executable invocation for a step-type pipeline atom.
+Only applicable when pipeline_type = \"step\". MUST be a non-empty string
+when present.
+"""
+
+[[fields]]
+name        = "condition"
+type        = "string"
+required    = false
+description = """
+Boolean predicate expression that a gate-type pipeline atom evaluates.
+The expression language is runtime-specific (e.g. GitHub Actions expression
+syntax, CEL). Only applicable when pipeline_type = \"gate\".
+"""
+
+[[fields]]
+name        = "timeout_seconds"
+type        = "integer"
+required    = false
+description = """
+Maximum wall-clock duration in seconds allowed for this step or stage. The
+runtime enforces this ceiling and fails the unit if exceeded. MUST be a
+positive integer when present.
+"""
+
+[[fields]]
+name        = "retryable"
+type        = "boolean"
+required    = false
+description = """
+When true, the runtime MAY automatically retry this step on transient
+failure, subject to the runtime's retry policy. Defaults to false when absent.
+"""
+
+# ── Cross-references to other grammar atoms ───────────────────────────────────
+
+[[references]]
+name        = "grammar_envelope"
+target      = "schema-atoms/toml-schema/grammar-envelope@1.0.0-draft"
+cardinality = "one"
+# This grammar atom conforms to the grammar envelope contract.
+
+[[references]]
+name        = "workflow_grammar"
+target      = "schema-atoms/toml-schema/grammar-workflow@1.0.0-draft"
+cardinality = "many"
+# Pipeline atoms are composed into workflow atoms as execution stages and steps.
+
+# ── Validation constraints ─────────────────────────────────────────────────────
+
+[[constraints]]
+rule = "kind MUST equal \"grammar\""
+
+[[constraints]]
+rule = "class MUST equal \"pipeline\""
+
+[[constraints]]
+rule = "pipeline_type MUST be one of: stage | step | gate"
+
+[[constraints]]
+rule = "runtime MUST be a non-empty string"
+
+[[constraints]]
+rule = "steps MUST be present and non-empty when pipeline_type = \"stage\""
+
+[[constraints]]
+rule = "command MUST be present and non-empty when pipeline_type = \"step\""
+
+[[constraints]]
+rule = "condition MUST be present and non-empty when pipeline_type = \"gate\""
+
+[[constraints]]
+rule = "timeout_seconds, if present, MUST be a positive integer"
+
+[[constraints]]
+rule = "id MUST match the pattern pipeline-atoms/pipeline/<slug>"
+
+# ── Signatures (unsigned placeholder) ─────────────────────────────────────────
+[[signatures]]
+algorithm     = "ml-dsa-65"
+signer_role   = "catalog-maintainer"
+signer_key_id = "k_cs_schema_2026"
+signature     = "UNSIGNED-PLACEHOLDER"
+signed_at     = "2026-05-26T00:00:00Z"
+covers        = "content_hash"

@@ -1,0 +1,186 @@
+# atoms/key.toml — Grammar atom for the key atom class
+#
+# Defines the structural contract that every key atom must satisfy.
+# This is a grammar atom: kind = "grammar", class = "key".
+#
+# Conforms to:
+#   - Atom Spec v1.2.0 (universal envelope, Part I)
+#   - Grammar atom envelope: schema-atoms/toml-schema/grammar-envelope@1.0.0-draft
+
+# ── Universal envelope ──────────────────────────────────────────────────────
+id           = "schema-atoms/toml-schema/grammar-key"
+version      = "1.0.0-draft"
+content_hash = "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+lifecycle    = "draft"
+created_at   = "2026-05-26T00:00:00Z"
+
+# ── Grammar discriminators ────────────────────────────────────────────────────
+kind  = "grammar"
+name  = "Key Grammar"
+class = "key"
+
+description = """
+A key atom is a public-key atom in the key-management catalog. It records a
+public key, the key algorithm, the signing role (catalog-maintainer, editor,
+operator), succession references, and revocation status. Private keys NEVER
+appear in atoms — only the public half.
+"""
+
+# ── Field definitions ─────────────────────────────────────────────────────────
+
+[[fields]]
+name        = "id"
+type        = "string"
+required    = true
+description = "Atom identifier: key-atoms/key/<slug>"
+
+[[fields]]
+name        = "version"
+type        = "string"
+required    = true
+description = "SemVer string. Immutable once published."
+
+[[fields]]
+name        = "content_hash"
+type        = "string"
+required    = true
+description = "SHA-256 hex of canonical TOML body excluding [signatures]."
+
+[[fields]]
+name        = "lifecycle"
+type        = "string"
+required    = true
+description = "One of: draft | published | adopted | historic"
+
+[[fields]]
+name        = "created_at"
+type        = "datetime"
+required    = true
+description = "RFC 3339 creation timestamp."
+
+[[fields]]
+name        = "name"
+type        = "string"
+required    = true
+description = "Human-readable display name for this key atom."
+
+[[fields]]
+name        = "algorithm"
+type        = "string"
+required    = true
+description = """
+Cryptographic algorithm family for this key. One of:
+  ed25519   — Edwards-curve Digital Signature Algorithm (255-bit)
+  ml-dsa-65 — NIST FIPS 204 Module-Lattice-Based DSA (post-quantum, security level 3)
+  rsa-4096  — RSA with 4096-bit key (legacy interoperability contexts only)
+"""
+
+[[fields]]
+name        = "key_type"
+type        = "string"
+required    = true
+description = """
+Purpose category of this key record. One of:
+  key        — active public signing key
+  revocation — a key used solely to publish signed revocation notices
+  succession — a key designated to replace a retiring key
+"""
+
+[[fields]]
+name        = "public_key_pem"
+type        = "string"
+required    = true
+description = """
+PEM-encoded public key (BEGIN PUBLIC KEY ... END PUBLIC KEY). Private key
+material MUST NEVER appear in a key atom — this field accepts only the public
+component.
+"""
+
+[[fields]]
+name        = "fingerprint"
+type        = "string"
+required    = true
+description = """
+Canonical fingerprint of the public key. Format: sha256:<base64url-no-pad>.
+Used for compact key identification in signatures and trust-chain lookups.
+"""
+
+[[fields]]
+name        = "signing_role"
+type        = "string"
+required    = false
+description = """
+The organizational role authorized to sign with this key (e.g.
+\"catalog-maintainer\", \"editor\", \"operator\"). Corresponds to the signer_role
+field in atom [[signatures]] blocks.
+"""
+
+[[fields]]
+name        = "successor_ref"
+type        = "string"
+required    = false
+description = """
+Reference to the successor key atom that should take over when this key is
+retired. Format: key-atoms/key/<slug>@<version>.
+"""
+
+[[fields]]
+name        = "revoked_at"
+type        = "datetime"
+required    = false
+description = "RFC 3339 datetime when this key was revoked. Absent means the key is active."
+
+[[fields]]
+name        = "revocation_reason"
+type        = "string"
+required    = false
+description = """
+Human-readable explanation of why this key was revoked. MUST be present when
+revoked_at is set.
+"""
+
+# ── Cross-references to other grammar atoms ───────────────────────────────────
+
+[[references]]
+name        = "grammar_envelope"
+target      = "schema-atoms/toml-schema/grammar-envelope@1.0.0-draft"
+cardinality = "one"
+# This grammar atom conforms to the grammar envelope contract.
+
+# ── Validation constraints ─────────────────────────────────────────────────────
+
+[[constraints]]
+rule = "kind MUST equal \"grammar\""
+
+[[constraints]]
+rule = "class MUST equal \"key\""
+
+[[constraints]]
+rule = "algorithm MUST be one of: ed25519 | ml-dsa-65 | rsa-4096"
+
+[[constraints]]
+rule = "key_type MUST be one of: key | revocation | succession"
+
+[[constraints]]
+rule = "public_key_pem MUST be a non-empty string containing a PEM-encoded public key"
+
+[[constraints]]
+rule = "fingerprint MUST match the pattern sha256:<base64url>"
+
+[[constraints]]
+rule = "revocation_reason MUST be present when revoked_at is set"
+
+[[constraints]]
+rule = "private key material MUST NOT appear in public_key_pem or any other field"
+
+[[constraints]]
+rule = "id MUST match the pattern key-atoms/key/<slug>"
+
+# ── Signatures (unsigned placeholder) ─────────────────────────────────────────
+[[signatures]]
+algorithm     = "ml-dsa-65"
+signer_role   = "catalog-maintainer"
+signer_key_id = "k_cs_schema_2026"
+signature     = "UNSIGNED-PLACEHOLDER"
+signed_at     = "2026-05-26T00:00:00Z"
+covers        = "content_hash"

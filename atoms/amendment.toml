@@ -1,0 +1,175 @@
+# atoms/amendment.toml — Grammar atom for the amendment atom class
+#
+# Defines the structural contract that every amendment atom must satisfy.
+# This is a grammar atom: kind = "grammar", class = "amendment".
+#
+# Conforms to:
+#   - Atom Spec v1.2.0 (universal envelope, Part I)
+#   - Grammar atom envelope: schema-atoms/toml-schema/grammar-envelope@1.0.0-draft
+
+# ── Universal envelope ──────────────────────────────────────────────────────
+id           = "schema-atoms/toml-schema/grammar-amendment"
+version      = "1.0.0-draft"
+content_hash = "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+lifecycle    = "draft"
+created_at   = "2026-05-26T00:00:00Z"
+
+# ── Grammar discriminators ────────────────────────────────────────────────────
+kind  = "grammar"
+name  = "Amendment Grammar"
+class = "amendment"
+
+description = """
+An amendment atom is a typed change proposal for a governance document — a
+constitution, policy, or spec. It records the target document, the proposed
+change text, rationale, and effective date. Amendment atoms create an auditable
+change-control lineage.
+"""
+
+# ── Field definitions ─────────────────────────────────────────────────────────
+
+[[fields]]
+name        = "id"
+type        = "string"
+required    = true
+description = "Atom identifier: amendment-atoms/amendment/<slug>"
+
+[[fields]]
+name        = "version"
+type        = "string"
+required    = true
+description = "SemVer string. Immutable once published."
+
+[[fields]]
+name        = "content_hash"
+type        = "string"
+required    = true
+description = "SHA-256 hex of canonical TOML body excluding [signatures]."
+
+[[fields]]
+name        = "lifecycle"
+type        = "string"
+required    = true
+description = "One of: draft | published | adopted | historic"
+
+[[fields]]
+name        = "created_at"
+type        = "datetime"
+required    = true
+description = "RFC 3339 creation timestamp."
+
+[[fields]]
+name        = "name"
+type        = "string"
+required    = true
+description = "Human-readable display name for this amendment."
+
+[[fields]]
+name        = "target_document_ref"
+type        = "string"
+required    = true
+description = """
+Reference to the governance document this amendment targets.
+Format: <catalog>/<class>/<slug>@<version>  (e.g. constitution-atoms/constitution/olympus-central@1.0.0).
+"""
+
+[[fields]]
+name        = "change_type"
+type        = "string"
+required    = true
+description = """
+Category of change being proposed. One of:
+  additive    — adds new content without altering existing rules
+  corrective  — fixes an error or ambiguity in the target document
+  breaking    — changes meaning in a backward-incompatible way
+  deprecation — marks a section or rule as deprecated
+  revocation  — removes a section or rule entirely
+"""
+
+[[fields]]
+name        = "rationale"
+type        = "string"
+required    = true
+description = """
+Human-readable justification for the amendment. MUST explain why the change
+is necessary. Referenced in audit and governance review processes.
+"""
+
+[[fields]]
+name        = "proposed_text"
+type        = "string"
+required    = false
+description = """
+The verbatim replacement or addition text for the section being amended.
+For revocations, this field is omitted or empty.
+"""
+
+[[fields]]
+name        = "effective_date"
+type        = "datetime"
+required    = false
+description = "RFC 3339 datetime when this amendment takes effect if accepted."
+
+[[fields]]
+name        = "status"
+type        = "string"
+required    = false
+description = """
+Workflow state of this amendment proposal. One of:
+  proposed   — submitted, awaiting review
+  accepted   — approved; change is (or will be) in effect
+  rejected   — reviewed and declined
+  superseded — replaced by a later amendment
+"""
+
+[[fields]]
+name        = "proposed_by"
+type        = "string"
+required    = false
+description = "Identity string of the proposer (e.g. a DID, handle, or key_id)."
+
+# ── Cross-references to other grammar atoms ───────────────────────────────────
+
+[[references]]
+name        = "grammar_envelope"
+target      = "schema-atoms/toml-schema/grammar-envelope@1.0.0-draft"
+cardinality = "one"
+# This grammar atom conforms to the grammar envelope contract.
+
+[[references]]
+name        = "constitution_grammar"
+target      = "schema-atoms/toml-schema/grammar-constitution@1.0.0-draft"
+cardinality = "many"
+# Amendment atoms typically target constitution atoms as their governance document.
+
+# ── Validation constraints ─────────────────────────────────────────────────────
+
+[[constraints]]
+rule = "kind MUST equal \"grammar\""
+
+[[constraints]]
+rule = "class MUST equal \"amendment\""
+
+[[constraints]]
+rule = "target_document_ref MUST be a non-empty string"
+
+[[constraints]]
+rule = "change_type MUST be one of: additive | corrective | breaking | deprecation | revocation"
+
+[[constraints]]
+rule = "rationale MUST be a non-empty string"
+
+[[constraints]]
+rule = "status, if present, MUST be one of: proposed | accepted | rejected | superseded"
+
+[[constraints]]
+rule = "id MUST match the pattern amendment-atoms/amendment/<slug>"
+
+# ── Signatures (unsigned placeholder) ─────────────────────────────────────────
+[[signatures]]
+algorithm     = "ml-dsa-65"
+signer_role   = "catalog-maintainer"
+signer_key_id = "k_cs_schema_2026"
+signature     = "UNSIGNED-PLACEHOLDER"
+signed_at     = "2026-05-26T00:00:00Z"
+covers        = "content_hash"

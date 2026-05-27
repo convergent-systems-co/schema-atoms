@@ -1,0 +1,170 @@
+# atoms/constitution.toml — Grammar atom for the constitution atom class
+#
+# Defines the structural contract that every constitution atom must satisfy.
+# This is a grammar atom: kind = "grammar", class = "constitution".
+#
+# Conforms to:
+#   - Atom Spec v1.2.0 (universal envelope, Part I)
+#   - Grammar atom envelope: schema-atoms/toml-schema/grammar-envelope@1.0.0-draft
+
+# ── Universal envelope ──────────────────────────────────────────────────────
+id           = "schema-atoms/toml-schema/grammar-constitution"
+version      = "1.0.0-draft"
+content_hash = "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+lifecycle    = "draft"
+created_at   = "2026-05-26T00:00:00Z"
+
+# ── Grammar discriminators ────────────────────────────────────────────────────
+kind  = "grammar"
+name  = "Constitution Grammar"
+class = "constitution"
+
+description = """
+A constitution atom defines the foundational governance document for an
+organization or system. It assembles charters (mission, values, scope) and
+bylaws (procedures, quorum, voting rules) into a ratified governance corpus
+that policy-atoms and compliance-atoms reference.
+"""
+
+# ── Field definitions ─────────────────────────────────────────────────────────
+
+[[fields]]
+name        = "id"
+type        = "string"
+required    = true
+description = "Atom identifier: constitution-atoms/constitution/<slug>"
+
+[[fields]]
+name        = "version"
+type        = "string"
+required    = true
+description = "SemVer string. Immutable once published."
+
+[[fields]]
+name        = "content_hash"
+type        = "string"
+required    = true
+description = "SHA-256 hex of canonical TOML body excluding [signatures]."
+
+[[fields]]
+name        = "lifecycle"
+type        = "string"
+required    = true
+description = "One of: draft | published | adopted | historic"
+
+[[fields]]
+name        = "created_at"
+type        = "datetime"
+required    = true
+description = "RFC 3339 creation timestamp."
+
+[[fields]]
+name        = "name"
+type        = "string"
+required    = true
+description = "Human-readable display name for this constitution."
+
+[[fields]]
+name        = "charters"
+type        = "array"
+required    = true
+description = """
+List of charter references that form the foundational mission, values, and
+scope declarations of this constitution. Each entry is a reference string of
+the form <catalog>/<class>/<slug>@<version>. At least one MUST be present.
+"""
+
+[[fields]]
+name        = "bylaws"
+type        = "array"
+required    = false
+description = """
+List of bylaw references defining procedural rules — quorum requirements,
+voting thresholds, amendment procedures. Each entry is a reference string
+of the form <catalog>/<class>/<slug>@<version>.
+"""
+
+[[fields]]
+name        = "principles"
+type        = "array"
+required    = false
+description = """
+List of principle references encoding non-procedural normative commitments
+(e.g. guiding values, operating principles). Each entry is a reference
+string of the form <catalog>/<class>/<slug>@<version>.
+"""
+
+[[fields]]
+name        = "federation"
+type        = "string"
+required    = false
+description = """
+Identifier of the federation or parent governance body this constitution
+belongs to. Used by olympus-central for multi-organization governance trees.
+"""
+
+[[fields]]
+name        = "ratified_at"
+type        = "datetime"
+required    = false
+description = "RFC 3339 datetime when this constitution was ratified."
+
+[[fields]]
+name        = "status"
+type        = "string"
+required    = false
+description = """
+Current standing of this constitution. One of:
+  draft      — under authorship or review
+  ratified   — approved and in force
+  superseded — replaced by a newer version of this constitution
+"""
+
+# ── Cross-references to other grammar atoms ───────────────────────────────────
+
+[[references]]
+name        = "grammar_envelope"
+target      = "schema-atoms/toml-schema/grammar-envelope@1.0.0-draft"
+cardinality = "one"
+# This grammar atom conforms to the grammar envelope contract.
+
+[[references]]
+name        = "amendment_grammar"
+target      = "schema-atoms/toml-schema/grammar-amendment@1.0.0-draft"
+cardinality = "many"
+# Constitution atoms are the primary target of amendment atoms.
+
+[[references]]
+name        = "policy_grammar"
+target      = "schema-atoms/toml-schema/grammar-policy@1.0.0-draft"
+cardinality = "many"
+# Policy atoms may reference a constitution as their governing instrument.
+
+# ── Validation constraints ─────────────────────────────────────────────────────
+
+[[constraints]]
+rule = "kind MUST equal \"grammar\""
+
+[[constraints]]
+rule = "class MUST equal \"constitution\""
+
+[[constraints]]
+rule = "charters MUST contain at least one entry"
+
+[[constraints]]
+rule = "each charters entry MUST be a non-empty string"
+
+[[constraints]]
+rule = "status, if present, MUST be one of: draft | ratified | superseded"
+
+[[constraints]]
+rule = "id MUST match the pattern constitution-atoms/constitution/<slug>"
+
+# ── Signatures (unsigned placeholder) ─────────────────────────────────────────
+[[signatures]]
+algorithm     = "ml-dsa-65"
+signer_role   = "catalog-maintainer"
+signer_key_id = "k_cs_schema_2026"
+signature     = "UNSIGNED-PLACEHOLDER"
+signed_at     = "2026-05-26T00:00:00Z"
+covers        = "content_hash"
