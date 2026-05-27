@@ -1,0 +1,159 @@
+# atoms/grammar-envelope.toml — Meta-grammar: the schema of all grammar atoms
+#
+# Defines the structural contract that every grammar atom itself must satisfy.
+# This is the "schema of schema-atoms" — the atom that bootstraps the type
+# system by defining the shape of all other grammar atoms.
+#
+# Conforms to:
+#   - Atom Spec v1.2.0 (universal envelope, Part I)
+#
+# Self-referential: this atom conforms to the contract it defines.
+
+# ── Universal envelope ──────────────────────────────────────────────────────
+id           = "schema-atoms/toml-schema/grammar-envelope"
+version      = "1.0.0-draft"
+content_hash = "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+lifecycle    = "draft"
+created_at   = "2026-05-27T00:00:00Z"
+
+# ── Grammar discriminators ────────────────────────────────────────────────────
+kind  = "grammar"
+name  = "Grammar Envelope"
+class = "grammar-envelope"
+
+description = """
+The grammar envelope is the meta-grammar: it defines the structural contract
+that every grammar atom in schema-atoms must satisfy. All other grammar atoms
+(persona, policy, agent, github, …) conform to this envelope.
+
+A grammar atom is a TOML document that:
+  - carries the universal atom envelope (id, version, content_hash, lifecycle, created_at)
+  - sets kind = "grammar" and class = "<atom-class>"
+  - declares [[fields]] entries describing every required and optional field
+    of atoms in that class
+  - declares [[constraints]] as plain-English validation rules
+  - optionally declares [[references]] to other grammar atoms
+  - carries an unsigned [[signatures]] placeholder
+
+The grammar envelope is self-hosting: this very document satisfies its own
+contract, making the type system bootstrappable without external authority.
+"""
+
+# ── Required envelope fields ──────────────────────────────────────────────────
+# Every grammar atom MUST include these fields in its TOML body.
+
+[[fields]]
+name        = "id"
+type        = "string"
+required    = true
+pattern     = "^schema-atoms/toml-schema/grammar-[a-z][a-z0-9-]*$"
+description = "Stable, globally-unique identifier for this grammar atom."
+
+[[fields]]
+name        = "version"
+type        = "string"
+required    = true
+pattern     = "^[0-9]+\\.[0-9]+\\.[0-9]+(-[a-z][a-z0-9-]*)?$"
+description = "SemVer. Immutable once a grammar atom reaches lifecycle=published."
+
+[[fields]]
+name        = "content_hash"
+type        = "string"
+required    = true
+description = "SHA-256 hex of the canonical TOML body (excluding [signatures]). Empty string during authoring; filled by canonicalize tool before signing."
+
+[[fields]]
+name        = "lifecycle"
+type        = "string"
+required    = true
+allowed     = ["draft", "published", "adopted", "historic"]
+description = "Publication state. Published grammar atoms define a stable contract consumers may depend on."
+
+[[fields]]
+name        = "created_at"
+type        = "datetime"
+required    = true
+description = "RFC 3339 timestamp of first authorship."
+
+[[fields]]
+name        = "kind"
+type        = "string"
+required    = true
+const       = "grammar"
+description = "Discriminator. MUST be the literal string 'grammar'."
+
+[[fields]]
+name        = "name"
+type        = "string"
+required    = true
+description = "Human-readable display name for this grammar atom."
+
+[[fields]]
+name        = "class"
+type        = "string"
+required    = true
+description = "The atom class this grammar defines (e.g. 'persona', 'policy', 'github'). MUST match the filename: atoms/<class>.toml."
+
+[[fields]]
+name        = "description"
+type        = "string"
+required    = true
+description = "Multi-line prose description of the atom class and its purpose in the ecosystem."
+
+[[fields]]
+name        = "fields"
+type        = "array-of-tables"
+required    = true
+min_items   = 1
+description = "Ordered list of field definitions. Each entry MUST have name, type, and required. May include pattern, const, allowed, min_items, description."
+
+[[fields]]
+name        = "constraints"
+type        = "array-of-tables"
+required    = false
+description = "Plain-English validation rules that go beyond JSON Schema expressiveness."
+
+[[fields]]
+name        = "references"
+type        = "array-of-tables"
+required    = false
+description = "Cross-references to other grammar atoms this grammar depends on or extends."
+
+[[fields]]
+name        = "signatures"
+type        = "array-of-tables"
+required    = true
+min_items   = 1
+description = "Signing metadata. At draft stage, one entry with signature='UNSIGNED-PLACEHOLDER' is required. Published grammar atoms MUST carry a real signature from the catalog-maintainer role."
+
+# ── Constraints ───────────────────────────────────────────────────────────────
+
+[[constraints]]
+rule = "kind MUST equal \"grammar\""
+
+[[constraints]]
+rule = "class MUST match the stem of the filename: atoms/<class>.toml"
+
+[[constraints]]
+rule = "At least one [[fields]] entry MUST have required=true"
+
+[[constraints]]
+rule = "Every [[fields]] entry MUST have a non-empty 'name' and a non-empty 'type'"
+
+[[constraints]]
+rule = "The 'id' field MUST match pattern: schema-atoms/toml-schema/grammar-<class>"
+
+[[constraints]]
+rule = "A grammar atom in lifecycle=published MUST have a non-placeholder signature from role=catalog-maintainer"
+
+[[constraints]]
+rule = "content_hash MUST be the SHA-256 hex digest of the canonical TOML body when lifecycle != draft"
+
+# ── Signatures ────────────────────────────────────────────────────────────────
+[[signatures]]
+algorithm     = "ml-dsa-65"
+signer_role   = "catalog-maintainer"
+signer_key_id = "k_cs_schema_2026"
+signature     = "UNSIGNED-PLACEHOLDER"
+signed_at     = "2026-05-27T00:00:00Z"
+covers        = "content_hash"

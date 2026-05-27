@@ -1,0 +1,133 @@
+# atoms/github.toml — Grammar atom for the github atom class
+#
+# Defines the structural contract that every github atom must satisfy.
+# This is a grammar atom: kind = "grammar", class = "github".
+#
+# Conforms to:
+#   - Atom Spec v1.2.0 (universal envelope, Part I)
+#   - Grammar atom envelope: schema-atoms/toml-schema/grammar-envelope@1.0.0-draft
+#
+# Catalog: action-atoms.com — atomic GitHub Actions catalog.
+
+# ── Universal envelope ──────────────────────────────────────────────────────
+id           = "schema-atoms/toml-schema/grammar-github"
+version      = "1.0.0-draft"
+content_hash = "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+lifecycle    = "draft"
+created_at   = "2026-05-27T00:00:00Z"
+
+# ── Grammar discriminators ────────────────────────────────────────────────────
+kind  = "grammar"
+name  = "GitHub Action Grammar"
+class = "github"
+
+description = """
+A github atom catalogs a single GitHub Actions step — either a reusable
+action (uses:) or a run: script snippet. It records the canonical action
+reference, default inputs, expected outputs, and the CI/CD context in which
+the step is appropriate.
+
+github atoms are the build blocks for composite action-atoms compositions,
+which assemble ordered step sequences into reusable CI/CD workflows.
+"""
+
+# ── Field definitions ─────────────────────────────────────────────────────────
+
+[[fields]]
+name        = "id"
+type        = "string"
+required    = true
+description = "Atom identifier: action-atoms/github/<slug>"
+
+[[fields]]
+name        = "version"
+type        = "string"
+required    = true
+description = "SemVer string. Immutable once published."
+
+[[fields]]
+name        = "content_hash"
+type        = "string"
+required    = true
+description = "SHA-256 hex of canonical TOML body excluding [signatures]."
+
+[[fields]]
+name        = "lifecycle"
+type        = "string"
+required    = true
+description = "One of: draft | published | adopted | historic"
+
+[[fields]]
+name        = "created_at"
+type        = "datetime"
+required    = true
+description = "RFC 3339 creation timestamp."
+
+[[fields]]
+name        = "name"
+type        = "string"
+required    = true
+description = "Human-readable display name (e.g. 'actions/checkout@v4')."
+
+[[fields]]
+name        = "description"
+type        = "string"
+required    = false
+description = "Purpose of the action and typical use context."
+
+[[fields]]
+name        = "action_ref"
+type        = "string"
+required    = true
+description = "The GitHub Actions reference string (e.g. 'actions/checkout@v4', 'trufflesecurity/trufflehog@v3.95.3')."
+
+[[fields]]
+name        = "inputs"
+type        = "table"
+required    = false
+description = "Default input values keyed by input name."
+
+[[fields]]
+name        = "outputs"
+type        = "array"
+required    = false
+description = "Names of outputs this action exposes."
+
+[[fields]]
+name        = "tags"
+type        = "array"
+required    = false
+description = "Searchable tags (e.g. 'checkout', 'security', 'deploy', 'setup')."
+
+# ── Cross-references ──────────────────────────────────────────────────────────
+
+[[references]]
+name        = "grammar_envelope"
+target      = "schema-atoms/toml-schema/grammar-envelope@1.0.0-draft"
+cardinality = "one"
+
+# ── Validation constraints ─────────────────────────────────────────────────────
+
+[[constraints]]
+rule = "kind MUST equal \"grammar\""
+
+[[constraints]]
+rule = "class MUST equal \"github\""
+
+[[constraints]]
+rule = "action_ref MUST be a non-empty string in the form '<owner>/<repo>@<ref>' or a plain run: script identifier"
+
+[[constraints]]
+rule = "id MUST match the pattern action-atoms/github/<slug>"
+
+[[constraints]]
+rule = "tags entries, if present, MUST be non-empty lowercase strings"
+
+# ── Signatures (unsigned placeholder) ─────────────────────────────────────────
+[[signatures]]
+algorithm     = "ml-dsa-65"
+signer_role   = "catalog-maintainer"
+signer_key_id = "k_cs_schema_2026"
+signature     = "UNSIGNED-PLACEHOLDER"
+signed_at     = "2026-05-27T00:00:00Z"
+covers        = "content_hash"
