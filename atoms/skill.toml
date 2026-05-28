@@ -3,8 +3,12 @@
 # Defines the structural contract that every skill atom must satisfy.
 # This is a grammar atom: kind = "grammar", class = "skill".
 #
+# Conforming catalogs:
+#   - skill-atoms.com  (JSON atoms, schema: skill-atoms.com/schemas/atom-v1.json)
+#   - ai-atoms.com     (JSON atoms, schema: ai-atoms.com/schemas/skill-v1.json)
+#
 # Conforms to:
-#   - Atom Spec v1.2.0 (universal envelope, Part I)
+#   - Atom Spec v1.3.0 (universal envelope, Part I)
 #   - Grammar atom envelope: schema-atoms/toml-schema/grammar-envelope@1.0.0-draft
 
 # ── Universal envelope ──────────────────────────────────────────────────────
@@ -26,6 +30,14 @@ skill, the system-prompt fragment the agent uses when exercising it, an
 invocation contract (inputs, outputs, side effects), and catalog metadata.
 Skills are the primitive building blocks from which prompt compositions and
 agentic personas are assembled.
+
+Two conforming catalogs define this class:
+  skill-atoms.com — general-purpose skill primitives for AI runtimes.
+                    JSON atoms validated against skill-atoms.com/schemas/atom-v1.json.
+                    id pattern: skill-atoms/skill/<slug>
+  ai-atoms.com    — AI governance and agentic workflow skills.
+                    JSON atoms validated against ai-atoms.com/schemas/skill-v1.json.
+                    id pattern: skill/<slug>. Adds invocation[] and platforms[].
 """
 
 # ── Field definitions ─────────────────────────────────────────────────────────
@@ -34,7 +46,7 @@ agentic personas are assembled.
 name        = "id"
 type        = "string"
 required    = true
-description = "Atom identifier: skill-atoms/skill/<slug>"
+description = "Atom identifier. skill-atoms pattern: skill-atoms/skill/<slug>. ai-atoms pattern: skill/<slug>. Both use kebab-case slugs."
 
 [[fields]]
 name        = "version"
@@ -82,7 +94,19 @@ description = "The prompt text injected into the system message when this skill 
 name        = "applicable_domains"
 type        = "array"
 required    = false
-description = "Domain tags: code, debug, testing, documentation, git, architecture, etc."
+description = "Domain tags: code, debug, testing, documentation, git, architecture, etc. Required by ai-atoms.com/schemas/skill-v1.json (minItems: 1)."
+
+[[fields]]
+name        = "invocation"
+type        = "array"
+required    = false
+description = """
+Slash-command invocation forms, e.g. ["/debug", "/debug \"<symptom>\""].
+First entry is the primary command; subsequent entries are subcommands or
+argument variants shown indented below the primary on the skills page.
+Introduced by ai-atoms.com/schemas/skill-v1.json. Omit for skills without
+a slash-command entry point.
+"""
 
 [[fields]]
 name        = "invocation_contract"
@@ -140,11 +164,18 @@ rule = "tags entries, if present, MUST be non-empty strings"
 rule = "lifecycle MUST be one of: draft | stable | deprecated | retired"
 
 [[constraints]]
-rule = "id MUST match the pattern skill-atoms/skill/<slug>"
+rule = "id MUST match skill-atoms/skill/<slug> (skill-atoms catalog) or skill/<slug> (ai-atoms catalog)"
+
+[[constraints]]
+rule = "invocation entries, if present, MUST be non-empty strings; primary entry SHOULD start with '/'"
 
 # ── Cross-references (non-grammar) ────────────────────────────────────────────
+# skill-atoms.com: normative JSON Schema for the skill-atoms catalog
 json_schema_ref = "skill-atoms.com/schemas/atom-v1"
 catalog_ref     = "skill-atoms.com/skills/skill"
+# ai-atoms.com: normative JSON Schema for the ai-atoms catalog (adds invocation, platforms)
+ai_json_schema_ref = "ai-atoms.com/schemas/skill-v1.json"
+ai_catalog_ref     = "ai-atoms.com/atoms/skill/"
 
 # ── Signatures (unsigned placeholder) ─────────────────────────────────────────
 [[signatures]]

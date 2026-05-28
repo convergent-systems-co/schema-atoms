@@ -40,6 +40,9 @@ atom_types:
   - ontology
   - controlled-vocabulary
   - code-list
+  # Family: grammar (structural contracts for atom classes in other catalogs)
+  - skill
+  - hook
 
 composition_type: spec-compositions
 composition_dir: compositions/

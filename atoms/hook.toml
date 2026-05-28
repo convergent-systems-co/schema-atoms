@@ -1,0 +1,234 @@
+# atoms/hook.toml — Grammar atom for the hook atom class
+#
+# Defines the structural contract that every hook atom must satisfy.
+# This is a grammar atom: kind = "grammar", class = "hook".
+#
+# Conforming catalog:
+#   - ai-atoms.com (JSON atoms, schema: ai-atoms.com/schemas/hook-v1.json)
+#
+# Conforms to:
+#   - Atom Spec v1.3.0 (universal envelope, Part I)
+#   - Grammar atom envelope: schema-atoms/toml-schema/grammar-envelope@1.0.0-draft
+
+# ── Universal envelope ──────────────────────────────────────────────────────
+id           = "schema-atoms/toml-schema/grammar-hook"
+version      = "1.0.0-draft"
+content_hash = "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+lifecycle    = "draft"
+created_at   = "2026-05-28T00:00:00Z"
+
+# ── Grammar discriminators ────────────────────────────────────────────────────
+kind  = "grammar"
+name  = "Hook Grammar"
+class = "hook"
+
+description = """
+A hook atom is an event-driven runtime behavior wired into AI tool
+infrastructure. Hooks respond to named events emitted by an AI tool
+(e.g. Claude Code's PreToolUse, PostToolUse, SessionStart, Stop) and
+execute a script that either blocks the triggering operation (blocking hook)
+or observes/audits it without interference (non-blocking hook).
+
+Hooks are installed by 'ai hooks install --all' which writes portable
+settings.json entries of the form:
+    {"command": "ai hooks run <slug>"}
+The 'ai hooks run' command discovers the correct Python binary and path
+at runtime, making hook wiring identical across macOS, Linux, and Windows.
+
+The conforming catalog is ai-atoms.com (JSON atoms validated against
+ai-atoms.com/schemas/hook-v1.json). id pattern: hook/<slug>.
+"""
+
+# ── Field definitions ─────────────────────────────────────────────────────────
+
+[[fields]]
+name        = "schema"
+type        = "string"
+required    = true
+description = "Must be exactly: https://ai-atoms.com/schemas/hook-v1.json"
+
+[[fields]]
+name        = "type"
+type        = "string"
+required    = true
+description = "Must be exactly: hook"
+
+[[fields]]
+name        = "id"
+type        = "string"
+required    = true
+description = "Stable namespaced identifier. Pattern: hook/<slug> (kebab-case). e.g. hook/branch-guard."
+
+[[fields]]
+name        = "version"
+type        = "string"
+required    = true
+description = "SemVer string. Patch for behavior tweaks; minor for new fields; major for breaking input/output contract changes."
+
+[[fields]]
+name        = "name"
+type        = "string"
+required    = true
+description = "Short human-readable display name. Maximum 80 characters."
+
+[[fields]]
+name        = "description"
+type        = "string"
+required    = true
+description = "What this hook does, what event it responds to, and what it enforces or emits. Maximum 1000 characters."
+
+[[fields]]
+name        = "event"
+type        = "string"
+required    = true
+description = """
+The AI tool event this hook responds to. Known Claude Code events:
+  PreToolUse       — fires before any tool call executes
+  PostToolUse      — fires after a tool call returns
+  SessionStart     — fires when a session begins
+  UserPromptSubmit — fires when the user submits a prompt
+  Stop             — fires when the main agent finishes a turn
+  SessionEnd       — fires when a session ends
+  SubagentStop     — fires when a subagent finishes a turn
+  PreCompact       — fires before context compaction runs
+"""
+
+[[fields]]
+name        = "language"
+type        = "string"
+required    = true
+description = "Implementation language. One of: python | bash | javascript | typescript. Python is strongly preferred for cross-platform compatibility via 'ai hooks run'."
+
+[[fields]]
+name        = "trigger"
+type        = "object"
+required    = true
+description = """
+Condition under which this hook fires within its event.
+  trigger.type    (required) — one of: tool-name | file-pattern | always | tool-category
+  trigger.pattern (optional) — glob or regex matched against tool name or file path.
+                               Required when trigger.type is tool-name or file-pattern.
+Examples:
+  {type = "tool-name", pattern = "Bash"} — fires only when the Bash tool is called.
+  {type = "always"} — fires on every instance of the declared event.
+  {type = "file-pattern", pattern = ".github/workflows/*.yml"} — fires on workflow edits.
+"""
+
+[[fields]]
+name        = "blocking"
+type        = "bool"
+required    = false
+description = """
+When true, the hook can abort the triggering operation by emitting a JSON
+permissionDecision deny object to stdout and exiting 0. When false (or absent),
+the hook is advisory — it may emit output or write audit records but MUST NOT
+attempt to block the operation. A blocking hook MUST always exit 0; a non-zero
+exit is treated as a hook failure, not a deny decision.
+"""
+
+[[fields]]
+name        = "side_effects"
+type        = "array"
+required    = false
+description = "Observable effects as human-readable strings. e.g. 'writes to ~/.ai/audit/', 'emits warning to stderr', 'modifies git argv'."
+
+[[fields]]
+name        = "script_path"
+type        = "string"
+required    = false
+description = "Relative path to the hook implementation script within this repository. Used when the script is committed alongside the atom."
+
+[[fields]]
+name        = "platforms"
+type        = "array"
+required    = false
+description = "Platforms on which this hook's logic is verified: linux | macos | windows. Omit to mean all platforms. Hook wiring via 'ai hooks run <slug>' is always cross-platform regardless of this field."
+
+[[fields]]
+name        = "platform_notes"
+type        = "string"
+required    = false
+description = "Human-readable notes about platform-specific behavior. Should reference 'ai hooks run <slug>' as the universal cross-platform invocation form."
+
+[[fields]]
+name        = "authored_by"
+type        = "string"
+required    = false
+description = "Key atom ID or author identifier (e.g. convergent-systems-key)."
+
+[[fields]]
+name        = "tags"
+type        = "array"
+required    = false
+description = "Searchable tag strings. Maximum 40 characters per tag."
+
+[[fields]]
+name        = "lifecycle"
+type        = "string"
+required    = false
+description = "Lifecycle stage: draft | stable | deprecated. Defaults to draft when absent."
+
+# ── Cross-references to other grammar atoms ───────────────────────────────────
+
+[[references]]
+name        = "grammar_envelope"
+target      = "schema-atoms/toml-schema/grammar-envelope@1.0.0-draft"
+cardinality = "one"
+
+[[references]]
+name        = "skill_grammar"
+target      = "schema-atoms/toml-schema/grammar-skill@1.0.0-draft"
+cardinality = "optional"
+# Hooks and skills are sibling classes in the ai-atoms catalog. A hook may
+# be the enforcement layer for a skill's declared invocation contract.
+
+# ── Cross-references (non-grammar) ────────────────────────────────────────────
+json_schema_ref = "ai-atoms.com/schemas/hook-v1.json"
+catalog_ref     = "ai-atoms.com/atoms/hook/"
+
+# ── Validation constraints ─────────────────────────────────────────────────────
+
+[[constraints]]
+rule = "kind MUST equal \"grammar\""
+
+[[constraints]]
+rule = "class MUST equal \"hook\""
+
+[[constraints]]
+rule = "type field in hook atom MUST equal \"hook\""
+
+[[constraints]]
+rule = "id MUST match the pattern ^hook/[a-z0-9][a-z0-9-]*$"
+
+[[constraints]]
+rule = "event MUST be a non-empty string naming a known AI tool event"
+
+[[constraints]]
+rule = "language MUST be one of: python, bash, javascript, typescript"
+
+[[constraints]]
+rule = "trigger.type MUST be one of: tool-name, file-pattern, always, tool-category"
+
+[[constraints]]
+rule = "trigger.pattern MUST be present when trigger.type is tool-name or file-pattern"
+
+[[constraints]]
+rule = "A blocking hook MUST emit JSON {hookSpecificOutput: {permissionDecision: 'deny'}} to stdout and exit 0"
+
+[[constraints]]
+rule = "A non-blocking hook MUST exit 0 under all conditions"
+
+[[constraints]]
+rule = "platforms entries, if present, MUST each be one of: linux, macos, windows"
+
+[[constraints]]
+rule = "lifecycle, if present, MUST be one of: draft, stable, deprecated"
+
+# ── Signatures (unsigned placeholder) ─────────────────────────────────────────
+[[signatures]]
+algorithm     = "ml-dsa-65"
+signer_role   = "catalog-maintainer"
+signer_key_id = "k_cs_schema_2026"
+signature     = "UNSIGNED-PLACEHOLDER"
+signed_at     = "2026-05-28T00:00:00Z"
+covers        = "content_hash"
