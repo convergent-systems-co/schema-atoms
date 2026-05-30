@@ -1,0 +1,192 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schema-atoms.com/v1/skill.schema.json",
+  "title": "skill (canonical)",
+  "description": "A skill atom — a bounded, invocable unit of AI capability with a declared system-prompt fragment, inputs, outputs, and side effects.",
+  "type": "object",
+  "required": [
+    "schema",
+    "type",
+    "id",
+    "version",
+    "name",
+    "description",
+    "system_prompt_fragment",
+    "applicable_domains"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema": {
+      "type": "string",
+      "const": "https://schema-atoms.com/v1/skill.schema.json"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "skill"
+      ]
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^skill/[a-z0-9][a-z0-9-]*$",
+      "description": "Namespaced identifier in the form skill/<slug>."
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:-[A-Za-z0-9.-]+)?$",
+      "description": "Semantic version of this skill atom."
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 80,
+      "description": "Human-readable display name."
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1000,
+      "description": "What this skill does, when to invoke it, and what it prevents."
+    },
+    "system_prompt_fragment": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The prompt fragment injected into an AI agent's system context when this skill is loaded. Must be self-contained and actionable."
+    },
+    "applicable_domains": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "minItems": 1,
+      "uniqueItems": true,
+      "description": "Domains where this skill applies (e.g. code, design, planning, debug, agents)."
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "coding",
+        "dotnet",
+        "data",
+        "design",
+        "product",
+        "operations",
+        "finance",
+        "legal",
+        "sales",
+        "marketing",
+        "hr",
+        "support",
+        "knowledge",
+        "governance"
+      ],
+      "description": "Single primary category used to group skills for selection/presentation. Display names: coding=Engineering & Coding, dotnet=.NET / Microsoft Engineering, data=Data, Analytics & Research, design=Design & UX, product=Product & Delivery, operations=Operations & IT, finance=Finance & Accounting, legal=Legal & Compliance, sales=Sales & CRM, marketing=Marketing & Content, hr=People & HR, support=Customer Support, knowledge=Knowledge & Docs, governance=Governance & Meta."
+    },
+    "depends_on": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^skill/[a-z0-9][a-z0-9-]*$"
+      },
+      "uniqueItems": true,
+      "description": "Sub-skills this skill installs on `ai skills install` and hides from the top-level catalog list (dispatcher pattern). Each entry is a namespaced skill id, e.g. \"skill/make-work\"."
+    },
+    "invocation_contract": {
+      "type": "object",
+      "description": "Declared inputs, outputs, and side effects for this skill.",
+      "additionalProperties": false,
+      "properties": {
+        "inputs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "name",
+              "type"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string"
+              },
+              "required": {
+                "type": "boolean"
+              },
+              "description": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "outputs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "name",
+              "type"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "side_effects": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "invocation": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "description": "Slash-command invocation forms, e.g. [\"/debug\", \"/debug \\\"<symptom>\\\"\", \"/debug --error <log>\"]. Omit for skills with no slash-command entry point.",
+      "uniqueItems": true
+    },
+    "authored_by": {
+      "type": "string",
+      "description": "Key atom ID or author identifier (e.g. 'convergent-systems-key', 'anthropics', 'kepano')."
+    },
+    "source_url": {
+      "type": "string",
+      "description": "URL of the original source file when this atom was imported from an external open-source repository. Used for attribution and tracking upstream changes."
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 40
+      },
+      "uniqueItems": true
+    },
+    "lifecycle": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "stable",
+        "deprecated"
+      ],
+      "description": "Lifecycle stage of this skill atom."
+    }
+  }
+}
